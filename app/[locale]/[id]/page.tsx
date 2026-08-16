@@ -49,7 +49,7 @@ export default function ProductPage({ params }: { params: Promise<{ locale: stri
       <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-[var(--color-accent)]/10 blur-[80px] rounded-full pointer-events-none animate-orb-2 -z-10" />
 
       {/* Hero Image */}
-      <div className="fixed top-0 left-0 w-full h-[45vh] sm:h-[50vh] md:h-[55vh] xl:h-[60vh] -z-20">
+      <div className="fixed inset-x-0 top-0 h-[45vh] sm:h-[50vh] md:h-[55vh] xl:h-[60vh] z-0 overflow-hidden">
         <Image
           src={product.image}
           alt={product.name}
