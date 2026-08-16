@@ -21,19 +21,23 @@ import {
   Check,
 } from 'lucide-react';
 import { storeInfo, isStoreOpen } from '@/data/storeInfo';
-import { THEME_STORAGE_KEY } from '@/config/theme';
+import {
+  THEME_STORAGE_KEY,
+  DEFAULT_THEME_COLORS,
+  getStoredThemePalette,
+  normalizeThemePalette,
+  setThemePalette,
+} from '@/config/theme';
 import { i18n } from '@/config/i18n';
 import { useLocaleTransition } from '@/context/LocaleTransitionContext';
 
 // ─── Helpers ───────────────────────────────────────────────
 
-// Format a time string (HH:mm) using the given locale
 function formatTimeLocalized(time24: string, locale: string): string {
   const [h, m] = time24.split(':').map(Number);
   const date = new Date();
   date.setHours(h, m, 0, 0);
 
-  // For Arabic, use 24-hour format; for others, keep 12-hour with AM/PM
   const options: Intl.DateTimeFormatOptions = {
     hour: 'numeric',
     minute: '2-digit',
@@ -42,9 +46,8 @@ function formatTimeLocalized(time24: string, locale: string): string {
   return new Intl.DateTimeFormat(locale, options).format(date);
 }
 
-// Get today's working hours from storeInfo
 function getTodayHours() {
-  const today = new Date().getDay(); // 0=Sunday, 6=Saturday
+  const today = new Date().getDay();
   const entry = storeInfo.workingHours.find((wh) => wh.day === today);
   return entry || null;
 }
@@ -75,6 +78,7 @@ function SocialIcon({ platform, className }: { platform: string; className?: str
 }
 
 // ─── Shared Popover ────────────────────────────────────────
+
 function Popover({
   trigger,
   children,
@@ -90,7 +94,7 @@ function Popover({
   const popoverRef = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState({ top: 0, left: 0 });
 
-  const popoverWidth = 240; // w-60
+  const popoverWidth = 240;
 
   useEffect(() => {
     if (!open) return;
@@ -115,7 +119,6 @@ function Popover({
     return () => window.removeEventListener('resize', updatePosition);
   }, [open]);
 
-  // Close on scroll (unless inside popover)
   useEffect(() => {
     if (!open) return;
     const handleScroll = (e: Event) => {
@@ -127,7 +130,6 @@ function Popover({
     return () => window.removeEventListener('scroll', handleScroll, true);
   }, [open, onToggle]);
 
-  // Close on outside click
   useEffect(() => {
     if (!open) return;
     const handleClickOutside = (e: MouseEvent) => {
@@ -168,6 +170,7 @@ function Popover({
 }
 
 // ─── Settings Content ──────────────────────────────────────
+
 function SettingsContent() {
   const t = useTranslations();
   const { theme, setTheme } = useTheme();
@@ -175,6 +178,11 @@ function SettingsContent() {
   const pathname = usePathname();
   const router = useRouter();
   const { startLocaleTransition } = useLocaleTransition();
+  const [palette, setPalette] = useState<string[]>(() => getStoredThemePalette());
+
+  useEffect(() => {
+    setPalette(getStoredThemePalette());
+  }, []);
 
   const currentTheme = theme || 'system';
 
@@ -224,6 +232,14 @@ function SettingsContent() {
     { id: 'dark' as const, icon: Moon, label: t('settings.dark') },
     { id: 'system' as const, icon: Monitor, label: t('settings.system') },
   ];
+
+  const handlePaletteChange = (index: number, value: string) => {
+    const next = [...palette];
+    next[index] = value;
+    const normalized = normalizeThemePalette(next);
+    setPalette(normalized);
+    setThemePalette(normalized);
+  };
 
   const languageOptions = i18n.locales.map((loc) => ({
     id: loc,
@@ -304,17 +320,49 @@ function SettingsContent() {
             );
           })}
         </div>
+
+        <div className="mt-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-primary-50)] p-2.5">
+          <div className="mb-2 flex items-center justify-between">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--color-text-muted)]">
+              Brand colors
+            </span>
+            <button
+              type="button"
+              onClick={() => {
+                const next = [...DEFAULT_THEME_COLORS];
+                setPalette(next);
+                setThemePalette(next);
+              }}
+              className="text-[10px] font-medium text-[var(--color-primary)] hover:opacity-80"
+            >
+              Reset
+            </button>
+          </div>
+          <div className="grid grid-cols-4 gap-2">
+            {palette.map((color, index) => (
+              <label key={`${color}-${index}`} className="flex cursor-pointer items-center justify-center">
+                <input
+                  type="color"
+                  value={color}
+                  onChange={(event) => handlePaletteChange(index, event.target.value)}
+                  className="h-9 w-9 rounded-lg border border-white/30 bg-transparent p-0 shadow-sm"
+                  aria-label={`Color ${index + 1}`}
+                />
+              </label>
+            ))}
+          </div>
+        </div>
       </div>
     </>
   );
 }
 
 // ─── SettingsMenu ──────────────────────────────────────────
+
 export function SettingsMenu() {
   const t = useTranslations();
   const [open, setOpen] = useState(false);
 
-  // --- FIX: gear icon now matches other icon buttons ---
   const trigger = (
     <div
       className={`
@@ -343,6 +391,7 @@ export function SettingsMenu() {
 }
 
 // ─── Header ────────────────────────────────────────────────
+
 export function Header() {
   const t = useTranslations();
   const locale = useLocale();
@@ -368,7 +417,6 @@ export function Header() {
     setPopoverOpen((prev) => (prev === id ? null : id));
   };
 
-  // ─── Reusable content builder ────────────────────────────
   const simpleContent = (
     icon: React.ReactNode,
     label: string,
@@ -402,14 +450,12 @@ export function Header() {
     </>
   );
 
-  // ─── Icon button ──────────────────────────────────────────
   const iconButton = (icon: React.ReactNode) => (
     <div className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/10 border border-white/20 text-white hover:bg-white/20 transition-colors group">
       {icon}
     </div>
   );
 
-  // ─── Status indicator (reused) ──────────────────────────
   const statusIndicator = (
     <div
       className={`flex items-center gap-2 px-2.5 py-1 rounded-full border backdrop-blur-sm transition-all
@@ -442,7 +488,6 @@ export function Header() {
     </div>
   );
 
-  // ─── Socials popover content ─────────────────────────────
   const socialsContent = (
     <>
       <div className="flex items-center gap-2 px-1 pb-2">
@@ -478,7 +523,7 @@ export function Header() {
         animation: 'gradientShift 8s ease-in-out infinite alternate',
       }}
     >
-      {/* ── Decorative layers ── */}
+      {/* Decorative layers */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute inset-0 bg-gradient-to-br from-black/10 via-transparent to-black/20" />
         <div className="absolute -top-20 -end-20 w-64 h-64 rounded-full bg-[var(--color-accent)]/20 opacity-60 animate-orb-1" />
@@ -486,108 +531,115 @@ export function Header() {
         <div className="absolute bottom-0 inset-x-0 h-12 bg-gradient-to-t from-black/10 to-transparent" />
       </div>
 
-      {/* ── Settings gear ── */}
+      {/* Settings gear */}
       <div className="absolute end-3 top-3 z-20 sm:end-5 sm:top-5">
         <SettingsMenu />
       </div>
 
-      {/* ── Main Content ── */}
-      <div className="relative z-10 flex flex-wrap items-start sm:items-center justify-between gap-4 w-full max-w-7xl mx-auto">
-        {/* Left side: Logo + Brand (with status indicator hidden on small screens) */}
-        <div className="flex items-center gap-4 sm:gap-6 flex-1 min-w-[200px]">
+      {/* ─── Fixed two‑column layout ── */}
+      <div className="relative z-10 flex flex-row items-center gap-4 sm:gap-6 w-full max-w-7xl mx-auto">
+        {/* Left column: Logo – fixed width, always its own column */}
+        <div className="flex-shrink-0">
           <div
-            className="flex h-12 w-12 sm:h-14 sm:w-14 md:h-16 md:w-16
-              items-center justify-center rounded-lg
+            className="flex h-20 w-20 sm:h-24 sm:w-24 md:h-28 md:w-28
+              items-center justify-center rounded-2xl
               border border-white/30 bg-white/15 backdrop-blur-md
-              shadow-[0_8px_32px_rgba(0,0,0,0.15)]
+              shadow-[0_8px_32px_rgba(0,0,0,0.2)]
               transition-all duration-300 hover:scale-105 hover:border-white/50
-              hover:shadow-[0_8px_40px_rgba(22,131,199,0.3)]
-              flex-shrink-0"
+              hover:shadow-[0_8px_40px_rgba(22,131,199,0.35)]
+              "
           >
             <UtensilsCrossed
               strokeWidth={2.2}
-              className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 drop-shadow-lg text-white"
+              className="h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14 drop-shadow-lg text-white"
             />
-          </div>
-          <div className="flex flex-col">
-            <div className="flex items-center gap-2">
-              <h1
-                className="text-xl sm:text-2xl md:text-3xl font-extrabold text-white drop-shadow-xl tracking-tight leading-none"
-                style={{
-                  fontFamily: 'var(--font-display), var(--font-inter), system-ui, sans-serif',
-                  textShadow: '0 2px 16px rgba(0,0,0,0.3)',
-                }}
-              >
-                {t('common.brandName')}
-              </h1>
-              {/* Status indicator – visible only on large screens */}
-              <div className="hidden lg:flex self-center">{statusIndicator}</div>
-            </div>
-            <p className="text-xs sm:text-sm md:text-base font-medium text-white/90 drop-shadow-md -mt-0.5">
-              {t('header.tagline')}
-            </p>
-            <div className="mt-2 h-0.5 w-12 sm:w-16 rounded-full bg-gradient-to-r from-white/80 to-transparent shadow-[0_0_12px_rgba(255,255,255,0.3)] animate-fade-in" />
           </div>
         </div>
 
-        {/* Right side: Mobile status (above icons) + icons row */}
-        <div className="flex flex-col items-start gap-1 sm:gap-1.5 ml-15">
-          {/* Mobile status indicator – visible only on small screens, placed above icons */}
-          <div className="lg:hidden ">{statusIndicator}</div>
-
-          {/* Icons row */}
-          <div className="flex items-center gap-1 sm:gap-1.5 flex-wrap sm:mt-3">
-            <Popover
-              open={popoverOpen === 'phone'}
-              onToggle={() => togglePopover('phone')}
-              trigger={iconButton(<Phone size={15} className="group-hover:scale-110 transition-transform" />)}
+        {/* Right column: everything else, never wraps under the logo */}
+        <div className="flex-1 flex flex-col min-w-0">
+          {/* Row: brand name + desktop status */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <h1
+              className="text-xl sm:text-2xl md:text-3xl font-extrabold text-white drop-shadow-xl tracking-tight leading-none"
+              style={{
+                fontFamily: 'var(--font-display), var(--font-inter), system-ui, sans-serif',
+                textShadow: '0 2px 16px rgba(0,0,0,0.3)',
+              }}
             >
-              {simpleContent(
-                <Phone className="h-3.5 w-3.5 text-[var(--color-text-muted)]" />,
-                t('storeInfo.phone'),
-                storeInfo.phone,
-                storeInfo.phone ? `tel:${storeInfo.phone}` : null
-              )}
-            </Popover>
+              {t('common.brandName')}
+            </h1>
+            {/* Desktop status – hidden on small screens */}
+            <div className="hidden lg:inline-flex">{statusIndicator}</div>
+          </div>
 
-            <Popover
-              open={popoverOpen === 'email'}
-              onToggle={() => togglePopover('email')}
-              trigger={iconButton(<Mail size={15} className="group-hover:scale-110 transition-transform" />)}
-            >
-              {simpleContent(
-                <Mail className="h-3.5 w-3.5 text-[var(--color-text-muted)]" />,
-                t('storeInfo.email'),
-                storeInfo.email,
-                storeInfo.email ? `mailto:${storeInfo.email}` : null
-              )}
-            </Popover>
+          {/* Tagline */}
+          <p className="text-xs sm:text-sm md:text-base font-medium text-white/90 drop-shadow-md -mt-0.5">
+            {t('header.tagline')}
+          </p>
 
-            <Popover
-              open={popoverOpen === 'address'}
-              onToggle={() => togglePopover('address')}
-              trigger={iconButton(<MapPin size={15} className="group-hover:scale-110 transition-transform" />)}
-            >
-              {simpleContent(
-                <MapPin className="h-3.5 w-3.5 text-[var(--color-text-muted)]" />,
-                t('storeInfo.address'),
-                displayAddress,
-                displayAddress ? storeInfo.mapUrl : null
-              )}
-            </Popover>
+          {/* Decorative line */}
+          <div className="mt-1 h-0.5 w-12 sm:w-16 rounded-full bg-gradient-to-r from-white/80 to-transparent shadow-[0_0_12px_rgba(255,255,255,0.3)] animate-fade-in" />
 
-            <Popover
-              open={popoverOpen === 'socials'}
-              onToggle={() => togglePopover('socials')}
-              trigger={iconButton(<Users size={15} className="group-hover:scale-110 transition-transform" />)}
-            >
-              {socialsContent}
-            </Popover>
+          {/* Bottom row: mobile status + icon bar */}
+          <div className="flex flex-wrap items-center gap-2 mt-1">
+            {/* Mobile status – visible only on small screens */}
+            <div className="lg:hidden">{statusIndicator}</div>
+
+            {/* Icons */}
+            <div className="flex items-center gap-1 sm:gap-1.5 flex-wrap">
+              <Popover
+                open={popoverOpen === 'phone'}
+                onToggle={() => togglePopover('phone')}
+                trigger={iconButton(<Phone size={15} className="group-hover:scale-110 transition-transform" />)}
+              >
+                {simpleContent(
+                  <Phone className="h-3.5 w-3.5 text-[var(--color-text-muted)]" />,
+                  t('storeInfo.phone'),
+                  storeInfo.phone,
+                  storeInfo.phone ? `tel:${storeInfo.phone}` : null
+                )}
+              </Popover>
+
+              <Popover
+                open={popoverOpen === 'email'}
+                onToggle={() => togglePopover('email')}
+                trigger={iconButton(<Mail size={15} className="group-hover:scale-110 transition-transform" />)}
+              >
+                {simpleContent(
+                  <Mail className="h-3.5 w-3.5 text-[var(--color-text-muted)]" />,
+                  t('storeInfo.email'),
+                  storeInfo.email,
+                  storeInfo.email ? `mailto:${storeInfo.email}` : null
+                )}
+              </Popover>
+
+              <Popover
+                open={popoverOpen === 'address'}
+                onToggle={() => togglePopover('address')}
+                trigger={iconButton(<MapPin size={15} className="group-hover:scale-110 transition-transform" />)}
+              >
+                {simpleContent(
+                  <MapPin className="h-3.5 w-3.5 text-[var(--color-text-muted)]" />,
+                  t('storeInfo.address'),
+                  displayAddress,
+                  displayAddress ? storeInfo.mapUrl : null
+                )}
+              </Popover>
+
+              <Popover
+                open={popoverOpen === 'socials'}
+                onToggle={() => togglePopover('socials')}
+                trigger={iconButton(<Users size={15} className="group-hover:scale-110 transition-transform" />)}
+              >
+                {socialsContent}
+              </Popover>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* ── Shimmer overlay ── */}
+      {/* Shimmer overlay */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div
           className="absolute top-0 left-0 w-1/3 h-full
