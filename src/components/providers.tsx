@@ -6,6 +6,7 @@ import { applyThemePalette, getStoredThemePalette, THEME_STORAGE_KEY } from '@/c
 import { CartProvider } from '@/context/CartContext';
 import { CartOverlay } from '@/components/cart/CartOverlay';
 import { LocaleTransitionProvider } from '@/context/LocaleTransitionContext';
+import { StoreProvider } from '@/context/StoreContext';
 
 interface ProvidersProps {
   children: ReactNode;
@@ -39,10 +40,12 @@ export function Providers({ children }: ProvidersProps) {
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem storageKey={THEME_STORAGE_KEY}>
       <ThemePaletteInitializer />
       <LocaleTransitionProvider>
-        <CartProvider>
-          {children}
-          <CartOverlay />
-        </CartProvider>
+        <StoreProvider>
+          <CartProvider>
+            {children}
+            <CartOverlay />
+          </CartProvider>
+        </StoreProvider>
       </LocaleTransitionProvider>
     </ThemeProvider>
   );

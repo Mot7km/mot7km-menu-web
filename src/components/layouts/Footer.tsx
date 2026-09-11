@@ -2,7 +2,8 @@
 
 import { Utensils, Phone, MapPin, Mail, Clock } from 'lucide-react';
 import { useTranslations, useLocale } from 'next-intl';
-import { storeInfo, getTodayHours } from '@/data/storeInfo';
+import { isStoreOpen } from '@/data/storeInfo';
+import { useStore } from '@/context/StoreContext';
 
 // ── Social Icons ──
 function WhatsAppIcon({ className }: { className?: string }) {
@@ -56,8 +57,13 @@ export function Footer() {
   const locale = useLocale();
   const isRTL = locale === 'ar';
   const currentYear = new Date().getFullYear();
-  const todayHours = getTodayHours();
-  const displayAddress = isRTL ? storeInfo.addressAr : storeInfo.address;
+  const { storeInfo, header, identity } = useStore();
+
+  const today = new Date().getDay();
+  const todayHours = storeInfo.workingHours.find((wh) => wh.day === today) || null;
+  const displayAddress = isRTL ? (storeInfo.addressAr || storeInfo.address) : storeInfo.address;
+  const brandName = header?.businessName || identity?.businessName || storeInfo.name;
+  const slogan = header?.slogan || identity?.slogan || t('header.tagline');
 
   return (
     <footer className="relative overflow-hidden border-t border-[var(--color-border)] bg-[var(--color-surface)] transition-colors">
@@ -89,11 +95,11 @@ export function Footer() {
                 className="gradient-text text-xl font-extrabold tracking-tight"
                 style={{ fontFamily: 'var(--font-display), var(--font-inter), system-ui, sans-serif' }}
               >
-                {t('common.brandName')}
+                {brandName}
               </span>
             </div>
             <p className="text-sm text-[var(--color-text-muted)] leading-relaxed max-w-[250px]">
-              {t('header.tagline')}
+              {slogan}
             </p>
           </div>
 
@@ -123,71 +129,79 @@ export function Footer() {
           </div>
 
           {/* Column 3: Contact Info */}
-          <div className="flex flex-col gap-3">
-            <h4 className="font-bold text-sm text-[var(--color-text-primary)] uppercase tracking-wider">
-              {t('storeInfo.phone')}
-            </h4>
-            <div className="flex flex-col gap-2.5">
-              <a
-                href={`tel:${storeInfo.phone}`}
-                className="inline-flex items-center gap-2 text-sm text-[var(--color-text-muted)]
-                  hover:text-[var(--color-primary)] transition-colors"
-              >
-                <Phone size={14} className="text-[var(--color-primary)] flex-shrink-0" />
-                <span dir="ltr">{storeInfo.phone}</span>
-              </a>
-              <div className="inline-flex items-start gap-2 text-sm text-[var(--color-text-muted)]">
-                <MapPin size={14} className="text-[var(--color-secondary)] flex-shrink-0 mt-0.5" />
-                <span>{displayAddress}</span>
+          {(storeInfo.phone || displayAddress || storeInfo.email) && (
+            <div className="flex flex-col gap-3">
+              <h4 className="font-bold text-sm text-[var(--color-text-primary)] uppercase tracking-wider">
+                {t('storeInfo.phone')}
+              </h4>
+              <div className="flex flex-col gap-2.5">
+                {storeInfo.phone && (
+                  <a
+                    href={`tel:${storeInfo.phone}`}
+                    className="inline-flex items-center gap-2 text-sm text-[var(--color-text-muted)]
+                      hover:text-[var(--color-primary)] transition-colors"
+                  >
+                    <Phone size={14} className="text-[var(--color-primary)] flex-shrink-0" />
+                    <span dir="ltr">{storeInfo.phone}</span>
+                  </a>
+                )}
+                {displayAddress && (
+                  <div className="inline-flex items-start gap-2 text-sm text-[var(--color-text-muted)]">
+                    <MapPin size={14} className="text-[var(--color-secondary)] flex-shrink-0 mt-0.5" />
+                    <span>{displayAddress}</span>
+                  </div>
+                )}
+                {storeInfo.email && (
+                  <a
+                    href={`mailto:${storeInfo.email}`}
+                    className="inline-flex items-center gap-2 text-sm text-[var(--color-text-muted)]
+                      hover:text-[var(--color-primary)] transition-colors"
+                  >
+                    <Mail size={14} className="text-[var(--color-accent)] flex-shrink-0" />
+                    <span>{storeInfo.email}</span>
+                  </a>
+                )}
+                {todayHours && (
+                  <div className="inline-flex items-center gap-2 text-sm text-[var(--color-text-muted)]">
+                    <Clock size={14} className="text-[var(--color-warning)] flex-shrink-0" />
+                    <span>{formatTime(todayHours.open)} – {formatTime(todayHours.close)}</span>
+                  </div>
+                )}
               </div>
-              {storeInfo.email && (
-                <a
-                  href={`mailto:${storeInfo.email}`}
-                  className="inline-flex items-center gap-2 text-sm text-[var(--color-text-muted)]
-                    hover:text-[var(--color-primary)] transition-colors"
-                >
-                  <Mail size={14} className="text-[var(--color-accent)] flex-shrink-0" />
-                  <span>{storeInfo.email}</span>
-                </a>
-              )}
-              {todayHours && (
-                <div className="inline-flex items-center gap-2 text-sm text-[var(--color-text-muted)]">
-                  <Clock size={14} className="text-[var(--color-warning)] flex-shrink-0" />
-                  <span>{formatTime(todayHours.open)} – {formatTime(todayHours.close)}</span>
-                </div>
-              )}
             </div>
-          </div>
+          )}
 
           {/* Column 4: Social */}
-          <div className="flex flex-col gap-3">
-            <h4 className="font-bold text-sm text-[var(--color-text-primary)] uppercase tracking-wider">
-              Social
-            </h4>
-            <div className="flex items-center gap-2">
-              {storeInfo.socials.map((social) => {
-                const IconComponent = socialIconMap[social.platform];
-                if (!IconComponent) return null;
-                return (
-                  <a
-                    key={social.platform}
-                    href={social.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-center w-10 h-10 rounded-xl
-                      bg-[var(--color-card-light)] dark:bg-[var(--color-elevated-dark)]
-                      border border-[var(--color-border)]
-                      hover:border-[var(--color-primary)]/50
-                      hover:scale-110 active:scale-95
-                      transition-all duration-300 group"
-                    aria-label={social.platform}
-                  >
-                    <IconComponent className="w-4 h-4 text-[var(--color-text-muted)] group-hover:text-[var(--color-primary)] transition-colors" />
-                  </a>
-                );
-              })}
+          {storeInfo.socials && storeInfo.socials.length > 0 && (
+            <div className="flex flex-col gap-3">
+              <h4 className="font-bold text-sm text-[var(--color-text-primary)] uppercase tracking-wider">
+                Social
+              </h4>
+              <div className="flex items-center gap-2">
+                {storeInfo.socials.map((social) => {
+                  const IconComponent = socialIconMap[social.platform];
+                  if (!IconComponent) return null;
+                  return (
+                    <a
+                      key={social.platform}
+                      href={social.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center w-10 h-10 rounded-xl
+                        bg-[var(--color-card-light)] dark:bg-[var(--color-elevated-dark)]
+                        border border-[var(--color-border)]
+                        hover:border-[var(--color-primary)]/50
+                        hover:scale-110 active:scale-95
+                        transition-all duration-300 group"
+                      aria-label={social.platform}
+                    >
+                      <IconComponent className="w-4 h-4 text-[var(--color-text-muted)] group-hover:text-[var(--color-primary)] transition-colors" />
+                    </a>
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Bottom divider + copyright */}

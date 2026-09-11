@@ -30,6 +30,7 @@ import {
 } from '@/config/theme';
 import { i18n } from '@/config/i18n';
 import { useLocaleTransition } from '@/context/LocaleTransitionContext';
+import { useStore } from '@/context/StoreContext';
 
 // ─── Helpers ───────────────────────────────────────────────
 
@@ -338,18 +339,24 @@ function SettingsContent() {
               Reset
             </button>
           </div>
-          <div className="grid grid-cols-4 gap-2">
-            {palette.map((color, index) => (
-              <label key={`${color}-${index}`} className="flex cursor-pointer items-center justify-center">
-                <input
-                  type="color"
-                  value={color}
-                  onChange={(event) => handlePaletteChange(index, event.target.value)}
-                  className="h-9 w-9 rounded-lg border border-white/30 bg-transparent p-0 shadow-sm"
-                  aria-label={`Color ${index + 1}`}
-                />
-              </label>
-            ))}
+          <div className="grid grid-cols-3 gap-2">
+            {palette.slice(0, 3).map((color, index) => {
+              const labels = ['Primary', 'Secondary', 'Accent'];
+              return (
+                <label key={`${color}-${index}`} className="flex flex-col items-center gap-1 cursor-pointer">
+                  <input
+                    type="color"
+                    value={color}
+                    onChange={(event) => handlePaletteChange(index, event.target.value)}
+                    className="h-9 w-9 rounded-lg border border-white/30 bg-transparent p-0 shadow-sm cursor-pointer"
+                    aria-label={labels[index] || `Color ${index + 1}`}
+                  />
+                  <span className="text-[9px] text-[var(--color-text-muted)] font-medium">
+                    {labels[index]}
+                  </span>
+                </label>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -396,22 +403,31 @@ export function Header() {
   const t = useTranslations();
   const locale = useLocale();
   const isRTL = locale === 'ar';
+  const { storeInfo, header, identity } = useStore();
 
   const [open, setOpen] = useState(true);
   const [popoverOpen, setPopoverOpen] = useState<string | null>(null);
   const [todayHours, setTodayHours] = useState<{ open: string; close: string } | null>(null);
 
   useEffect(() => {
-    setOpen(isStoreOpen());
-    setTodayHours(getTodayHours());
+    setOpen(isStoreOpen(storeInfo));
+    const today = new Date().getDay();
+    const entry = storeInfo.workingHours.find((wh) => wh.day === today);
+    setTodayHours(entry || null);
+
     const timer = setInterval(() => {
-      setOpen(isStoreOpen());
-      setTodayHours(getTodayHours());
+      setOpen(isStoreOpen(storeInfo));
+      const curToday = new Date().getDay();
+      const curEntry = storeInfo.workingHours.find((wh) => wh.day === curToday);
+      setTodayHours(curEntry || null);
     }, 60_000);
     return () => clearInterval(timer);
-  }, []);
+  }, [storeInfo]);
 
-  const displayAddress = isRTL ? storeInfo.addressAr : storeInfo.address;
+  const displayAddress = isRTL ? (storeInfo.addressAr || storeInfo.address) : storeInfo.address;
+  const brandName = header?.businessName || identity?.businessName || storeInfo.name;
+  const slogan = header?.slogan || identity?.slogan || t('header.tagline');
+  const logoUrl = header?.logoUrl || identity?.logo;
 
   const togglePopover = (id: string) => {
     setPopoverOpen((prev) => (prev === id ? null : id));
@@ -547,12 +563,21 @@ export function Header() {
               shadow-[0_8px_32px_rgba(0,0,0,0.2)]
               transition-all duration-300 hover:scale-105 hover:border-white/50
               hover:shadow-[0_8px_40px_rgba(22,131,199,0.35)]
+              overflow-hidden relative
               "
           >
-            <UtensilsCrossed
-              strokeWidth={2.2}
-              className="h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14 drop-shadow-lg text-white"
-            />
+            {logoUrl ? (
+              <img
+                src={logoUrl}
+                alt={brandName}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <UtensilsCrossed
+                strokeWidth={2.2}
+                className="h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14 drop-shadow-lg text-white"
+              />
+            )}
           </div>
         </div>
 
@@ -567,7 +592,7 @@ export function Header() {
                 textShadow: '0 2px 16px rgba(0,0,0,0.3)',
               }}
             >
-              {t('common.brandName')}
+              {brandName}
             </h1>
             {/* Desktop status – hidden on small screens */}
             <div className="hidden lg:inline-flex">{statusIndicator}</div>
@@ -575,7 +600,7 @@ export function Header() {
 
           {/* Tagline */}
           <p className="text-xs sm:text-sm md:text-base font-medium text-white/90 drop-shadow-md -mt-0.5">
-            {t('header.tagline')}
+            {slogan}
           </p>
 
           {/* Decorative line */}
@@ -588,52 +613,60 @@ export function Header() {
 
             {/* Icons */}
             <div className="flex items-center gap-1 sm:gap-1.5 flex-wrap">
-              <Popover
-                open={popoverOpen === 'phone'}
-                onToggle={() => togglePopover('phone')}
-                trigger={iconButton(<Phone size={15} className="group-hover:scale-110 transition-transform" />)}
-              >
-                {simpleContent(
-                  <Phone className="h-3.5 w-3.5 text-[var(--color-text-muted)]" />,
-                  t('storeInfo.phone'),
-                  storeInfo.phone,
-                  storeInfo.phone ? `tel:${storeInfo.phone}` : null
-                )}
-              </Popover>
+              {storeInfo.phone && (
+                <Popover
+                  open={popoverOpen === 'phone'}
+                  onToggle={() => togglePopover('phone')}
+                  trigger={iconButton(<Phone size={15} className="group-hover:scale-110 transition-transform" />)}
+                >
+                  {simpleContent(
+                    <Phone className="h-3.5 w-3.5 text-[var(--color-text-muted)]" />,
+                    t('storeInfo.phone'),
+                    storeInfo.phone,
+                    `tel:${storeInfo.phone}`
+                  )}
+                </Popover>
+              )}
 
-              <Popover
-                open={popoverOpen === 'email'}
-                onToggle={() => togglePopover('email')}
-                trigger={iconButton(<Mail size={15} className="group-hover:scale-110 transition-transform" />)}
-              >
-                {simpleContent(
-                  <Mail className="h-3.5 w-3.5 text-[var(--color-text-muted)]" />,
-                  t('storeInfo.email'),
-                  storeInfo.email,
-                  storeInfo.email ? `mailto:${storeInfo.email}` : null
-                )}
-              </Popover>
+              {storeInfo.email && (
+                <Popover
+                  open={popoverOpen === 'email'}
+                  onToggle={() => togglePopover('email')}
+                  trigger={iconButton(<Mail size={15} className="group-hover:scale-110 transition-transform" />)}
+                >
+                  {simpleContent(
+                    <Mail className="h-3.5 w-3.5 text-[var(--color-text-muted)]" />,
+                    t('storeInfo.email'),
+                    storeInfo.email,
+                    `mailto:${storeInfo.email}`
+                  )}
+                </Popover>
+              )}
 
-              <Popover
-                open={popoverOpen === 'address'}
-                onToggle={() => togglePopover('address')}
-                trigger={iconButton(<MapPin size={15} className="group-hover:scale-110 transition-transform" />)}
-              >
-                {simpleContent(
-                  <MapPin className="h-3.5 w-3.5 text-[var(--color-text-muted)]" />,
-                  t('storeInfo.address'),
-                  displayAddress,
-                  displayAddress ? storeInfo.mapUrl : null
-                )}
-              </Popover>
+              {displayAddress && (
+                <Popover
+                  open={popoverOpen === 'address'}
+                  onToggle={() => togglePopover('address')}
+                  trigger={iconButton(<MapPin size={15} className="group-hover:scale-110 transition-transform" />)}
+                >
+                  {simpleContent(
+                    <MapPin className="h-3.5 w-3.5 text-[var(--color-text-muted)]" />,
+                    t('storeInfo.address'),
+                    displayAddress,
+                    storeInfo.mapUrl || null
+                  )}
+                </Popover>
+              )}
 
-              <Popover
-                open={popoverOpen === 'socials'}
-                onToggle={() => togglePopover('socials')}
-                trigger={iconButton(<Users size={15} className="group-hover:scale-110 transition-transform" />)}
-              >
-                {socialsContent}
-              </Popover>
+              {storeInfo.socials && storeInfo.socials.length > 0 && (
+                <Popover
+                  open={popoverOpen === 'socials'}
+                  onToggle={() => togglePopover('socials')}
+                  trigger={iconButton(<Users size={15} className="group-hover:scale-110 transition-transform" />)}
+                >
+                  {socialsContent}
+                </Popover>
+              )}
             </div>
           </div>
         </div>

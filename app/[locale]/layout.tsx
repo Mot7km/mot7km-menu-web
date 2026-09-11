@@ -26,10 +26,41 @@ const plusJakarta = Plus_Jakarta_Sans({
   weight: ["400", "500", "600", "700", "800"],
 });
 
-export const metadata: Metadata = {
-  title: "MOT7KM — Smart Restaurant Solutions",
-  description: "A modern SaaS platform for restaurants: QR menus, POS, and ERP — all in one place.",
-};
+import { webMenuApi } from "@/lib/api/menuApi";
+
+export async function generateMetadata(): Promise<Metadata> {
+  try {
+    const store = await webMenuApi.getCompleteStoreData();
+    const title =
+      store.header?.businessName ||
+      store.identity?.businessName ||
+      "MOT7KM — Smart Restaurant Solutions";
+    const description =
+      store.header?.slogan ||
+      store.identity?.businessDescription ||
+      store.identity?.slogan ||
+      "A modern SaaS platform for restaurants: QR menus, POS, and ERP — all in one place.";
+    const icons = store.header?.logoUrl || store.identity?.logo
+      ? [{ url: (store.header?.logoUrl || store.identity?.logo)! }]
+      : [{ url: "/icon.png" }];
+
+    return {
+      title,
+      description,
+      icons,
+      openGraph: {
+        title,
+        description,
+        images: store.header?.coverUrl ? [{ url: store.header.coverUrl }] : undefined,
+      },
+    };
+  } catch {
+    return {
+      title: "MOT7KM — Smart Restaurant Solutions",
+      description: "A modern SaaS platform for restaurants: QR menus, POS, and ERP — all in one place.",
+    };
+  }
+}
 
 interface RootLayoutProps {
   children: React.ReactNode;

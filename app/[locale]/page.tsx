@@ -6,22 +6,41 @@ import { PromotionalCarousel } from '@/components/features/PromotionalCarousel';
 import Categories from '@/components/features/PromotionalCategories';
 import ListContainer from '@/components/common/ListContainer';
 import SearchBar from '@/components/common/SearchBar';
-import { allProducts } from '@/data/menu';
 import { PageShell } from '@/components/layouts/PageShell';
+import { useStore } from '@/context/StoreContext';
 
 export default function Home() {
   const t = useTranslations();
+  const { products: storeProducts, categories: apiCategories, promoCards, loading } = useStore();
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
 
   const categories = useMemo(() => {
+    if (apiCategories && apiCategories.length > 0) {
+      return [
+        {
+          id: 'All',
+          label: t('common.all'),
+          image: 'https://images.unsplash.com/photo-1493770348161-369560ae357d?w=200&q=80',
+        },
+        ...apiCategories.map((c: any) => {
+          const catName = c.categoryName || c.category_Name || c.name || `Category ${c.id}`;
+          return {
+            id: catName,
+            label: catName,
+            image: c.categoryImageUrl || c.imageUrl || 'https://images.unsplash.com/photo-1493770348161-369560ae357d?w=200&q=80',
+          };
+        }),
+      ];
+    }
+
     const derivedCategories = Array.from(
-      new Set(allProducts.map((product) => product.category).filter(Boolean) as string[]),
+      new Set(storeProducts.map((product) => product.category).filter(Boolean) as string[]),
     );
     return [
       { id: 'All', label: t('common.all'), image: 'https://images.unsplash.com/photo-1493770348161-369560ae357d?w=200&q=80' },
       ...derivedCategories.map((category) => {
-        const firstProduct = allProducts.find((p) => p.category === category);
+        const firstProduct = storeProducts.find((p) => p.category === category);
         return {
           id: category,
           label: category,
@@ -29,12 +48,12 @@ export default function Home() {
         };
       }),
     ];
-  }, [t]);
+  }, [apiCategories, storeProducts, t]);
 
   const normalizedQuery = searchQuery.trim().toLowerCase();
 
   const filteredProducts = useMemo(() => {
-    return allProducts.filter((product) => {
+    return storeProducts.filter((product) => {
       const matchesCategory = activeCategory === 'All' || product.category === activeCategory;
       if (!matchesCategory) return false;
       if (!normalizedQuery) return true;
@@ -66,21 +85,24 @@ export default function Home() {
   return (
     <PageShell showHeader showFooter>
       <div className="flex flex-col items-center justify-center">
-        <section className="section-glow relative w-full px-4 pt-10 pb-8 sm:px-6 sm:pt-12 sm:pb-10 lg:px-8">
-        <div className="mx-auto max-w-5xl md:max-w-6xl">
-          <h2
-            className="accent-line mb-6 text-2xl font-bold text-[var(--color-text-primary)] sm:text-3xl"
-            style={{ fontFamily: 'var(--font-display), var(--font-inter), system-ui, sans-serif' }}
-          >
-            {t('home.specialOffers')}
-          </h2>
-          <PromotionalCarousel />
-        </div>
-      </section>
+        {promoCards && promoCards.length > 0 && (
+          <>
+            <section className="section-glow relative w-full px-4 pt-10 pb-8 sm:px-6 sm:pt-12 sm:pb-10 lg:px-8">
+              <div className="mx-auto max-w-5xl md:max-w-6xl">
+                <h2
+                  className="accent-line mb-6 text-2xl font-bold text-[var(--color-text-primary)] sm:text-3xl"
+                  style={{ fontFamily: 'var(--font-display), var(--font-inter), system-ui, sans-serif' }}
+                >
+                  {t('home.specialOffers')}
+                </h2>
+                <PromotionalCarousel />
+              </div>
+            </section>
+            <div className="section-divider-premium w-full max-w-3xl mx-auto" />
+          </>
+        )}
 
-      <div className="section-divider-premium w-full max-w-3xl mx-auto" />
-
-      <section className="section-glow relative w-full px-4 pb-8 sm:px-6 lg:px-8">
+        <section className="section-glow relative w-full px-4 pb-8 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-5xl md:max-w-6xl">
           <div className="relative">
             <div className="sticky top-0 z-30 bg-[var(--color-background)]/90 backdrop-blur-xl border-b border-[var(--color-border)]/50 pt-3 pb-1 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 mb-6 shadow-sm transition-all duration-300">

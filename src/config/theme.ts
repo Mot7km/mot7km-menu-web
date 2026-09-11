@@ -2,10 +2,9 @@ export const THEME_STORAGE_KEY = "mot7km-theme";
 export const THEME_PALETTE_STORAGE_KEY = "mot7km-theme-palette";
 
 export const DEFAULT_THEME_COLORS = [
-  "#1683C7",
-  "#0F766E",
-  "#06B6D4",
-  "#F59E0B",
+  "#1683C7", // Primary
+  "#0F766E", // Secondary
+  "#06B6D4", // Accent
 ] as const;
 
 export const themes = {
@@ -101,25 +100,31 @@ function withAlpha(hex: string, alpha: number) {
   return `rgba(${r}, ${g}, ${b}, ${clamp(alpha, 0, 1)})`;
 }
 
-export function normalizeThemePalette(colors: ReadonlyArray<string> = DEFAULT_THEME_COLORS) {
+/**
+ * Normalizes the theme palette to strictly 3 colors: [primary, secondary, accent].
+ */
+export function normalizeThemePalette(colors: ReadonlyArray<string> = DEFAULT_THEME_COLORS): [string, string, string] {
   const trimmed = (colors || [])
     .map((color) => normalizeHex(color ?? ""))
     .filter((color): color is string => Boolean(color));
 
   if (!trimmed.length) return [...DEFAULT_THEME_COLORS];
 
-  const palette = [...trimmed.slice(0, 4)];
+  const palette: string[] = [...trimmed.slice(0, 3)];
 
-  while (palette.length < 4) {
+  while (palette.length < 3) {
     const fallbackIndex = palette.length % DEFAULT_THEME_COLORS.length;
     palette.push(DEFAULT_THEME_COLORS[fallbackIndex]);
   }
 
-  return palette.slice(0, 4);
+  return [palette[0], palette[1], palette[2]];
 }
 
+/**
+ * Generates all semantic CSS variables entirely derived from exactly 3 brand colors.
+ */
 export function generateThemeVariables(colors: string[] = [...DEFAULT_THEME_COLORS]) {
-  const [primary, secondary, accent, highlight] = normalizeThemePalette(colors);
+  const [primary, secondary, accent] = normalizeThemePalette(colors);
 
   const primary50 = mixHex(primary, "#FFFFFF", 0.86);
   const primary100 = mixHex(primary, "#FFFFFF", 0.7);
@@ -143,9 +148,9 @@ export function generateThemeVariables(colors: string[] = [...DEFAULT_THEME_COLO
     "--color-accent-dark": adjustHex(accent, -24),
     "--color-accent-light": adjustHex(accent, 28),
 
-    "--color-warning": highlight,
-    "--color-warning-dark": adjustHex(highlight, -18),
-    "--color-warning-light": adjustHex(highlight, 24),
+    "--color-warning": accent,
+    "--color-warning-dark": adjustHex(accent, -18),
+    "--color-warning-light": adjustHex(accent, 24),
 
     "--gradient-primary": `linear-gradient(135deg, ${primary}, ${accent})`,
     "--gradient-brand": `linear-gradient(135deg, ${primary}, ${secondary}, ${accent})`,
@@ -173,9 +178,9 @@ export function generateThemeVariables(colors: string[] = [...DEFAULT_THEME_COLO
     "--color-accent-dark": accent,
     "--color-accent-light": adjustHex(accent, 26),
 
-    "--color-warning": adjustHex(highlight, 6),
-    "--color-warning-dark": highlight,
-    "--color-warning-light": adjustHex(highlight, 20),
+    "--color-warning": adjustHex(accent, 6),
+    "--color-warning-dark": accent,
+    "--color-warning-light": adjustHex(accent, 20),
 
     "--gradient-primary": `linear-gradient(135deg, ${adjustHex(primary, 8)}, ${adjustHex(accent, 8)})`,
     "--gradient-brand": `linear-gradient(135deg, ${adjustHex(primary, 8)}, ${adjustHex(secondary, 8)}, ${adjustHex(accent, 8)})`,
