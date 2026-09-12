@@ -103,31 +103,6 @@ export function Footer() {
             </p>
           </div>
 
-          {/* Column 2: Quick Links */}
-          <div className="flex flex-col gap-3">
-            <h4 className="font-bold text-sm text-[var(--color-text-primary)] uppercase tracking-wider">
-              {t('footer.aboutUs')}
-            </h4>
-            <div className="flex flex-col gap-2">
-              {[
-                { label: t('footer.aboutUs'), href: '#' },
-                { label: t('footer.termsOfService'), href: '#' },
-                { label: t('footer.contactSupport'), href: '#' },
-              ].map((link) => (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  className="text-sm text-[var(--color-text-muted)]
-                    transition-all duration-200
-                    hover:text-[var(--color-primary)] hover:translate-x-1
-                    inline-flex items-center gap-1"
-                >
-                  {link.label}
-                </a>
-              ))}
-            </div>
-          </div>
-
           {/* Column 3: Contact Info */}
           {(storeInfo.phone || displayAddress || storeInfo.email) && (
             <div className="flex flex-col gap-3">
@@ -214,10 +189,28 @@ export function Footer() {
               provider: 'Mot7km'
             })}
           </p>
-          <div className="flex items-center gap-1.5 text-xs text-[var(--color-text-muted)]">
-            <span>Powered by</span>
+          <a
+            href="https://mot7km.store"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group inline-flex items-center gap-1.5 text-xs text-[var(--color-text-muted)] px-2.5 py-1 rounded-full border border-transparent hover:border-[var(--color-border)] hover:bg-[var(--color-surface)]/40 transition-all duration-300 opacity-70 hover:opacity-100 cursor-pointer"
+          >
+            <span className="transition-colors group-hover:text-[var(--color-text)]">Powered by</span>
             <span className="gradient-text font-bold">Mot7km</span>
-          </div>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="w-3 h-3 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300"
+            >
+              <path d="M7 17L17 7" />
+              <path d="M7 7h10v10" />
+            </svg>
+          </a>
         </div>
       </div>
     </footer>

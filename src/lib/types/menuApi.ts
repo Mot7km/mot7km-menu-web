@@ -137,9 +137,12 @@ export interface ApiCustomizationOption {
 export interface ApiReview {
   id: number | string;
   reviewer: string;
+  nameCustomer?: string;
   date: string;
+  createdAt?: string;
   rating: number;
   comment: string;
+  content?: string;
 }
 
 /**
