@@ -17,9 +17,10 @@ export interface SectionConfig {
 
 interface ListContainerProps {
   sections?: SectionConfig[];
+  loading?: boolean;
 }
 
-export default function ListContainer({ sections = [] }: ListContainerProps) {
+export default function ListContainer({ sections = [], loading = false }: ListContainerProps) {
   if (!sections.length) return null;
 
   return (
@@ -35,6 +36,7 @@ export default function ListContainer({ sections = [] }: ListContainerProps) {
                 initialCount={section.initialCount ?? 4}
                 loadMoreCount={section.loadMoreCount ?? 4}
                 showCount={section.showCount ?? true}
+                loading={loading}
               />
             );
           case 'reviews':

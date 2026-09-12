@@ -67,7 +67,7 @@ export default function Home() {
         .toLowerCase();
       return haystack.includes(normalizedQuery);
     });
-  }, [activeCategory, normalizedQuery]);
+  }, [activeCategory, normalizedQuery, storeProducts]);
 
   const sections = useMemo(() => {
     const result = [];
@@ -116,7 +116,7 @@ export default function Home() {
               </div>
             </div>
 
-            <ListContainer sections={sections} />
+            <ListContainer sections={sections} loading={loading} />
           </div>
         </div>
       </section>

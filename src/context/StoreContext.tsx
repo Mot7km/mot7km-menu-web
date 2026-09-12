@@ -47,7 +47,7 @@ interface StoreProviderProps {
 
 export function StoreProvider({ children, initialData }: StoreProviderProps) {
   const [loading, setLoading] = useState(true);
-  const [businessName, setBusinessName] = useState(initialData?.businessName || 'iiimot7km');
+  const [businessName, setBusinessName] = useState(initialData?.businessName);
   const [menuId, setMenuId] = useState(initialData?.menuId || 4);
   const [identity, setIdentity] = useState<ApiBusinessIdentity | null>(initialData?.identity || null);
   const [header, setHeader] = useState<ApiStoreHeader | null>(initialData?.header || null);
