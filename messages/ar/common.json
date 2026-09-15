@@ -60,7 +60,10 @@
     "system": "النظام"
   },
   "loading": {
-    "switchingLanguage": "جاري تبديل اللغة…"
+    "switchingLanguage": "جاري تبديل اللغة…",
+    "store": "جاري تحميل المتجر…",
+    "page": "جاري تحميل الصفحة…",
+    "product": "جاري تحميل المنتج…"
   },
   "reviews": {
     "title": "التقييمات",

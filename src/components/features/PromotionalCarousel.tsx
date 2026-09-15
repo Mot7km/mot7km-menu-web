@@ -5,8 +5,9 @@ import { Coffee, ChevronLeft, ChevronRight } from 'lucide-react';
 import useEmblaCarousel from 'embla-carousel-react';
 import Autoplay from 'embla-carousel-autoplay';
 import { useEffect, useState } from 'react';
-import { promoCards, PromoCardData } from '@/data/menupromo';
+import { PromoCardData } from '@/data/menupromo';
 import { usePathname } from 'next/navigation';
+import { useStore } from '@/context/StoreContext';
 
 // -------------------------------------------------------------------
 // Main Carousel – full‑width on mobile, container‑width on larger screens
@@ -14,6 +15,7 @@ import { usePathname } from 'next/navigation';
 export function PromotionalCarousel() {
   const pathname = usePathname();
   const isRTL = pathname?.startsWith('/ar') ?? false;
+  const { promoCards } = useStore();
 
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [emblaRef, emblaApi] = useEmblaCarousel(
@@ -42,6 +44,10 @@ export function PromotionalCarousel() {
   const scrollPrev = () => emblaApi?.scrollPrev();
   const scrollNext = () => emblaApi?.scrollNext();
   const scrollTo = (index: number) => emblaApi?.scrollTo(index);
+
+  if (!promoCards || promoCards.length === 0) {
+    return null;
+  }
 
   return (
     // Full‑width breakout on mobile, respect container on larger screens

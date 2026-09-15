@@ -47,24 +47,17 @@ export function GridProductCard({ product }: ProductCardProps) {
       href={href}
       prefetch={false}
       className="group relative flex flex-col w-full h-full
-        bg-[var(--color-surface)] rounded-2xl
-        border border-[var(--color-border)]
+        bg-[#0b1120] rounded-3xl
+        border border-slate-800
         overflow-hidden
         transition-all duration-400 ease-out
-        hover:border-[var(--color-primary)]/40
+        hover:border-cyan-500/50
+        hover:shadow-[0_0_30px_rgba(34,211,238,0.15)]
         active:scale-[0.98]
         cursor-pointer"
-      style={{ boxShadow: 'var(--shadow-card)' }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.boxShadow = 'var(--shadow-card-hover)';
-        e.currentTarget.style.transform = 'translateY(-4px)';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.boxShadow = 'var(--shadow-card)';
-        e.currentTarget.style.transform = 'translateY(0)';
-      }}
     >
-      <div className="relative w-full aspect-[4/3] sm:aspect-[4/3] md:aspect-[4/3] bg-[var(--color-card-light)] dark:bg-[var(--color-card-dark)] overflow-hidden flex-shrink-0">
+      {/* Image Section */}
+      <div className="relative w-full aspect-[4/3] overflow-hidden flex-shrink-0">
         <Image
           src={product.image}
           alt={product.name}
@@ -72,61 +65,68 @@ export function GridProductCard({ product }: ProductCardProps) {
           className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent
-          opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        
+        {/* Dark gradient overlay at the bottom of the image for better badge visibility */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0b1120] via-transparent to-transparent opacity-80 pointer-events-none" />
 
+        {/* Quick Add Button */}
         <button
           onClick={handleQuickAdd}
           disabled={isAdding}
-          className={`absolute top-2 sm:top-3 end-2 sm:end-3 z-20 flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/90 dark:bg-black/70 backdrop-blur-md border border-[var(--color-border)] text-[var(--color-primary)] transition-all duration-300 shadow-[0_4px_10px_rgba(0,0,0,0.1)] hover:shadow-[0_4px_15px_rgba(22,131,199,0.3)] hover:scale-110 active:scale-95 cursor-pointer ${
-            isAdding ? 'opacity-50 pointer-events-none' : 'hover:bg-[var(--color-primary)] hover:text-white'
-          }`}
+          className={`absolute top-3 end-3 z-20 flex items-center justify-center w-10 h-10 rounded-full 
+            bg-cyan-500/20 backdrop-blur-md border border-cyan-500/30 
+            text-cyan-400 transition-all duration-300 
+            shadow-[0_4px_10px_rgba(0,0,0,0.3)] 
+            hover:bg-cyan-500 hover:text-[#0b1120] hover:scale-110 active:scale-95 cursor-pointer
+            ${isAdding ? 'opacity-50 pointer-events-none' : ''}`}
           aria-label="Add to cart"
         >
-          <ShoppingBag size={16} />
+          <ShoppingBag size={18} />
         </button>
 
-        <div className="absolute bottom-2 sm:bottom-3 end-2 sm:end-3 z-10">
-          <span className="inline-flex items-center px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl
-            bg-white/80 dark:bg-black/60 backdrop-blur-md
-            border border-white/30 dark:border-white/10
-            font-bold text-xs sm:text-sm text-[var(--color-primary)]
+        {/* Price Badge */}
+        <div className="absolute bottom-3 end-3 z-10">
+          <span className="inline-flex items-center px-4 py-1.5 rounded-full
+            bg-[#0b1120]/80 backdrop-blur-md
+            border border-cyan-500/30
+            font-bold text-sm text-cyan-400
             shadow-lg
             transition-all duration-300
-            group-hover:shadow-[0_0_20px_rgba(22,131,199,0.25)]
+            group-hover:shadow-[0_0_20px_rgba(34,211,238,0.3)]
             group-hover:scale-105">
             {product.price}
           </span>
         </div>
-
-        <div className="absolute top-0 start-0 w-20 h-20
-          bg-gradient-to-br from-[var(--color-primary)]/10 to-transparent
-          opacity-0 group-hover:opacity-100 transition-opacity duration-500
-          pointer-events-none" />
       </div>
 
-      <div className="flex flex-col flex-1 p-3 sm:p-4 gap-1.5">
-        {/* 👇 removed line-clamp-1, added break-words */}
-        <h4 className="font-bold text-sm sm:text-base leading-tight sm:leading-6 text-[var(--color-text-primary)] break-words
-          group-hover:text-[var(--color-primary)] transition-colors duration-300"
-          style={{ fontFamily: 'var(--font-display), var(--font-inter), system-ui, sans-serif' }}>
+      {/* Content Section */}
+      <div className="flex flex-col flex-1 p-4 gap-3 bg-[#0b1120]">
+        <h4 
+          className="font-bold text-base leading-snug text-white break-words
+            group-hover:text-cyan-400 transition-colors duration-300"
+          style={{ fontFamily: 'var(--font-display), var(--font-inter), system-ui, sans-serif' }}
+        >
           {product.name}
         </h4>
 
-        <div className="flex items-center justify-between mt-auto pt-2 sm:pt-2.5 border-t border-[var(--color-divider)]">
+        <div className="flex items-center justify-between mt-auto pt-3 border-t border-slate-800">
+          {/* Category Badge */}
           {product.category && (
-            <span className="text-[10px] font-medium text-[var(--color-text-muted)]
-              bg-[var(--color-card-light)] dark:bg-[var(--color-elevated-dark)]
-              px-2 py-0.5 rounded-full truncate max-w-[80px] sm:max-w-[100px]">
+            <span className="text-xs font-medium text-slate-400
+              bg-slate-800/80 backdrop-blur-sm
+              px-3 py-1.5 rounded-full truncate max-w-[100px]">
               {product.category}
             </span>
           )}
+
+          {/* Rating Badge */}
           <div className="flex items-center gap-1.5
-            bg-[var(--color-primary-50)] px-2 py-0.5 sm:py-1 rounded-full
+            bg-amber-500/10 border border-amber-500/30 
+            px-2.5 py-1.5 rounded-full
             transition-all duration-300
-            group-hover:shadow-[0_0_12px_rgba(22,131,199,0.15)]">
-            <Star size={12} className="text-[var(--color-warning)] fill-[var(--color-warning)]" strokeWidth={0} />
-            <span className="text-xs font-bold text-[var(--color-text-primary)] leading-none">
+            group-hover:shadow-[0_0_12px_rgba(245,158,11,0.15)]">
+            <Star size={14} className="text-amber-400 fill-amber-400" strokeWidth={0} />
+            <span className="text-xs font-bold text-amber-400 leading-none">
               {product.rating}
             </span>
           </div>

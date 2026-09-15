@@ -60,7 +60,10 @@
     "system": "System"
   },
   "loading": {
-    "switchingLanguage": "Switching language…"
+    "switchingLanguage": "Switching language…",
+    "store": "Loading store…",
+    "page": "Loading page…",
+    "product": "Loading product…"
   },
   "reviews": {
     "title": "Reviews",

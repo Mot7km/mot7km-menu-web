@@ -4,25 +4,32 @@ import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import { allProducts } from '@/data/menu';
 import { CustomizationOptions } from '@/components/features/CustomizationOptions';
 import ListContainer from '@/components/common/ListContainer';
 import { ArrowLeft, Sparkles, Star } from 'lucide-react';
-import { use, useMemo, useState } from 'react';
+import { use, useEffect, useMemo, useState } from 'react';
 import { useCart } from '@/context/CartContext';
 import { AddToCartBar } from '@/components/cart/AddToCartBar';
+import { useStore } from '@/context/StoreContext';
 
 export default function ProductPage({ params }: { params: Promise<{ locale: string; id: string }> }) {
   const resolvedParams = use(params);
   const { locale, id } = resolvedParams;
   const t = useTranslations();
   const { addToCart } = useCart();
+  const { products: storeProducts, recordView } = useStore();
 
   const [selections, setSelections] = useState<Record<string, string>>({});
   const [extraTotal, setExtraTotal] = useState<number>(0);
   const [quantity, setQuantity] = useState(1);
 
-  const product = useMemo(() => allProducts.find((p) => p.id === id), [id]);
+  useEffect(() => {
+    if (id) {
+      recordView(id);
+    }
+  }, [id, recordView]);
+
+  const product = useMemo(() => storeProducts.find((p) => p.id === id), [storeProducts, id]);
 
   if (!product) {
     notFound();

@@ -7,6 +7,7 @@ import { Product } from '@/data/menu';
 import { GridProductCard } from '@/components/features/ProductCards/GridProductCard';
 import { HorizontalProductCard } from '@/components/features/ProductCards/HorizontalProductCard';
 import { ViewMoreButton, ThatsIt } from '@/components/ui/ViewMore';
+import { Loader } from '@/components/ui/Loader';
 
 interface ProductSectionProps {
   title?: string;
@@ -14,6 +15,7 @@ interface ProductSectionProps {
   initialCount?: number;
   loadMoreCount?: number;
   showCount?: boolean;
+  loading?: boolean;
 }
 
 export default function ProductSection({
@@ -22,6 +24,7 @@ export default function ProductSection({
   initialCount = 4,
   loadMoreCount = 4,
   showCount = true,
+  loading = false,
 }: ProductSectionProps) {
   const t = useTranslations();
   const [visibleCount, setVisibleCount] = useState(initialCount);
@@ -32,6 +35,14 @@ export default function ProductSection({
   useEffect(() => {
     setVisibleCount(initialCount);
   }, [products, initialCount]);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-56 items-center justify-center" aria-live="polite">
+        <Loader size="md" text="Loading products..." />
+      </div>
+    );
+  }
 
   const handleLoadMore = () => {
     setVisibleCount(Math.min(visibleCount + loadMoreCount, products.length));
