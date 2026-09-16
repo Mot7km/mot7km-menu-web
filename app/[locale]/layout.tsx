@@ -1,63 +1,69 @@
 import type { Metadata } from "next";
-import { Cairo, Inter, Plus_Jakarta_Sans, Roboto } from "next/font/google";
 import { notFound } from "next/navigation";
 import { getMessages } from "next-intl/server";
 import { NextIntlClientProvider } from "next-intl";
 import { Providers } from "@/components/providers";
 import { i18n } from "@/config/i18n";
 
-const roboto = Roboto({
-  variable: "--font-roboto",
-   weight: ["300", "400", "500", "700"],
-  subsets: ["latin", "latin-ext"],
-  display: "swap",
-});
-
-const cairo = Cairo({
-  variable: "--font-cairo",
-  subsets: ["arabic", "latin"],
-  display: "swap",
-});
-
-const plusJakarta = Plus_Jakarta_Sans({
-  variable: "--font-display",
-  subsets: ["latin", "latin-ext"],
-  display: "swap",
-  weight: ["400", "500", "600", "700", "800"],
-});
-
 import { webMenuApi } from "@/lib/api/menuApi";
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata({ searchParams }: { searchParams: Promise<{ businessName?: string }> }): Promise<Metadata> {
   try {
-    const store = await webMenuApi.getCompleteStoreData();
-    const title =
+    const { businessName } = await searchParams;
+    if (!businessName) {
+      return {
+        icons: [{ url: "/default-icon.png", rel: "icon" }],
+      };
+    }
+    const store = await webMenuApi.getCompleteStoreData(businessName);
+    const brandName =
       store.header?.businessName ||
       store.identity?.businessName ||
+      businessName;
+    const title =
+      brandName ||
       "MOT7KM — Smart Restaurant Solutions";
     const description =
       store.header?.slogan ||
       store.identity?.businessDescription ||
       store.identity?.slogan ||
       "A modern SaaS platform for restaurants: QR menus, POS, and ERP — all in one place.";
-    const icons = store.header?.logoUrl || store.identity?.logo
-      ? [{ url: (store.header?.logoUrl || store.identity?.logo)! }]
-      : [{ url: "/icon.png" }];
+    const logoUrl = store.header?.logo || store.header?.logoUrl || store.identity?.logo;
+    const iconUrl = logoUrl
+      ? `/api/tenant-icon?businessName=${encodeURIComponent(businessName)}`
+      : "/default-icon.png";
+
+    const icons = [{ url: iconUrl, rel: "icon" as const }, { url: iconUrl, rel: "apple-touch-icon" as const }];
 
     return {
       title,
       description,
       icons,
+      applicationName: brandName,
+      keywords: [brandName, "digital menu", "restaurant menu", "QR menu"],
+      alternates: {
+        canonical: brandName ? `/${businessName}` : undefined,
+      },
       openGraph: {
         title,
         description,
-        images: store.header?.coverUrl ? [{ url: store.header.coverUrl }] : undefined,
+        siteName: brandName,
+        images: store.header?.coverUrl || store.header?.backGroundImage
+          ? [{ url: (store.header?.coverUrl || store.header?.backGroundImage)! }]
+          : undefined,
+      },
+      twitter: {
+        card: "summary_large_image",
+        title,
+        description,
+        images: logoUrl ? [logoUrl] : undefined,
       },
     };
   } catch {
     return {
       title: "MOT7KM — Smart Restaurant Solutions",
       description: "A modern SaaS platform for restaurants: QR menus, POS, and ERP — all in one place.",
+      icons: [{ url: "/default-icon.png", rel: "icon" }],
     };
   }
 }
@@ -88,12 +94,12 @@ export default async function LocaleLayout({
     <html
       lang={locale}
       dir={isRTL ? "rtl" : "ltr"}
-      className={`${roboto.variable} ${cairo.variable} ${plusJakarta.variable} h-full antialiased`}
+      className="h-full antialiased"
       suppressHydrationWarning
     >
       <body
         className="flex min-h-full flex-col bg-[var(--color-background)] text-[var(--color-text-primary)] transition-colors duration-300"
-        style={{ fontFamily: isRTL ? "var(--font-cairo)" : "var(--font-inter)" }}
+        style={{ fontFamily: isRTL ? "var(--font-arabic)" : "var(--font-english)" }}
       >
         <NextIntlClientProvider messages={messages}>
           <Providers>

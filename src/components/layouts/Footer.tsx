@@ -1,6 +1,6 @@
 'use client';
 
-import { Utensils, Phone, MapPin, Mail, Clock } from 'lucide-react';
+import { Phone, MapPin, Mail, Clock } from 'lucide-react';
 import { useTranslations, useLocale } from 'next-intl';
 import { isStoreOpen } from '@/data/storeInfo';
 import { useStore } from '@/context/StoreContext';
@@ -64,6 +64,7 @@ export function Footer() {
   const displayAddress = isRTL ? (storeInfo.addressAr || storeInfo.address) : storeInfo.address;
   const brandName = header?.businessName || identity?.businessName || storeInfo.name;
   const slogan = header?.slogan || identity?.slogan || t('header.tagline');
+  const logoUrl = header?.logo || header?.logoUrl || identity?.logo;
 
   return (
     <footer className="relative overflow-hidden border-t border-[var(--color-border)] bg-[var(--color-surface)] transition-colors">
@@ -71,7 +72,7 @@ export function Footer() {
       <div className="absolute top-0 inset-x-0 h-[2px] overflow-hidden" style={{ background: 'var(--gradient-primary)' }}>
         <div
           className="absolute top-0 left-0 w-1/3 h-full
-            bg-gradient-to-r from-transparent via-white/40 to-transparent"
+            bg-gradient-to-r from-transparent via-[var(--color-text-on-primary)]/40 to-transparent"
           style={{ animation: 'shimmerLine 4s ease-in-out infinite' }}
         />
       </div>
@@ -85,15 +86,16 @@ export function Footer() {
           {/* Column 1: Brand */}
           <div className="flex flex-col gap-3">
             <div className="flex items-center gap-2.5">
-              <div
-                className="flex h-10 w-10 items-center justify-center rounded-xl shadow-md"
-                style={{ background: 'var(--gradient-primary)' }}
-              >
-                <Utensils strokeWidth={2.5} className="h-5 w-5 text-white" />
+              <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-[var(--color-border-strong)] bg-[var(--color-surface)] shadow-md">
+                {logoUrl ? (
+                  <img src={logoUrl} alt={brandName} className="h-full w-full object-cover" />
+                ) : (
+                  <span className="text-sm font-bold text-[var(--color-primary)]">{brandName.slice(0, 1)}</span>
+                )}
               </div>
               <span
                 className="gradient-text text-xl font-extrabold tracking-tight"
-                style={{ fontFamily: 'var(--font-display), var(--font-inter), system-ui, sans-serif' }}
+                style={{ fontFamily: 'var(--font-display)' }}
               >
                 {brandName}
               </span>
@@ -185,7 +187,7 @@ export function Footer() {
           <p className="text-xs text-[var(--color-text-muted)]">
             {t('footer.copyrightText', {
               year: currentYear,
-              brand: t('common.brandName'),
+              brand: brandName,
               provider: 'Mot7km'
             })}
           </p>

@@ -48,27 +48,27 @@ function CartButtonInner({
       className={`
         relative w-full h-full rounded-full
         bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-accent)]
-        border border-white/30
-        shadow-[0_8px_32px_rgba(22,131,199,0.35)]
-        hover:shadow-[0_8px_40px_rgba(22,131,199,0.5)]
+        border border-[var(--color-border-strong)]
+        shadow-[var(--shadow-glow)]
+        hover:shadow-[var(--shadow-glow-strong)]
         active:scale-95
         touch-manipulation
         flex items-center justify-center
         ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}
       `}
       style={{
-        backgroundColor: 'rgba(22, 131, 199, 0.8)',
+        backgroundColor: 'var(--color-primary)',
         backdropFilter: 'blur(6px)',
         transform: `translateX(${tuckOffsetX}px)`,
         opacity: isIdle ? 0.6 : 1,
         transition: 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease, box-shadow 0.2s',
       }}
     >
-      <ShoppingBag size={28} className="text-white drop-shadow-sm" />
+      <ShoppingBag size={28} className="text-[var(--color-text-on-primary)] drop-shadow-sm" />
 
       {itemCount > 0 && (
         <span
-          className="absolute bg-white text-[var(--color-primary)] text-xs font-bold w-6 h-6 flex items-center justify-center rounded-full shadow-md ring-2 ring-white/50"
+          className="absolute bg-[var(--color-secondary)] text-[var(--color-text-on-secondary)] text-xs font-bold w-6 h-6 flex items-center justify-center rounded-full shadow-md ring-2 ring-[var(--color-border-strong)]"
           style={{
             top: '-4px',
             right: '-4px',

@@ -18,7 +18,7 @@ export default function NotFound() {
         <h1
           className="gradient-text text-8xl font-extrabold leading-none tracking-tight sm:text-9xl md:text-[10rem] animate-gradient-shift"
           style={{
-            fontFamily: 'var(--font-display), var(--font-inter), system-ui, sans-serif',
+            fontFamily: 'var(--font-display)',
           }}
         >
           404

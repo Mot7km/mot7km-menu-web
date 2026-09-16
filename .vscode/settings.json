@@ -1,0 +1,8 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^python -c \"import requests, json; r=requests\\.get\\('http://mot7km\\.runasp\\.net/api/menu/by-business-name/mot7km', timeout=20\\); print\\(r\\.status_code\\); print\\(r\\.text\\[:4000\\]\\)\"$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}

@@ -6,6 +6,7 @@ export interface PromoCardData {
   badge?: string;
   image: string;
   gradient: string;
+  backgroundColor?: string;
   textColor: string;
   badgeColor?: string;
   badgeBg?: string;

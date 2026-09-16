@@ -65,7 +65,7 @@ export default function ProductSection({
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2">
         <h2
           className="accent-line font-bold text-2xl leading-8 text-[var(--color-text-primary)]"
-          style={{ fontFamily: 'var(--font-display), var(--font-inter), system-ui, sans-serif' }}
+          style={{ fontFamily: 'var(--font-display)' }}
         >
           {sectionTitle}
         </h2>
@@ -84,7 +84,7 @@ export default function ProductSection({
               onClick={() => setLayout('grid')}
               className={`p-1.5 rounded-full transition-all duration-200 cursor-pointer ${
                 layout === 'grid'
-                  ? 'bg-[var(--color-primary)] text-white shadow-[0_2px_8px_rgba(22,131,199,0.3)]'
+                  ? 'bg-[var(--color-primary)] text-[var(--color-text-on-primary)] shadow-[var(--shadow-glow)]'
                   : 'text-[var(--color-text-muted)] hover:text-[var(--color-primary)] hover:bg-[var(--color-primary)]/10'
               }`}
               aria-label="Grid view"
@@ -96,7 +96,7 @@ export default function ProductSection({
               onClick={() => setLayout('horizontal')}
               className={`p-1.5 rounded-full transition-all duration-200 cursor-pointer ${
                 layout === 'horizontal'
-                  ? 'bg-[var(--color-primary)] text-white shadow-[0_2px_8px_rgba(22,131,199,0.3)]'
+                  ? 'bg-[var(--color-primary)] text-[var(--color-text-on-primary)] shadow-[var(--shadow-glow)]'
                   : 'text-[var(--color-text-muted)] hover:text-[var(--color-primary)] hover:bg-[var(--color-primary)]/10'
               }`}
               aria-label="Horizontal list view"

@@ -13,6 +13,8 @@
     }
   },
   "home": {
+    "noOffersTitle": "العروض قادمة قريباً",
+    "noOffers": "لا توجد عروض متاحة حالياً.",
     "specialOffers": "عروض خاصة",
     "bestSeller": "الأكثر مبيعاً",
     "exploreItems": "استكشف المنتجات"
@@ -36,6 +38,13 @@
     "placeholder": "ابحث عن أطباق فاخرة..."
   },
   "productPage": {
+    "notFoundTitle": "المنتج غير موجود",
+    "notFoundDescription": "هذا المنتج غير متاح في هذه القائمة.",
+    "noCategory": "بدون تصنيف",
+    "noRating": "لا يوجد تقييم بعد",
+    "noPrice": "السعر غير متاح",
+    "noDescription": "لا يتوفر وصف لهذا المنتج.",
+    "noIngredients": "لم تتم إضافة مكونات لهذا المنتج.",
     "backToMenu": "العودة إلى القائمة",
     "ingredients": "المكونات",
     "total": "الإجمالي",
@@ -45,7 +54,8 @@
     "increaseQuantity": "زيادة الكمية"
   },
   "customization": {
-    "title": "تخصيص"
+    "title": "تخصيص",
+    "empty": "لا توجد خيارات تخصيص متاحة لهذا المنتج."
   },
   "languages": {
     "en": "EN",
@@ -68,6 +78,7 @@
   "reviews": {
     "title": "التقييمات",
     "noReviews": "لا توجد تقييمات حتى الآن.",
+    "empty": "لا توجد تقييمات حتى الآن. كن أول من يشارك تجربته.",
     "viewMore": "عرض المزيد"
   },
   "trustBadges": {

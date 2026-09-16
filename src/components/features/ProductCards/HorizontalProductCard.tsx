@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Star, ShoppingBag } from 'lucide-react';
 import { Product } from '@/data/menu';
-import { useLocale } from '@/hooks/useLocale';
+import { useBusinessRoute } from '@/hooks/useLocale';
 import { useCart } from '@/context/CartContext';
 import { useRef, useState } from 'react';
 
@@ -13,8 +13,8 @@ interface HorizontalProductCardProps {
 }
 
 export function HorizontalProductCard({ product }: HorizontalProductCardProps) {
-  const locale = useLocale();
-  const href = `/${locale}/${product.id}`;
+  const { getPath } = useBusinessRoute();
+  const href = getPath(product.id);
   const { addToCart, setIsDrawerOpen } = useCart();
   const [isAdding, setIsAdding] = useState(false);
   const addTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -95,7 +95,7 @@ export function HorizontalProductCard({ product }: HorizontalProductCardProps) {
         <div className="flex items-start justify-between gap-2">
           <h4 className="font-bold text-sm sm:text-base md:text-lg text-[var(--color-text-primary)] leading-tight
             group-hover:text-[var(--color-primary)] transition-colors duration-300 line-clamp-2"
-            style={{ fontFamily: 'var(--font-display), var(--font-inter), system-ui, sans-serif' }}>
+            style={{ fontFamily: 'var(--font-display)' }}>
             {product.name}
           </h4>
         </div>

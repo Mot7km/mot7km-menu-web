@@ -2,6 +2,7 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState, useMemo, ReactNode } from 'react';
+import { usePathname } from 'next/navigation';
 import { webMenuApi } from '@/lib/api/menuApi';
 import type {
   ApiBusinessIdentity,
@@ -17,11 +18,13 @@ import { PromoCardData } from '@/data/menupromo';
 
 export interface StoreContextType {
   loading: boolean;
+  storeNotFound: boolean;
   businessName: string;
   menuId: number;
   identity: ApiBusinessIdentity | null;
   header: ApiStoreHeader | null;
   sliders: ApiSliderItem[];
+  sliderHeader: string | null;
   categories: ApiCategory[];
   products: Product[];
   storeInfo: StoreInfo;
@@ -46,27 +49,58 @@ interface StoreProviderProps {
 }
 
 export function StoreProvider({ children, initialData }: StoreProviderProps) {
+  const pathname = usePathname();
   const [loading, setLoading] = useState(true);
-  const [businessName, setBusinessName] = useState(initialData?.businessName);
-  const [menuId, setMenuId] = useState(initialData?.menuId || 4);
+  const [storeNotFound, setStoreNotFound] = useState(false);
+  const [businessName, setBusinessName] = useState(initialData?.businessName || '');
+  const [menuId, setMenuId] = useState(initialData?.menuId || 0);
   const [identity, setIdentity] = useState<ApiBusinessIdentity | null>(initialData?.identity || null);
   const [header, setHeader] = useState<ApiStoreHeader | null>(initialData?.header || null);
   const [apiSliders, setApiSliders] = useState<ApiSliderItem[]>(initialData?.sliders || []);
+  const [sliderHeader, setSliderHeader] = useState<string | null>(initialData?.sliderHeader || null);
   const [apiCategories, setApiCategories] = useState<ApiCategory[]>(initialData?.categories || []);
   const [apiProducts, setApiProducts] = useState<ApiProduct[]>(initialData?.products || []);
 
   const loadData = async () => {
     try {
       setLoading(true);
-      const data = await webMenuApi.getCompleteStoreData();
+      const segments = window.location.pathname.split('/').filter(Boolean);
+      const requestedBusinessName = new URLSearchParams(window.location.search).get('businessName') ||
+        (segments.length >= 2 && (segments[1] === 'en' || segments[1] === 'ar') ? decodeURIComponent(segments[0]) : undefined);
+      if (!requestedBusinessName) {
+        setIdentity(null);
+        setHeader(null);
+        setApiSliders([]);
+        setSliderHeader(null);
+        setApiCategories([]);
+        setApiProducts([]);
+        setStoreNotFound(true);
+        return;
+      }
+
+      // Clear the previous tenant before applying the next tenant's branding.
+      setBusinessName(requestedBusinessName);
+      setIdentity(null);
+      setHeader(null);
+      setApiSliders([]);
+      setSliderHeader(null);
+      setApiCategories([]);
+      setApiProducts([]);
+      setStoreNotFound(false);
+
+      const data = await webMenuApi.getCompleteStoreData(requestedBusinessName);
+      const returnedName = data.header?.businessName || data.identity?.businessName;
+      setStoreNotFound(Boolean(returnedName && returnedName.toLowerCase() !== requestedBusinessName.toLowerCase()) ||
+        !data.header && !data.identity && !data.categories?.length && !data.products?.length);
 
       if (data.businessName) setBusinessName(data.businessName);
       if (data.menuId) setMenuId(data.menuId);
-      if (data.identity) setIdentity(data.identity);
-      if (data.header) setHeader(data.header);
-      if (data.sliders) setApiSliders(data.sliders);
-      if (data.categories) setApiCategories(data.categories);
-      if (data.products) setApiProducts(data.products);
+      setIdentity(data.identity);
+      setHeader(data.header);
+      setApiSliders(data.sliders || []);
+      setSliderHeader(data.sliderHeader || null);
+      setApiCategories(data.categories || []);
+      setApiProducts(data.products || []);
     } catch (err) {
       console.error('[StoreProvider] Failed to fetch live menu data:', err);
     } finally {
@@ -76,31 +110,33 @@ export function StoreProvider({ children, initialData }: StoreProviderProps) {
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [pathname]);
 
   // ─── Synchronize Brand Colors & Typography into DOM (Strictly 3 Colors) ───
   useEffect(() => {
-    if (identity?.colors) {
-      const { primary, secondary, accent } = identity.colors;
-      if (primary && primary !== 'string') {
-        const custom3Colors = [
-          primary,
-          secondary && secondary !== 'string' ? secondary : primary,
-          accent && accent !== 'string' ? accent : primary,
-        ];
-        const normalized = normalizeThemePalette(custom3Colors);
-        applyThemePalette(normalized);
-      }
+    const root = document.documentElement;
+    root.style.setProperty('--font-arabic', 'sans-serif');
+    root.style.setProperty('--font-english', 'sans-serif');
+    root.style.setProperty('--font-display', 'sans-serif');
+
+    const resolvedPalette = identity?.colors
+      ? [identity.colors.primary, identity.colors.secondary, identity.colors.accent]
+      : [];
+
+    const validPalette = resolvedPalette.filter(
+      (color): color is string => Boolean(color && typeof color === 'string' && color.trim())
+    );
+
+    if (validPalette.length >= 3) {
+      applyThemePalette(normalizeThemePalette(validPalette));
     }
 
     if (identity?.typography) {
-      const root = document.documentElement;
       if (identity.typography.arabicFont && identity.typography.arabicFont !== 'string') {
-        root.style.setProperty('--font-cairo', identity.typography.arabicFont);
+        root.style.setProperty('--font-arabic', identity.typography.arabicFont);
       }
       if (identity.typography.englishFont && identity.typography.englishFont !== 'string') {
-        root.style.setProperty('--font-inter', identity.typography.englishFont);
-        root.style.setProperty('--font-roboto', identity.typography.englishFont);
+        root.style.setProperty('--font-english', identity.typography.englishFont);
         root.style.setProperty('--font-display', identity.typography.englishFont);
       }
     }
@@ -129,21 +165,13 @@ export function StoreProvider({ children, initialData }: StoreProviderProps) {
     const address = header?.address || '';
     const addressAr = header?.addressAr || address;
 
-    const workingHours = (header?.workingHours && header.workingHours.length > 0)
+    const workingHours = header?.workingHours?.length
       ? header.workingHours.map((wh) => ({
           day: wh.day,
           open: wh.open,
           close: wh.close,
         }))
-      : [
-          { day: 0, open: '10:00', close: '00:00' },
-          { day: 1, open: '10:00', close: '00:00' },
-          { day: 2, open: '10:00', close: '00:00' },
-          { day: 3, open: '10:00', close: '00:00' },
-          { day: 4, open: '10:00', close: '00:00' },
-          { day: 5, open: '12:00', close: '02:00' },
-          { day: 6, open: '12:00', close: '02:00' },
-        ];
+      : [];
 
     const rawSocials = header?.socialLinks || header?.socials;
 
@@ -183,15 +211,16 @@ export function StoreProvider({ children, initialData }: StoreProviderProps) {
   const promoCards = useMemo<PromoCardData[]>(() => {
     if (apiSliders && apiSliders.length > 0) {
       return apiSliders.map((slider, index) => {
-        const title = slider.title || slider.name || slider.titleAr || 'Special Offer';
+        const title = slider.header || slider.title || slider.name || slider.titleAr || '';
         const image = slider.imageUrl || slider.image || '';
         return {
           id: slider.id || index + 1,
           title,
-          description: slider.description || slider.descriptionAr || '',
+          description: slider.desc || slider.description || slider.descriptionAr || '',
           badge: slider.badge || slider.badgeAr || '',
           image,
-          gradient: slider.gradient || 'linear-gradient(135deg, var(--color-primary), var(--color-accent))',
+          gradient: slider.gradient || '',
+          backgroundColor: slider.bgColor || undefined,
           textColor: 'text-white',
           badgeColor: 'text-[var(--color-accent)]',
           badgeBg: 'rgba(0, 0, 0, 0.4)',
@@ -207,20 +236,16 @@ export function StoreProvider({ children, initialData }: StoreProviderProps) {
     if (apiProducts && apiProducts.length > 0) {
       return apiProducts.map((p) => {
         const rawPrice = p.price;
-        const priceNum = typeof rawPrice === 'number'
-          ? rawPrice
-          : parseFloat(String(rawPrice || '0').replace(/[^0-9.]/g, '')) || 0;
-
-        const name = p.productName || p.product_Name || p.name || 'Product';
-        const image = p.productImageUrl || p.product_ImageUrl || p.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&q=80';
-        const categoryName = p.categoryName || p.category || (apiCategories.find((c) => String(c.id) === String(p.categoryId))?.categoryName ?? 'General');
+        const name = p.productName || p.product_Name || p.name || '';
+        const image = p.productImageUrl || p.product_ImageUrl || p.image || '';
+        const categoryName = p.categoryName || p.category || apiCategories.find((c) => String(c.id) === String(p.categoryId))?.categoryName || '';
 
         return {
           id: String(p.id),
           name,
           description: p.description || '',
-          price: `$${priceNum.toFixed(2)}`,
-          rating: (p.rating || p.averageRating) ? Number(p.rating || p.averageRating).toFixed(1) : '5.0',
+          price: rawPrice === undefined || rawPrice === null || rawPrice === '' ? '' : String(rawPrice),
+          rating: (p.rating ?? p.averageRating) == null ? '' : Number(p.rating ?? p.averageRating).toFixed(1),
           image,
           featured: true,
           category: categoryName,
@@ -245,11 +270,13 @@ export function StoreProvider({ children, initialData }: StoreProviderProps) {
 
   const value = {
     loading,
+    storeNotFound,
     businessName,
     menuId,
     identity,
     header,
     sliders: apiSliders,
+    sliderHeader,
     categories: apiCategories,
     products,
     storeInfo,

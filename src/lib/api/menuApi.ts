@@ -1,10 +1,11 @@
 // src/lib/api/menuApi.ts
-import { API_BASE_URL, DEFAULT_BUSINESS_NAME } from '../constants';
+import { API_BASE_URL } from '../constants';
 import type {
   ApiBusinessIdentity,
   ApiStoreHeader,
   ApiSlider,
   ApiSliderItem,
+  ApiSlidersResponse,
   ApiCategory,
   ApiProduct,
   ApiProductDetails,
@@ -119,8 +120,8 @@ export const webMenuApi = {
    * GET /api/menu/sliders
    * Get promotional sliders and carousel banners.
    */
-  async getSliders(): Promise<ApiSlider[] | null> {
-    return fetchApi<ApiSlider[]>('/api/menu/sliders');
+  async getSliders(): Promise<ApiSlidersResponse | ApiSlider[] | null> {
+    return fetchApi<ApiSlidersResponse | ApiSlider[]>('/api/menu/sliders');
   },
 
   /**
@@ -201,16 +202,17 @@ export const webMenuApi = {
     identity: ApiBusinessIdentity | null;
     header: ApiStoreHeader | null;
     sliders: ApiSliderItem[] | null;
+    sliderHeader: string | null;
     categories: ApiCategory[] | null;
     products: ApiProduct[] | null;
   }> {
     let businessName = customBusinessName;
-    let menuId = 4;
+    let menuId = 0;
 
     // 1. Resolve Profile
     try {
       const profile = await this.getProfile();
-      if (profile?.businessName) {
+      if (!businessName && profile?.businessName) {
         businessName = profile.businessName;
       }
       if (profile?.menuId) {
@@ -219,7 +221,7 @@ export const webMenuApi = {
     } catch {}
 
     if (!businessName) {
-      businessName = DEFAULT_BUSINESS_NAME;
+      return { businessName: '', menuId, identity: null, header: null, sliders: null, sliderHeader: null, categories: null, products: null };
     }
 
     // 2. Fetch the complete menu bundle by business name
@@ -230,18 +232,20 @@ export const webMenuApi = {
         rawBundle.businessIdentity || rawBundle.identity || null;
 
       // Normalize header
-      const header: ApiStoreHeader = rawBundle.header || {};
-      if (rawBundle.businessDescription && !header.slogan) {
+      const header: ApiStoreHeader | null = rawBundle.header || null;
+      if (rawBundle.businessDescription && header && !header.slogan) {
         header.slogan = rawBundle.businessDescription;
       }
 
       // Normalize sliders (backend might return { sliderHeader, sliderItems: [...] } or an array)
       let sliders: ApiSliderItem[] | null = null;
+      let sliderHeader: string | null = null;
       if (rawBundle.sliders) {
         if (Array.isArray(rawBundle.sliders)) {
           sliders = rawBundle.sliders;
         } else if (Array.isArray(rawBundle.sliders.sliderItems)) {
           sliders = rawBundle.sliders.sliderItems;
+          sliderHeader = rawBundle.sliders.sliderHeader || null;
         }
       }
 
@@ -273,6 +277,11 @@ export const webMenuApi = {
         });
       }
 
+      if (categories && categories.length > 0 && products.length === 0) {
+        const results = await Promise.all(categories.map((category) => this.getProductsByCategory(Number(category.id))));
+        products = results.flatMap((result) => result || []);
+      }
+
       // If separate identity endpoint is needed because bundle didn't include it
       let resolvedIdentity = identity;
       if (!resolvedIdentity) {
@@ -280,12 +289,13 @@ export const webMenuApi = {
       }
 
       // If sliders are empty, check /api/menu/sliders
-      if (!sliders || sliders.length === 0) {
+      if (!sliders || sliders.length === 0 || !sliderHeader) {
         const directSliders: any = await this.getSliders();
         if (Array.isArray(directSliders)) {
           sliders = directSliders;
         } else if (directSliders?.sliderItems) {
           sliders = directSliders.sliderItems;
+          sliderHeader = directSliders.sliderHeader || null;
         }
       }
 
@@ -293,8 +303,9 @@ export const webMenuApi = {
         businessName,
         menuId,
         identity: resolvedIdentity,
-        header,
+        header: header || await this.getHeader(businessName),
         sliders,
+        sliderHeader,
         categories,
         products: products.length > 0 ? products : null,
       };
@@ -309,10 +320,12 @@ export const webMenuApi = {
     ]);
 
     let sliders: ApiSliderItem[] | null = null;
+    let sliderHeader: string | null = null;
     if (Array.isArray(rawSliders)) {
       sliders = rawSliders;
     } else if ((rawSliders as any)?.sliderItems) {
       sliders = (rawSliders as any).sliderItems;
+      sliderHeader = (rawSliders as any).sliderHeader || null;
     }
 
     let products: ApiProduct[] | null = null;
@@ -331,6 +344,7 @@ export const webMenuApi = {
       identity,
       header,
       sliders,
+      sliderHeader,
       categories,
       products,
     };

@@ -113,7 +113,7 @@ export function CartDrawer({
         <div className="p-3 sm:p-4 lg:p-6 border-b border-[var(--color-border)] flex flex-col items-center shrink-0">
           <div className="w-12 h-1.5 bg-[var(--color-border-strong)] rounded-full mb-3 sm:mb-4 opacity-50" />
           <div className="w-full flex items-center justify-between">
-            <h2 className="font-montserrat font-bold text-lg sm:text-xl lg:text-2xl text-[var(--color-text-primary)] flex items-center gap-2">
+            <h2 className="font-api font-bold text-lg sm:text-xl lg:text-2xl text-[var(--color-text-primary)] flex items-center gap-2">
               <ShoppingBag size={20} className="text-[var(--color-primary)]" />
               {t('cart.yourOrder')}
             </h2>
@@ -173,7 +173,7 @@ export function CartDrawer({
                   </div>
 
                   <div className="flex items-center justify-between mt-3 flex-wrap gap-2">
-                    <span className="font-montserrat font-bold text-sm sm:text-base lg:text-lg text-[var(--color-primary)]">
+                    <span className="font-api font-bold text-sm sm:text-base lg:text-lg text-[var(--color-primary)]">
                       ${totalGroupPrice.toFixed(2)}
                     </span>
 
@@ -234,7 +234,7 @@ export function CartDrawer({
             <span className="text-[var(--color-text-secondary)] font-medium text-sm sm:text-base">
               {t('cart.grandTotal')}
             </span>
-            <span className="font-montserrat font-bold text-xl sm:text-2xl lg:text-3xl text-[var(--color-text-primary)]">
+            <span className="font-api font-bold text-xl sm:text-2xl lg:text-3xl text-[var(--color-text-primary)]">
               ${totalPrice.toFixed(2)}
             </span>
           </div>

@@ -23,10 +23,6 @@ import {
 import { storeInfo, isStoreOpen } from '@/data/storeInfo';
 import {
   THEME_STORAGE_KEY,
-  DEFAULT_THEME_COLORS,
-  getStoredThemePalette,
-  normalizeThemePalette,
-  setThemePalette,
 } from '@/config/theme';
 import { i18n } from '@/config/i18n';
 import { useLocaleTransition } from '@/context/LocaleTransitionContext';
@@ -54,10 +50,10 @@ function getTodayHours() {
 }
 
 const socialColorMap: Record<string, string> = {
-  whatsapp: '#25D366',
-  instagram: '#E4405F',
-  facebook: '#1877F2',
-  tiktok: '#000000',
+  whatsapp: 'var(--color-primary)',
+  instagram: 'var(--color-secondary)',
+  facebook: 'var(--color-accent)',
+  tiktok: 'var(--color-text-primary)',
 };
 
 function SocialIcon({ platform, className }: { platform: string; className?: string }) {
@@ -179,12 +175,6 @@ function SettingsContent() {
   const pathname = usePathname();
   const router = useRouter();
   const { startLocaleTransition } = useLocaleTransition();
-  const [palette, setPalette] = useState<string[]>(() => getStoredThemePalette());
-
-  useEffect(() => {
-    setPalette(getStoredThemePalette());
-  }, []);
-
   const currentTheme = theme || 'system';
 
   const applyTheme = (name: 'light' | 'dark' | 'system') => {
@@ -233,14 +223,6 @@ function SettingsContent() {
     { id: 'dark' as const, icon: Moon, label: t('settings.dark') },
     { id: 'system' as const, icon: Monitor, label: t('settings.system') },
   ];
-
-  const handlePaletteChange = (index: number, value: string) => {
-    const next = [...palette];
-    next[index] = value;
-    const normalized = normalizeThemePalette(next);
-    setPalette(normalized);
-    setThemePalette(normalized);
-  };
 
   const languageOptions = i18n.locales.map((loc) => ({
     id: loc,
@@ -322,43 +304,6 @@ function SettingsContent() {
           })}
         </div>
 
-        <div className="mt-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-primary-50)] p-2.5">
-          <div className="mb-2 flex items-center justify-between">
-            <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--color-text-muted)]">
-              Brand colors
-            </span>
-            <button
-              type="button"
-              onClick={() => {
-                const next = [...DEFAULT_THEME_COLORS];
-                setPalette(next);
-                setThemePalette(next);
-              }}
-              className="text-[10px] font-medium text-[var(--color-primary)] hover:opacity-80"
-            >
-              Reset
-            </button>
-          </div>
-          <div className="grid grid-cols-3 gap-2">
-            {palette.slice(0, 3).map((color, index) => {
-              const labels = ['Primary', 'Secondary', 'Accent'];
-              return (
-                <label key={`${color}-${index}`} className="flex flex-col items-center gap-1 cursor-pointer">
-                  <input
-                    type="color"
-                    value={color}
-                    onChange={(event) => handlePaletteChange(index, event.target.value)}
-                    className="h-9 w-9 rounded-lg border border-white/30 bg-transparent p-0 shadow-sm cursor-pointer"
-                    aria-label={labels[index] || `Color ${index + 1}`}
-                  />
-                  <span className="text-[9px] text-[var(--color-text-muted)] font-medium">
-                    {labels[index]}
-                  </span>
-                </label>
-              );
-            })}
-          </div>
-        </div>
       </div>
     </>
   );
@@ -427,7 +372,7 @@ export function Header() {
   const displayAddress = isRTL ? (storeInfo.addressAr || storeInfo.address) : storeInfo.address;
   const brandName = header?.businessName || identity?.businessName || storeInfo.name;
   const slogan = header?.slogan || identity?.slogan || t('header.tagline');
-  const logoUrl = header?.logoUrl || identity?.logo;
+  const logoUrl = header?.logo || header?.logoUrl || identity?.logo;
 
   const togglePopover = (id: string) => {
     setPopoverOpen((prev) => (prev === id ? null : id));
@@ -467,7 +412,7 @@ export function Header() {
   );
 
   const iconButton = (icon: React.ReactNode) => (
-    <div className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/10 border border-white/20 text-white hover:bg-white/20 transition-colors group">
+    <div className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[var(--color-surface)]/10 border border-[var(--color-border-strong)] text-[var(--color-text-on-primary)] hover:bg-[var(--color-surface)]/20 transition-colors group">
       {icon}
     </div>
   );
@@ -476,13 +421,13 @@ export function Header() {
     <div
       className={`flex items-center gap-2 px-2.5 py-1 rounded-full border backdrop-blur-sm transition-all
         ${open
-          ? 'border-green-400/40 bg-green-500/10 text-green-300'
-          : 'border-red-400/40 bg-red-500/10 text-red-300'
+          ? 'border-[var(--color-success)]/40 bg-[var(--color-success)]/10 text-[var(--color-success)]'
+          : 'border-[var(--color-error)]/40 bg-[var(--color-error)]/10 text-[var(--color-error)]'
         }`}
     >
       <span
         className={`inline-block w-2 h-2 rounded-full animate-pulse ${
-          open ? 'bg-green-400' : 'bg-red-400'
+          open ? 'bg-[var(--color-success)]' : 'bg-[var(--color-error)]'
         }`}
       />
       <span className="text-xs font-medium whitespace-nowrap">
@@ -559,10 +504,10 @@ export function Header() {
           <div
             className="flex h-20 w-20 sm:h-24 sm:w-24 md:h-28 md:w-28
               items-center justify-center rounded-2xl
-              border border-white/30 bg-white/15 backdrop-blur-md
-              shadow-[0_8px_32px_rgba(0,0,0,0.2)]
-              transition-all duration-300 hover:scale-105 hover:border-white/50
-              hover:shadow-[0_8px_40px_rgba(22,131,199,0.35)]
+              border border-[var(--color-border-strong)] bg-[var(--color-surface)]/20 backdrop-blur-md
+              shadow-[var(--shadow-card)]
+              transition-all duration-300 hover:scale-105 hover:border-[var(--color-accent)]
+              hover:shadow-[var(--shadow-glow-strong)]
               overflow-hidden relative
               "
           >
@@ -575,7 +520,7 @@ export function Header() {
             ) : (
               <UtensilsCrossed
                 strokeWidth={2.2}
-                className="h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14 drop-shadow-lg text-white"
+                className="h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14 drop-shadow-lg text-[var(--color-text-on-primary)]"
               />
             )}
           </div>
@@ -586,10 +531,10 @@ export function Header() {
           {/* Row: brand name + desktop status */}
           <div className="flex items-center gap-2 flex-wrap">
             <h1
-              className="text-xl sm:text-2xl md:text-3xl font-extrabold text-white drop-shadow-xl tracking-tight leading-none"
+              className="text-xl sm:text-2xl md:text-3xl font-extrabold text-[var(--color-text-on-primary)] drop-shadow-xl tracking-tight leading-none"
               style={{
-                fontFamily: 'var(--font-display), var(--font-inter), system-ui, sans-serif',
-                textShadow: '0 2px 16px rgba(0,0,0,0.3)',
+                fontFamily: 'var(--font-display)',
+                textShadow: '0 2px 16px var(--color-primary)',
               }}
             >
               {brandName}
@@ -599,12 +544,12 @@ export function Header() {
           </div>
 
           {/* Tagline */}
-          <p className="text-xs sm:text-sm md:text-base font-medium text-white/90 drop-shadow-md -mt-0.5">
+          <p className="text-xs sm:text-sm md:text-base font-medium text-[var(--color-text-on-primary)]/90 drop-shadow-md -mt-0.5">
             {slogan}
           </p>
 
           {/* Decorative line */}
-          <div className="mt-1 h-0.5 w-12 sm:w-16 rounded-full bg-gradient-to-r from-white/80 to-transparent shadow-[0_0_12px_rgba(255,255,255,0.3)] animate-fade-in" />
+          <div className="mt-1 h-0.5 w-12 sm:w-16 rounded-full bg-gradient-to-r from-[var(--color-text-on-primary)]/80 to-transparent shadow-[var(--shadow-glow)] animate-fade-in" />
 
           {/* Bottom row: mobile status + icon bar */}
           <div className="flex flex-wrap items-center gap-2 mt-1">

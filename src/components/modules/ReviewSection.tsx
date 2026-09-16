@@ -74,7 +74,7 @@ export default function ReviewSection({
       <div className="flex flex-row items-center justify-between gap-2 sm:gap-4 border-b border-[var(--color-divider)] pb-3">
         <h2
           className="accent-line font-bold text-base sm:text-xl md:text-2xl leading-6 sm:leading-8 text-[var(--color-text-primary)] truncate min-w-0 flex-1"
-          style={{ fontFamily: 'var(--font-display), var(--font-inter), system-ui, sans-serif' }}
+          style={{ fontFamily: 'var(--font-display)' }}
         >
           {sectionTitle}
         </h2>
@@ -84,7 +84,7 @@ export default function ReviewSection({
           <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0 px-3 py-1.5 rounded-full bg-[var(--color-warning)]/8 border border-[var(--color-warning)]/15">
             <span
               className="font-extrabold text-lg sm:text-xl md:text-2xl text-[var(--color-warning-dark)]"
-              style={{ fontFamily: 'var(--font-display), var(--font-inter), system-ui, sans-serif' }}
+              style={{ fontFamily: 'var(--font-display)' }}
             >
               {avgRating}
             </span>

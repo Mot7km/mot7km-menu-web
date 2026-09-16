@@ -47,7 +47,7 @@ export default function ReviewForm({
       onMouseEnter={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
       onMouseLeave={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-xs)'; }}
     >
-      <h3 className="font-montserrat font-bold text-lg text-[var(--color-text-primary)]">
+      <h3 className="font-api font-bold text-lg text-[var(--color-text-primary)]">
         {t('review.writeReview')}
       </h3>
 
@@ -142,9 +142,9 @@ export default function ReviewForm({
         disabled={!isFormValid || isLoading}
         className="mt-2 w-full py-3 rounded-xl
           bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-accent)]
-          text-white font-bold text-base
-          shadow-[0_4px_15px_rgba(22,131,199,0.3)]
-          hover:shadow-[0_4px_25px_rgba(22,131,199,0.4)]
+          text-[var(--color-text-on-primary)] font-bold text-base
+          shadow-[var(--shadow-glow)]
+          hover:shadow-[var(--shadow-glow-strong)]
           hover:scale-[1.01] active:scale-[0.99]
           transition-all duration-200
           disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"

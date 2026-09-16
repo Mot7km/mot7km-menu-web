@@ -13,6 +13,8 @@
     }
   },
   "home": {
+    "noOffersTitle": "Offers are on their way",
+    "noOffers": "There are no promotions available right now.",
     "specialOffers": "Special Offers",
     "bestSeller": "Best Seller",
     "exploreItems": "Explore Items"
@@ -36,6 +38,13 @@
     "placeholder": "Search for premium dishes..."
   },
   "productPage": {
+    "notFoundTitle": "Product not found",
+    "notFoundDescription": "This product is not available in this menu.",
+    "noCategory": "Uncategorized",
+    "noRating": "No rating yet",
+    "noPrice": "Price unavailable",
+    "noDescription": "No description is available for this product.",
+    "noIngredients": "No ingredients have been provided.",
     "backToMenu": "Back to menu",
     "ingredients": "Ingredients",
     "total": "Total",
@@ -45,7 +54,8 @@
     "increaseQuantity": "Increase quantity"
   },
   "customization": {
-    "title": "Customization"
+    "title": "Customization",
+    "empty": "No customization options are available for this product."
   },
   "languages": {
     "en": "EN",
@@ -68,6 +78,7 @@
   "reviews": {
     "title": "Reviews",
     "noReviews": "No reviews yet.",
+    "empty": "No reviews yet. Be the first to share your experience.",
     "viewMore": "View More"
   },
   "trustBadges": {

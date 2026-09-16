@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Star, ShoppingBag } from 'lucide-react';
 import { Product } from '@/data/menu';
-import { useLocale } from '@/hooks/useLocale';
+import { useBusinessRoute } from '@/hooks/useLocale';
 import { useCart } from '@/context/CartContext';
 import { useRef, useState } from 'react';
 
@@ -13,8 +13,8 @@ interface ProductCardProps {
 }
 
 export function GridProductCard({ product }: ProductCardProps) {
-  const locale = useLocale();
-  const href = `/${locale}/${product.id}`;
+  const { getPath } = useBusinessRoute();
+  const href = getPath(product.id);
   const { addToCart, setIsDrawerOpen } = useCart();
   const [isAdding, setIsAdding] = useState(false);
   const addTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -47,12 +47,12 @@ export function GridProductCard({ product }: ProductCardProps) {
       href={href}
       prefetch={false}
       className="group relative flex flex-col w-full h-full
-        bg-[#0b1120] rounded-3xl
-        border border-slate-800
+        bg-[var(--color-surface)] rounded-3xl
+        border border-[var(--color-border)]
         overflow-hidden
         transition-all duration-400 ease-out
-        hover:border-cyan-500/50
-        hover:shadow-[0_0_30px_rgba(34,211,238,0.15)]
+        hover:border-[var(--color-accent)]
+        hover:shadow-[var(--shadow-glow)]
         active:scale-[0.98]
         cursor-pointer"
     >
@@ -67,17 +67,17 @@ export function GridProductCard({ product }: ProductCardProps) {
         />
         
         {/* Dark gradient overlay at the bottom of the image for better badge visibility */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0b1120] via-transparent to-transparent opacity-80 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-surface)] via-transparent to-transparent opacity-80 pointer-events-none" />
 
         {/* Quick Add Button */}
         <button
           onClick={handleQuickAdd}
           disabled={isAdding}
           className={`absolute top-3 end-3 z-20 flex items-center justify-center w-10 h-10 rounded-full 
-            bg-cyan-500/20 backdrop-blur-md border border-cyan-500/30 
-            text-cyan-400 transition-all duration-300 
-            shadow-[0_4px_10px_rgba(0,0,0,0.3)] 
-            hover:bg-cyan-500 hover:text-[#0b1120] hover:scale-110 active:scale-95 cursor-pointer
+            bg-[var(--color-accent-50)] backdrop-blur-md border border-[var(--color-accent)]
+            text-[var(--color-accent)] transition-all duration-300
+            shadow-[var(--shadow-sm)]
+            hover:bg-[var(--color-accent)] hover:text-[var(--color-text-on-accent)] hover:scale-110 active:scale-95 cursor-pointer
             ${isAdding ? 'opacity-50 pointer-events-none' : ''}`}
           aria-label="Add to cart"
         >
@@ -87,12 +87,12 @@ export function GridProductCard({ product }: ProductCardProps) {
         {/* Price Badge */}
         <div className="absolute bottom-3 end-3 z-10">
           <span className="inline-flex items-center px-4 py-1.5 rounded-full
-            bg-[#0b1120]/80 backdrop-blur-md
-            border border-cyan-500/30
-            font-bold text-sm text-cyan-400
+            bg-[var(--color-surface)]/80 backdrop-blur-md
+            border border-[var(--color-accent)]
+            font-bold text-sm text-[var(--color-accent)]
             shadow-lg
             transition-all duration-300
-            group-hover:shadow-[0_0_20px_rgba(34,211,238,0.3)]
+            group-hover:shadow-[var(--shadow-glow)]
             group-hover:scale-105">
             {product.price}
           </span>
@@ -100,33 +100,36 @@ export function GridProductCard({ product }: ProductCardProps) {
       </div>
 
       {/* Content Section */}
-      <div className="flex flex-col flex-1 p-4 gap-3 bg-[#0b1120]">
+      <div className="flex flex-col flex-1 p-4 gap-3 bg-[var(--color-surface)]">
         <h4 
-          className="font-bold text-base leading-snug text-white break-words
-            group-hover:text-cyan-400 transition-colors duration-300"
-          style={{ fontFamily: 'var(--font-display), var(--font-inter), system-ui, sans-serif' }}
+          className="font-bold text-base leading-snug text-[var(--color-text-primary)] break-words
+            group-hover:text-[var(--color-accent)] transition-colors duration-300"
+          style={{ fontFamily: 'var(--font-display)' }}
         >
           {product.name}
         </h4>
 
-        <div className="flex items-center justify-between mt-auto pt-3 border-t border-slate-800">
+        <div className="flex items-center justify-between mt-auto pt-3 border-t border-[var(--color-border)]">
           {/* Category Badge */}
           {product.category && (
-            <span className="text-xs font-medium text-slate-400
-              bg-slate-800/80 backdrop-blur-sm
-              px-3 py-1.5 rounded-full truncate max-w-[100px]">
+            <span className="inline-flex items-center px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full
+              bg-[var(--color-primary-50)] border border-[var(--color-border)]
+              font-medium text-[10px] sm:text-xs text-[var(--color-primary)]
+              shadow-sm transition-all duration-300
+              group-hover:shadow-[var(--shadow-glow)]
+              whitespace-nowrap uppercase tracking-wider">
               {product.category}
             </span>
           )}
 
           {/* Rating Badge */}
           <div className="flex items-center gap-1.5
-            bg-amber-500/10 border border-amber-500/30 
+            bg-[var(--color-accent-50)] border border-[var(--color-accent)]
             px-2.5 py-1.5 rounded-full
             transition-all duration-300
-            group-hover:shadow-[0_0_12px_rgba(245,158,11,0.15)]">
-            <Star size={14} className="text-amber-400 fill-amber-400" strokeWidth={0} />
-            <span className="text-xs font-bold text-amber-400 leading-none">
+            group-hover:shadow-[var(--shadow-glow)]">
+            <Star size={14} className="text-[var(--color-accent)] fill-[var(--color-accent)]" strokeWidth={0} />
+            <span className="text-xs font-bold text-[var(--color-accent)] leading-none">
               {product.rating}
             </span>
           </div>

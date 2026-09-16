@@ -61,7 +61,7 @@ export function CustomizationOptions({ product, onPriceChange, onSelectionsChang
   }, [product]);
 
   if (!product.customizationOptions || product.customizationOptions.length === 0) {
-    return null;
+    return <div className="w-full rounded-2xl border border-dashed border-[var(--color-border)] bg-[var(--color-surface)] px-6 py-5 text-center text-sm text-[var(--color-text-muted)]"><div className="mb-1 flex items-center justify-center gap-2 font-semibold text-[var(--color-text-primary)]"><Settings2 size={17} className="text-[var(--color-primary)]" />{t('customization.title')}</div>{t('customization.empty')}</div>;
   }
 
   const isYesNoOption = (option: typeof product.customizationOptions[0]) => {
@@ -81,7 +81,7 @@ export function CustomizationOptions({ product, onPriceChange, onSelectionsChang
           <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[var(--color-primary)]/10 text-[var(--color-primary)]">
             <Settings2 size={18} />
           </div>
-          <h3 className="font-montserrat font-bold text-lg lg:text-xl text-[var(--color-text-primary)]">
+          <h3 className="font-api font-bold text-lg lg:text-xl text-[var(--color-text-primary)]">
             {t('customization.title')}
           </h3>
         </div>
@@ -135,11 +135,11 @@ export function CustomizationOptions({ product, onPriceChange, onSelectionsChang
 
                 <div className={`w-6 h-6 rounded-md border-2 transition-all duration-300 flex items-center justify-center ml-4
                   ${isChecked 
-                    ? 'bg-[var(--color-primary)] border-[var(--color-primary)] shadow-[0_0_10px_rgba(22,131,199,0.4)]' 
+                    ? 'bg-[var(--color-primary)] border-[var(--color-primary)] shadow-[var(--shadow-glow)]'
                     : 'bg-transparent border-[var(--color-border-strong)] group-hover:border-[var(--color-primary)]/50'
                   }`}
                 >
-                  <Check size={14} strokeWidth={3} className={`text-white transition-transform duration-300 ${isChecked ? 'scale-100 opacity-100' : 'scale-0 opacity-0'}`} />
+                  <Check size={14} strokeWidth={3} className={`text-[var(--color-text-on-primary)] transition-transform duration-300 ${isChecked ? 'scale-100 opacity-100' : 'scale-0 opacity-0'}`} />
                 </div>
               </div>
             );
@@ -167,7 +167,7 @@ export function CustomizationOptions({ product, onPriceChange, onSelectionsChang
                         hover:scale-[1.02] active:scale-[0.98]
                         cursor-pointer
                         ${isSelected
-                          ? 'text-white shadow-[0_4px_15px_rgba(22,131,199,0.3)] border-transparent'
+                          ? 'text-[var(--color-text-on-primary)] shadow-[var(--shadow-glow)] border-transparent'
                           : 'bg-[var(--color-surface)] border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-primary)] hover:text-[var(--color-text-primary)]'
                         }
                       `}

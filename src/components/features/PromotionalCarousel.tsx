@@ -1,62 +1,127 @@
 'use client';
 
 import Image from 'next/image';
-import { Coffee, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Coffee, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 import useEmblaCarousel from 'embla-carousel-react';
 import Autoplay from 'embla-carousel-autoplay';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { PromoCardData } from '@/data/menupromo';
-import { usePathname } from 'next/navigation';
 import { useStore } from '@/context/StoreContext';
+import { useLocale, useTranslations } from 'next-intl';
 
 // -------------------------------------------------------------------
 // Main Carousel – full‑width on mobile, container‑width on larger screens
 // -------------------------------------------------------------------
 export function PromotionalCarousel() {
-  const pathname = usePathname();
-  const isRTL = pathname?.startsWith('/ar') ?? false;
-  const { promoCards } = useStore();
+  const t = useTranslations();
+  const locale = useLocale();
+  const isRTL = locale === 'ar';
+  const { promoCards, sliderHeader, loading } = useStore();
 
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const slideCount = promoCards?.length ?? 0;
+
+  // Loop only when there are enough slides to fill more than one "page".
+  // With 1–2 slides on wide screens, loop:true makes Embla ignore
+  // `containScroll` and produces dead snaps.
+  const loop = slideCount > 2;
+
+  // Lazy-init Autoplay exactly once. Calling Autoplay() during render would
+  // create a new plugin instance on every render and leak listeners.
+  const autoplayRef = useRef<ReturnType<typeof Autoplay> | null>(null);
+  if (autoplayRef.current === null) {
+    autoplayRef.current = Autoplay({
+      delay: 4000,
+      stopOnInteraction: true,
+    });
+  }
+
   const [emblaRef, emblaApi] = useEmblaCarousel(
     {
-      loop: true,
+      loop,
       align: 'center',
       containScroll: 'trimSnaps',
       dragFree: false,
       direction: isRTL ? 'rtl' : 'ltr',
     },
-    [Autoplay({ delay: 4000, stopOnInteraction: true })]
+    [autoplayRef.current]
   );
+
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [snapCount, setSnapCount] = useState(0);
+  const [canPrev, setCanPrev] = useState(false);
+  const [canNext, setCanNext] = useState(false);
 
   useEffect(() => {
     if (!emblaApi) return;
 
-    const onSelect = () => setSelectedIndex(emblaApi.selectedScrollSnap());
-    emblaApi.on('select', onSelect);
-    onSelect();
+    const sync = () => {
+      setSelectedIndex(emblaApi.selectedScrollSnap());
+      setSnapCount(emblaApi.scrollSnapList().length);
+      setCanPrev(emblaApi.canScrollPrev());
+      setCanNext(emblaApi.canScrollNext());
+    };
+
+    sync();
+    emblaApi.on('select', sync);
+    emblaApi.on('reInit', sync);
 
     return () => {
-      emblaApi.off('select', onSelect);
+      emblaApi.off('select', sync);
+      emblaApi.off('reInit', sync);
     };
   }, [emblaApi]);
 
-  const scrollPrev = () => emblaApi?.scrollPrev();
-  const scrollNext = () => emblaApi?.scrollNext();
-  const scrollTo = (index: number) => emblaApi?.scrollTo(index);
+  // Pause autoplay when there's nothing to rotate through.
+  useEffect(() => {
+    const autoplay = autoplayRef.current;
+    if (!autoplay) return;
+    if (snapCount > 1) autoplay.play();
+    else autoplay.stop();
+  }, [snapCount]);
 
-  if (!promoCards || promoCards.length === 0) {
-    return null;
+  const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
+  const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
+  const scrollTo = useCallback(
+    (i: number) => emblaApi?.scrollTo(i),
+    [emblaApi]
+  );
+
+  // ---------------- Loading / empty state ----------------
+  if (loading || !promoCards?.length) {
+    return (
+      <section className="relative flex min-h-56 items-center justify-center overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-6 py-10 text-center shadow-[var(--shadow-card)]">
+        <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-primary)]/[0.08] via-transparent to-[var(--color-accent)]/[0.12]" />
+        <div className="relative flex max-w-sm flex-col items-center gap-3">
+          <Sparkles className="h-7 w-7 text-[var(--color-primary)]" />
+          <h3 className="text-lg font-bold text-[var(--color-text-primary)]">
+            {loading ? t('loading.store') : t('home.noOffersTitle')}
+          </h3>
+          {!loading && (
+            <p className="text-sm text-[var(--color-text-muted)]">
+              {t('home.noOffers')}
+            </p>
+          )}
+        </div>
+      </section>
+    );
   }
+
+  // Only show navigation when Embla actually has more than one snap.
+  const showNav = snapCount > 1;
 
   return (
     // Full‑width breakout on mobile, respect container on larger screens
     <section
       className="relative overflow-x-hidden py-2
-        w-fill left-1/2 -translate-x-1/2
+        w-full left-1/2 -translate-x-1/2
         sm:w-auto sm:left-0 sm:translate-x-0"
     >
       <div className="relative">
+        {sliderHeader && (
+          <h2 className="mb-2 px-2 text-lg font-bold text-[var(--color-text-primary)] font-api">
+            {sliderHeader}
+          </h2>
+        )}
         {/* Carousel Viewport */}
         <div
           className="overflow-hidden rounded-2xl touch-pan-y"
@@ -67,8 +132,7 @@ export function PromotionalCarousel() {
             {promoCards.map((card) => (
               <div
                 key={card.id}
-                className="min-w-0 flex-shrink-0 flex-grow-0 basis-[85%] sm:basis-[75%] md:basis-[60%] lg:basis-[50%]
-                  px-2 py-2"
+                className="min-w-0 shrink-0 grow-0 basis-[85%] sm:basis-[75%] md:basis-[60%] lg:basis-[50%] px-2 py-2"
               >
                 <PromoCard {...card} />
               </div>
@@ -77,56 +141,70 @@ export function PromotionalCarousel() {
         </div>
 
         {/* Navigation Arrows — hidden on mobile, visible on sm+ */}
-        <button
-          onClick={scrollPrev}
-          className="absolute top-1/2 left-0 -translate-y-1/2 z-10
-            hidden sm:flex items-center justify-center
-            w-11 h-11 rounded-full
-            glass
-            text-[var(--color-text-secondary)] hover:text-[var(--color-primary)]
-            transition-all duration-200
-            hover:scale-110 active:scale-95
-            focus:outline-none focus-ring
-            cursor-pointer"
-          aria-label={isRTL ? 'التالي' : 'Previous'}
-        >
-          <ChevronLeft className="w-5 h-5" />
-        </button>
-
-        <button
-          onClick={scrollNext}
-          className="absolute top-1/2 right-0 -translate-y-1/2 z-10
-            hidden sm:flex items-center justify-center
-            w-11 h-11 rounded-full
-            glass
-            text-[var(--color-text-secondary)] hover:text-[var(--color-primary)]
-            transition-all duration-200
-            hover:scale-110 active:scale-95
-            focus:outline-none focus-ring
-            cursor-pointer"
-          aria-label={isRTL ? 'السابق' : 'Next'}
-        >
-          <ChevronRight className="w-5 h-5" />
-        </button>
-
-        {/* Dots */}
-        <div className="mt-5 flex justify-center gap-2">
-          {promoCards.map((_, index) => (
+        {showNav && (
+          <>
             <button
-              key={index}
-              className={`h-2 rounded-full transition-all duration-400 ease-out cursor-pointer
-                ${
+              onClick={scrollPrev}
+              disabled={!loop && !canPrev}
+              aria-label={isRTL ? 'التالي' : 'Previous'}
+              className="absolute top-1/2 left-0 -translate-y-1/2 z-10
+                hidden sm:flex items-center justify-center
+                w-11 h-11 rounded-full
+                glass
+                text-[var(--color-text-secondary)] hover:text-[var(--color-primary)]
+                transition-all duration-200
+                hover:scale-110 active:scale-95
+                focus:outline-none focus-ring
+                cursor-pointer
+                disabled:opacity-0 disabled:pointer-events-none"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+
+            <button
+              onClick={scrollNext}
+              disabled={!loop && !canNext}
+              aria-label={isRTL ? 'السابق' : 'Next'}
+              className="absolute top-1/2 right-0 -translate-y-1/2 z-10
+                hidden sm:flex items-center justify-center
+                w-11 h-11 rounded-full
+                glass
+                text-[var(--color-text-secondary)] hover:text-[var(--color-primary)]
+                transition-all duration-200
+                hover:scale-110 active:scale-95
+                focus:outline-none focus-ring
+                cursor-pointer
+                disabled:opacity-0 disabled:pointer-events-none"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </>
+        )}
+
+        {/* Dots — driven by actual snap count, not card count */}
+        {showNav && (
+          <div className="mt-5 flex justify-center gap-2">
+            {Array.from({ length: snapCount }).map((_, index) => (
+              <button
+                key={index}
+                onClick={() => scrollTo(index)}
+                aria-label={`Go to slide ${index + 1}`}
+                className={`h-2 rounded-full transition-all duration-400 ease-out cursor-pointer
+                  ${
+                    index === selectedIndex
+                      ? 'w-7'
+                      : 'w-2 bg-[var(--color-border-strong)] hover:bg-[var(--color-primary)]/40'
+                  }
+                `}
+                style={
                   index === selectedIndex
-                    ? 'w-7'
-                    : 'w-2 bg-[var(--color-border-strong)] hover:bg-[var(--color-primary)]/40'
+                    ? { background: 'var(--gradient-primary)' }
+                    : undefined
                 }
-              `}
-              style={index === selectedIndex ? { background: 'var(--gradient-primary)' } : undefined}
-              onClick={() => scrollTo(index)}
-              aria-label={`Go to slide ${index + 1}`}
-            />
-          ))}
-        </div>
+              />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
@@ -141,9 +219,10 @@ function PromoCard({
   badge,
   image,
   gradient,
+  backgroundColor,
   hasIcon,
 }: PromoCardData) {
-  const overlayGradient = gradient || 'var(--gradient-primary)';
+  const hasImage = Boolean(image);
 
   return (
     <div
@@ -163,7 +242,7 @@ function PromoCard({
       }}
     >
       {/* Image */}
-      {image && (
+      {hasImage && (
         <>
           <Image
             src={image}
@@ -174,18 +253,18 @@ function PromoCard({
             sizes="(max-width: 640px) 85vw, (max-width: 768px) 75vw, (max-width: 1024px) 60vw, 50vw"
           />
           {/* Gradient overlay */}
-          <div
-            className="absolute inset-0 opacity-80"
-            style={{ background: overlayGradient }}
-          />
+          {gradient && <div className="absolute inset-0 opacity-80" style={{ background: gradient }} />}
           {/* Depth overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/10 group-hover:from-black/20 transition-colors duration-400" />
         </>
       )}
 
       {/* No-image background */}
-      {!image && (
-        <div className="absolute inset-0 bg-[var(--color-card-light)] dark:bg-[var(--color-card-dark)]" />
+      {!hasImage && (
+        <div
+          className="absolute inset-0 bg-[var(--color-card-light)] dark:bg-[var(--color-card-dark)]"
+          style={backgroundColor ? { backgroundColor } : undefined}
+        />
       )}
 
       {/* Decorative Icon */}
@@ -210,10 +289,10 @@ function PromoCard({
 
         <h3
           className={`text-xl sm:text-2xl md:text-[1.7rem] font-bold leading-tight tracking-tight
-            ${image ? 'text-white' : 'text-[var(--color-text-primary)]'}
+            ${hasImage || backgroundColor ? 'text-[var(--color-text-on-primary)]' : 'text-[var(--color-text-primary)]'}
             line-clamp-2
           `}
-          style={{ fontFamily: 'var(--font-display), var(--font-inter), system-ui, sans-serif' }}
+          style={{ fontFamily: 'var(--font-display)' }}
         >
           {title}
         </h3>
@@ -221,7 +300,7 @@ function PromoCard({
         {description && (
           <p
             className={`mt-1 text-xs sm:text-sm font-normal leading-5 max-w-sm
-              ${image ? 'text-white/85' : 'text-[var(--color-text-muted)]'}
+              ${hasImage || backgroundColor ? 'text-[var(--color-text-on-primary)]/85' : 'text-[var(--color-text-muted)]'}
               line-clamp-2 sm:line-clamp-3
             `}
           >

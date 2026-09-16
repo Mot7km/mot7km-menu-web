@@ -1,87 +1,35 @@
 @import "tailwindcss";
 
 /* =================================================================
-   ROOT — Light Theme
-   ================================================================= */
+  Runtime theme tokens. Values are populated from the tenant identity.
+  ================================================================= */
 :root {
-  /* =========================
-     Primary Colors
-     ========================= */
-  --color-primary: #1683C7;
-  --color-primary-dark: #0B5A8A;
-  --color-primary-light: #22D3EE;
-  --color-primary-50: #F0F9FF;
-  --color-primary-100: #E0F2FE;
-
-  /* =========================
-     Secondary & Accent
-     ========================= */
-  --color-secondary: #0F766E;
-  --color-secondary-dark: #115E59;
-  --color-secondary-light: #2DD4BF;
-  
-  --color-accent: #06B6D4;
-  --color-accent-dark: #0891B2;
-  --color-accent-light: #67E8F9;
-
-  /* =========================
-     Background & Surface Colors (Premium Light)
-     ========================= */
-  --color-background: #FAFAFB; /* Very clean, slightly cool off-white */
-  --color-surface: #FFFFFF;
-  --color-card-light: #F4F5F7; /* Soft contrast for cards */
-  --color-surface-elevated: #FFFFFF;
-
-  /* =========================
-     Text Colors
-     ========================= */
-  --color-text-primary: #111827; /* Deep gray-blue, softer than black */
-  --color-text-secondary: #4B5563;
-  --color-text-muted: #6B7280;
-  --color-text-light: #9CA3AF;
-  --color-text-on-primary: #FFFFFF;
-
-  /* =========================
-     Status Colors
-     ========================= */
-  --color-success: #10B981;
-  --color-warning: #F59E0B;
-  --color-error: #EF4444;
-  --color-info: #06B6D4;
-
-  /* =========================
-     Border & Divider Colors
-     ========================= */
-  --color-border: rgba(17, 24, 39, 0.08); /* Transparent borders look more premium */
-  --color-border-strong: rgba(17, 24, 39, 0.15);
-  --color-divider: rgba(17, 24, 39, 0.05);
-
-  /* =========================
-     Gradients
-     ========================= */
-  --gradient-primary: linear-gradient(135deg, #1683C7, #06B6D4);
-  --gradient-brand: linear-gradient(135deg, #1683C7, #0F766E, #06B6D4);
-  --gradient-accent: linear-gradient(135deg, #06B6D4, #22D3EE);
-  --gradient-hero: linear-gradient(135deg, rgba(22,131,199,0.9), rgba(15,118,110,0.85), rgba(6,182,212,0.8));
-  --gradient-subtle: linear-gradient(135deg, rgba(22,131,199,0.03), transparent, rgba(6,182,212,0.03));
-
-  /* =========================
-     Premium Shadow System (Light)
-     ========================= */
-  --shadow-xs: 0 1px 2px 0 rgba(17, 24, 39, 0.03);
-  --shadow-sm: 0 1px 3px 0 rgba(17, 24, 39, 0.04), 0 1px 2px -1px rgba(17, 24, 39, 0.02);
-  --shadow-md: 0 4px 6px -1px rgba(17, 24, 39, 0.05), 0 2px 4px -2px rgba(17, 24, 39, 0.03);
-  --shadow-lg: 0 10px 15px -3px rgba(17, 24, 39, 0.06), 0 4px 6px -4px rgba(17, 24, 39, 0.04);
-  --shadow-xl: 0 20px 25px -5px rgba(17, 24, 39, 0.08), 0 8px 10px -6px rgba(17, 24, 39, 0.04);
-  --shadow-card: 0 4px 20px -2px rgba(17, 24, 39, 0.05), 0 0 3px rgba(17, 24, 39, 0.02);
-  --shadow-card-hover: 0 12px 32px -4px rgba(22, 131, 199, 0.12), 0 4px 12px rgba(17, 24, 39, 0.04);
-  --shadow-glow: 0 0 20px rgba(22, 131, 199, 0.15);
-  --shadow-glow-strong: 0 0 40px rgba(22, 131, 199, 0.25);
-  --shadow-glow-primary: 0 10px 30px rgba(22, 131, 199, 0.2);
-
-  /* =========================
-     Border Radius
-     ========================= */
+  --color-primary: currentColor;
+  --color-secondary: currentColor;
+  --color-accent: currentColor;
+  --color-background: transparent;
+  --color-surface: transparent;
+  --color-card-light: transparent;
+  --color-surface-elevated: transparent;
+  --color-text-primary: currentColor;
+  --color-text-secondary: currentColor;
+  --color-text-muted: currentColor;
+  --color-text-light: currentColor;
+  --color-text-on-primary: currentColor;
+  --color-border: currentColor;
+  --color-border-strong: currentColor;
+  --color-divider: currentColor;
+  --gradient-primary: none;
+  --gradient-brand: none;
+  --gradient-accent: none;
+  --gradient-hero: none;
+  --gradient-subtle: none;
+  --shadow-card: none;
+  --shadow-card-hover: none;
+  --shadow-glow: none;
+  --font-english: sans-serif;
+  --font-arabic: sans-serif;
+  --font-display: var(--font-english);
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
@@ -90,58 +38,9 @@
   --radius-full: 9999px;
 }
 
-/* =================================================================
-   DARK THEME
-   ================================================================= */
 .dark {
-  /* Backgrounds — deeper, richer */
-  --color-background: #030712;
-  --color-surface: #0F172A;
-  --color-card-dark: #1E293B;
-  --color-elevated-dark: #1E293B;
-  --color-surface-elevated: #1E293B;
-  --color-primary-50: rgba(22, 131, 199, 0.08);
-  --color-primary-100: rgba(22, 131, 199, 0.15);
-
-  /* Text */
-  --color-text-primary: #F8FAFC;
-  --color-text-secondary: #CBD5E1;
-  --color-text-muted: #94A3B8;
-  --color-text-on-primary: #FFFFFF;
-
-  /* Borders & Dividers */
-  --color-border: rgba(255, 255, 255, 0.08);
-  --color-border-strong: rgba(255, 255, 255, 0.15);
-  --color-divider: rgba(255, 255, 255, 0.06);
-
-  /* QR Colors (Dark) */
-  --qr-background: #030712;
-  --qr-surface: #0F172A;
-  --qr-card: #1E293B;
-  --qr-text: #F8FAFC;
-  --qr-muted: #94A3B8;
-  --qr-border: rgba(255, 255, 255, 0.12);
-
-  /* POS Colors (Dark) */
-  --pos-background: #030712;
-  --pos-panel: #0F172A;
-  --pos-card: #1E293B;
-  --pos-primary-action: #22C55E;
-  --pos-secondary-action: #1683C7;
-  --pos-danger-action: #EF4444;
-  --pos-warning-action: #F59E0B;
-
-  /* Dark Gradients */
-  --gradient-dark: linear-gradient(135deg, #020617, #030712, #0F172A);
-  --gradient-hero: linear-gradient(135deg, rgba(22,131,199,0.9), rgba(15,118,110,0.8), rgba(6,182,212,0.7));
-  --gradient-subtle: linear-gradient(135deg, rgba(22, 131, 199, 0.06), transparent, rgba(6, 182, 212, 0.04));
-
-  /* Dark Shadow System — stronger glows */
-  --shadow-card: 0 2px 4px rgba(0, 0, 0, 0.3), 0 8px 20px rgba(0, 0, 0, 0.2);
-  --shadow-card-hover: 0 8px 24px rgba(22, 131, 199, 0.2), 0 16px 40px rgba(0, 0, 0, 0.3);
-  --shadow-glow: 0 0 30px rgba(22, 131, 199, 0.2);
-  --shadow-glow-strong: 0 0 60px rgba(22, 131, 199, 0.35);
-  --shadow-glow-primary: 0 0 40px rgba(22, 131, 199, 0.25), 0 0 80px rgba(22, 131, 199, 0.12);
+  --color-card-dark: var(--color-surface-elevated);
+  --color-elevated-dark: var(--color-surface-elevated);
 }
 
 /* =================================================================
@@ -157,7 +56,7 @@ body {
   margin: 0;
   background-color: var(--color-background);
   color: var(--color-text-primary);
-  font-family: var(--font-geist-sans, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial);
+  font-family: var(--font-english);
   transition: background-color 0.3s ease, color 0.3s ease;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -165,6 +64,10 @@ body {
 
 * {
   box-sizing: border-box;
+}
+
+.font-api {
+  font-family: var(--font-display);
 }
 
 /* =================================================================
@@ -231,10 +134,10 @@ body {
 
 @keyframes pulseGlow {
   0%, 100% {
-    box-shadow: 0 0 8px rgba(22, 131, 199, 0.2);
+    box-shadow: var(--shadow-glow);
   }
   50% {
-    box-shadow: 0 0 20px rgba(22, 131, 199, 0.4);
+    box-shadow: var(--shadow-glow-strong);
   }
 }
 
@@ -268,10 +171,10 @@ body {
 
 @keyframes glowPulse {
   0%, 100% {
-    box-shadow: 0 0 15px rgba(22, 131, 199, 0.15);
+    box-shadow: var(--shadow-glow);
   }
   50% {
-    box-shadow: 0 0 30px rgba(22, 131, 199, 0.3), 0 0 60px rgba(22, 131, 199, 0.1);
+    box-shadow: var(--shadow-glow-strong);
   }
 }
 
@@ -311,7 +214,7 @@ body {
   background: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(255, 255, 255, 0.08) 50%,
+    color-mix(in srgb, var(--color-text-on-primary) 8%, transparent) 50%,
     transparent 100%
   );
   background-size: 200% 100%;
@@ -366,58 +269,58 @@ body {
    GLASS & SURFACE EFFECTS
    ================================================================= */
 .glass {
-  background: rgba(255, 255, 255, 0.65);
+  background: color-mix(in srgb, var(--color-surface) 65%, transparent);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
 }
 
 .dark .glass {
-  background: rgba(15, 23, 42, 0.7);
-  border-color: rgba(255, 255, 255, 0.08);
-  box-shadow: none;
+  background: color-mix(in srgb, var(--color-surface) 70%, transparent);
+  border-color: var(--color-border);
+  box-shadow: var(--shadow-sm);
 }
 
 .glass-subtle {
-  background: rgba(255, 255, 255, 0.4);
+  background: color-mix(in srgb, var(--color-surface) 40%, transparent);
   backdrop-filter: blur(12px) saturate(150%);
   -webkit-backdrop-filter: blur(12px) saturate(150%);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid var(--color-border);
 }
 
 .dark .glass-subtle {
-  background: rgba(15, 23, 42, 0.5);
-  border-color: rgba(255, 255, 255, 0.06);
+  background: color-mix(in srgb, var(--color-surface) 50%, transparent);
+  border-color: var(--color-border);
 }
 
 /* ── NEW: Premium glass variants ── */
 .glass-card {
-  background: rgba(255, 255, 255, 0.8);
+  background: color-mix(in srgb, var(--color-surface) 80%, transparent);
   backdrop-filter: blur(24px) saturate(200%);
   -webkit-backdrop-filter: blur(24px) saturate(200%);
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  box-shadow: 0 8px 32px rgba(17, 24, 39, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-card);
 }
 
 .dark .glass-card {
-  background: rgba(15, 23, 42, 0.6);
-  border-color: rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  background: color-mix(in srgb, var(--color-surface) 60%, transparent);
+  border-color: var(--color-border);
+  box-shadow: var(--shadow-card);
 }
 
 .glass-strong {
-  background: rgba(255, 255, 255, 0.9);
+  background: color-mix(in srgb, var(--color-surface) 90%, transparent);
   backdrop-filter: blur(28px) saturate(200%);
   -webkit-backdrop-filter: blur(28px) saturate(200%);
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  box-shadow: 0 4px 24px rgba(17, 24, 39, 0.06);
+  border: 1px solid var(--color-border-strong);
+  box-shadow: var(--shadow-md);
 }
 
 .dark .glass-strong {
-  background: rgba(15, 23, 42, 0.85);
-  border-color: rgba(255, 255, 255, 0.12);
-  box-shadow: none;
+  background: color-mix(in srgb, var(--color-surface) 85%, transparent);
+  border-color: var(--color-border-strong);
+  box-shadow: var(--shadow-md);
 }
 
 /* =================================================================
@@ -453,27 +356,27 @@ body {
    GLOW UTILITIES (NEW)
    ================================================================= */
 .glow-sm {
-  box-shadow: 0 0 15px rgba(22, 131, 199, 0.1);
+  box-shadow: var(--shadow-glow);
 }
 
 .glow-md {
-  box-shadow: 0 0 25px rgba(22, 131, 199, 0.15);
+  box-shadow: var(--shadow-glow-strong);
 }
 
 .glow-lg {
-  box-shadow: 0 0 40px rgba(22, 131, 199, 0.2);
+  box-shadow: var(--shadow-glow-strong);
 }
 
 .dark .glow-sm {
-  box-shadow: 0 0 20px rgba(22, 131, 199, 0.15);
+  box-shadow: var(--shadow-glow);
 }
 
 .dark .glow-md {
-  box-shadow: 0 0 35px rgba(22, 131, 199, 0.2);
+  box-shadow: var(--shadow-glow-strong);
 }
 
 .dark .glow-lg {
-  box-shadow: 0 0 50px rgba(22, 131, 199, 0.3);
+  box-shadow: var(--shadow-glow-strong);
 }
 
 /* =================================================================
@@ -539,7 +442,7 @@ body {
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(22, 131, 199, 0.6),
+    color-mix(in srgb, var(--color-primary) 60%, transparent),
     transparent
   );
   animation: shimmerLine 3s ease-in-out infinite;
@@ -557,13 +460,13 @@ body {
   transform: translateX(-50%);
   width: 200px;
   height: 200px;
-  background: radial-gradient(circle, rgba(22, 131, 199, 0.06) 0%, transparent 70%);
+  background: radial-gradient(circle, color-mix(in srgb, var(--color-primary) 6%, transparent) 0%, transparent 70%);
   pointer-events: none;
   z-index: 0;
 }
 
 .dark .section-glow::before {
-  background: radial-gradient(circle, rgba(22, 131, 199, 0.1) 0%, transparent 70%);
+  background: radial-gradient(circle, color-mix(in srgb, var(--color-primary) 10%, transparent) 0%, transparent 70%);
 }
 
 /* =================================================================
@@ -627,8 +530,8 @@ body {
    BADGE STYLES
    ================================================================= */
 .badge-featured {
-  background: linear-gradient(135deg, var(--color-featured), #9333EA);
-  color: white;
+  background: var(--gradient-primary);
+  color: var(--color-text-on-primary);
   font-size: 0.7rem;
   font-weight: 600;
   letter-spacing: 0.05em;
@@ -648,21 +551,21 @@ body {
 }
 
 .dark .badge-count {
-  background: rgba(22, 131, 199, 0.12);
-  border-color: rgba(22, 131, 199, 0.2);
+  background: var(--color-primary-50);
+  border-color: var(--color-primary-100);
 }
 
 /* ── NEW: Status badges ── */
 .badge-new {
   background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
-  color: white;
+  color: var(--color-text-on-primary);
   font-size: 0.65rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   padding: 3px 8px;
   border-radius: var(--radius-full);
-  box-shadow: 0 2px 8px rgba(22, 131, 199, 0.3);
+  box-shadow: var(--shadow-glow);
 }
 
 /* =================================================================
@@ -677,27 +580,27 @@ body {
 }
 
 .orb-primary {
-  background: rgba(22, 131, 199, 0.15);
+  background: color-mix(in srgb, var(--color-primary) 15%, transparent);
 }
 
 .orb-accent {
-  background: rgba(6, 182, 212, 0.12);
+  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
 }
 
 .orb-secondary {
-  background: rgba(15, 118, 110, 0.1);
+  background: color-mix(in srgb, var(--color-secondary) 10%, transparent);
 }
 
 .dark .orb-primary {
-  background: rgba(22, 131, 199, 0.2);
+  background: color-mix(in srgb, var(--color-primary) 20%, transparent);
 }
 
 .dark .orb-accent {
-  background: rgba(6, 182, 212, 0.15);
+  background: color-mix(in srgb, var(--color-accent) 15%, transparent);
 }
 
 .dark .orb-secondary {
-  background: rgba(15, 118, 110, 0.12);
+  background: color-mix(in srgb, var(--color-secondary) 12%, transparent);
 }
 
 /* =================================================================

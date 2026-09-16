@@ -40,7 +40,7 @@ export function AddToCartBar({
             <span className="text-[var(--color-text-secondary)] text-xs sm:text-sm font-medium tracking-wide">
               {t('total')}
             </span>
-            <span className="font-montserrat font-bold text-2xl sm:text-3xl text-[var(--color-text-primary)] leading-tight">
+            <span className="font-api font-bold text-2xl sm:text-3xl text-[var(--color-text-primary)] leading-tight">
               ${total.toFixed(2)}
             </span>
           </div>

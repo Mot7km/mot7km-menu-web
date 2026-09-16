@@ -59,11 +59,14 @@ export interface ApiSliderItem {
   name?: string | null;
   title?: string | null;
   titleAr?: string | null;
+  header?: string | null;
   description?: string | null;
   descriptionAr?: string | null;
+  desc?: string | null;
   badge?: string | null;
   badgeAr?: string | null;
   gradient?: string | null;
+  bgColor?: string | null;
   imageUrl?: string | null;
   image?: string | null;
   menuId?: number;

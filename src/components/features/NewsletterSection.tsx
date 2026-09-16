@@ -36,7 +36,7 @@ export function NewsletterSection() {
 
         <h2
           className="text-3xl md:text-4xl font-extrabold text-[var(--color-text-primary)]"
-          style={{ fontFamily: 'var(--font-display), system-ui' }}
+          style={{ fontFamily: 'var(--font-display)' }}
         >
           {t('title')}
         </h2>
