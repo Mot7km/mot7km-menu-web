@@ -16,6 +16,15 @@ import { StoreInfo } from '@/data/storeInfo';
 import { Product } from '@/data/menu';
 import { PromoCardData } from '@/data/menupromo';
 
+function normalizeApiFont(value: string | null | undefined) {
+  const font = value?.trim();
+  if (!font || font.toLowerCase() === 'string' || !/^[a-z0-9 _-]+$/i.test(font)) {
+    return null;
+  }
+
+  return font;
+}
+
 export interface StoreContextType {
   loading: boolean;
   storeNotFound: boolean;
@@ -119,6 +128,20 @@ export function StoreProvider({ children, initialData }: StoreProviderProps) {
     root.style.setProperty('--font-english', 'sans-serif');
     root.style.setProperty('--font-display', 'sans-serif');
 
+    const arabicFont = normalizeApiFont(identity?.typography?.arabicFont);
+    const englishFont = normalizeApiFont(identity?.typography?.englishFont);
+    const apiFonts = [arabicFont, englishFont].filter((font, index, fonts): font is string =>
+      Boolean(font) && fonts.indexOf(font) === index
+    );
+
+    let fontStylesheet: HTMLLinkElement | null = null;
+    if (apiFonts.length > 0) {
+      fontStylesheet = document.createElement('link');
+      fontStylesheet.rel = 'stylesheet';
+      fontStylesheet.href = `https://fonts.googleapis.com/css2?${apiFonts.map((font) => `family=${encodeURIComponent(font)}`).join('&')}&display=swap`;
+      document.head.appendChild(fontStylesheet);
+    }
+
     const resolvedPalette = identity?.colors
       ? [identity.colors.primary, identity.colors.secondary, identity.colors.accent]
       : [];
@@ -131,15 +154,17 @@ export function StoreProvider({ children, initialData }: StoreProviderProps) {
       applyThemePalette(normalizeThemePalette(validPalette));
     }
 
-    if (identity?.typography) {
-      if (identity.typography.arabicFont && identity.typography.arabicFont !== 'string') {
-        root.style.setProperty('--font-arabic', identity.typography.arabicFont);
-      }
-      if (identity.typography.englishFont && identity.typography.englishFont !== 'string') {
-        root.style.setProperty('--font-english', identity.typography.englishFont);
-        root.style.setProperty('--font-display', identity.typography.englishFont);
-      }
+    if (arabicFont) {
+      root.style.setProperty('--font-arabic', `"${arabicFont}", sans-serif`);
     }
+    if (englishFont) {
+      root.style.setProperty('--font-english', `"${englishFont}", sans-serif`);
+      root.style.setProperty('--font-display', `"${englishFont}", sans-serif`);
+    }
+
+    return () => {
+      fontStylesheet?.remove();
+    };
   }, [identity]);
 
   // ─── Dynamic Browser Title / Tab Name ───
