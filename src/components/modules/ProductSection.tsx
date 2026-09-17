@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { LayoutGrid, LayoutList } from 'lucide-react';
+import { LayoutGrid, LayoutList, PackageOpen } from 'lucide-react';
 import { Product } from '@/data/menu';
 import { GridProductCard } from '@/components/features/ProductCards/GridProductCard';
 import { HorizontalProductCard } from '@/components/features/ProductCards/HorizontalProductCard';
@@ -36,6 +36,8 @@ export default function ProductSection({
     setVisibleCount(initialCount);
   }, [products, initialCount]);
 
+  const sectionTitle = title || t('productList.menu');
+
   if (loading) {
     return (
       <div className="flex min-h-56 items-center justify-center" aria-live="polite">
@@ -51,13 +53,47 @@ export default function ProductSection({
   // Empty state
   if (!products.length) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 text-[var(--color-text-muted)]">
-        <p className="text-sm">{t('productList.empty') || 'No products available'}</p>
-      </div>
+      <section className="w-full max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="flex flex-col gap-6">
+          <h2
+            className="accent-line font-bold text-2xl leading-8 text-[var(--color-text-primary)]"
+            style={{ fontFamily: 'var(--font-display)' }}
+          >
+            {sectionTitle}
+          </h2>
+
+          <div
+            role="status"
+            aria-live="polite"
+            className="relative overflow-hidden rounded-3xl border border-dashed border-[var(--color-border)] bg-[var(--color-surface)] px-6 py-14 text-center shadow-sm"
+          >
+            {/* Soft decorative gradient */}
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[var(--color-primary)]/5 via-transparent to-transparent" />
+
+            <div className="relative">
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--color-primary)]/10 text-[var(--color-primary)] ring-1 ring-[var(--color-primary)]/20">
+                <PackageOpen className="h-8 w-8" aria-hidden="true" />
+              </div>
+
+              <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
+                {t('productList.empty') || 'No products available'}
+              </h3>
+
+              <p className="mx-auto mt-2 max-w-md text-sm text-[var(--color-text-muted)]">
+                {t('productList.emptyDescription') ||
+                  'Try adjusting your filters or check back later.'}
+              </p>
+
+              <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-xs font-medium text-[var(--color-text-muted)]">
+                <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-primary)]" />
+                {t('productList.emptyHint') || 'New items are added regularly'}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     );
   }
-
-  const sectionTitle = title || t('productList.menu');
 
   return (
     <section className="flex flex-col gap-6 w-full max-w-7xl mx-auto px-4 sm:px-6">
