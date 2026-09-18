@@ -5,6 +5,7 @@ import React from 'react';
 export interface LoaderProps {
   fullScreen?: boolean;
   size?: 'sm' | 'md' | 'lg';
+  variant?: 'page' | 'section' | 'action';
   text?: string;
   className?: string;
 }
@@ -12,6 +13,7 @@ export interface LoaderProps {
 export const Loader: React.FC<LoaderProps> = ({
   fullScreen = false,
   size = 'md',
+  variant = 'section',
   text = 'Loading...',
   className = '',
 }) => {
@@ -19,6 +21,12 @@ export const Loader: React.FC<LoaderProps> = ({
     sm: 'h-6 w-6',
     md: 'h-12 w-12',
     lg: 'h-16 w-16',
+  };
+
+  const textClasses = {
+    page: 'text-base font-medium',
+    section: 'text-sm',
+    action: 'text-xs font-medium',
   };
 
   const spinner = (
@@ -36,7 +44,7 @@ export const Loader: React.FC<LoaderProps> = ({
         <div className="absolute inset-[3px] rounded-full bg-[var(--color-background)]" />
         <span className="sr-only">Loading</span>
       </div>
-      {text && <p className="animate-pulse text-sm text-[var(--color-text-muted)]">{text}</p>}
+      {text && <p className={`animate-pulse text-[var(--color-text-muted)] ${textClasses[variant]}`}>{text}</p>}
     </div>
   );
 

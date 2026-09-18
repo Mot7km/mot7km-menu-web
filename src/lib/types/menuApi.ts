@@ -51,7 +51,14 @@ export interface ApiStoreHeader {
     close: string;
     isClosed?: boolean;
   }> | null;
-  branches?: any[] | null;
+  branches?: ApiBranch[] | null;
+}
+
+export interface ApiBranch {
+  id: number | string;
+  name?: string | null;
+  location?: string | null;
+  isMainBranch?: boolean;
 }
 
 export interface ApiSliderItem {
@@ -154,8 +161,20 @@ export interface ApiReview {
 /**
  * Enriched product details from /api/menu/products/{id} or /api/menu/product-details/{id}
  */
-export interface ApiProductDetails extends ApiProduct {
+export interface ApiProductDetails extends Omit<ApiProduct, 'ingredients'> {
   views?: number;
+  ingredients?: Array<string | { id: number | string; name: string }>;
+  customizations?: Array<{ id: number | string; name: string; price: number }>;
+}
+
+export interface ApiBusinessMenu {
+  businessName: string;
+  displayBusinessName?: string | null;
+  businessDescription?: string | null;
+  businessIdentity?: ApiBusinessIdentity | null;
+  header?: ApiStoreHeader | null;
+  sliders?: ApiSlidersResponse | null;
+  categories?: ApiCategory[] | null;
 }
 
 /**

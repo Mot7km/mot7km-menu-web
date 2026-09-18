@@ -12,11 +12,14 @@ import { useCart } from '@/context/CartContext';
 import { AddToCartBar } from '@/components/cart/AddToCartBar';
 import { useStore } from '@/context/StoreContext';
 import { useBusinessRoute } from '@/hooks/useLocale';
+import { useSearchParams } from 'next/navigation';
+import NotFound from '../not-found';
 
 export default function ProductPage({ params }: { params: Promise<{ locale: string; id: string }> }) {
   const resolvedParams = use(params);
   const { id } = resolvedParams;
   const t = useTranslations();
+  const searchParams = useSearchParams();
   const { addToCart } = useCart();
   const { products: storeProducts, recordView, loading } = useStore();
   const { getPath } = useBusinessRoute();
@@ -40,6 +43,9 @@ export default function ProductPage({ params }: { params: Promise<{ locale: stri
   }
 
   if (!product) {
+    if (!searchParams.get('businessName')) {
+      return <NotFound />;
+    }
     notFound();
   }
 

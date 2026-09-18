@@ -1,4 +1,4 @@
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { i18n } from '@/config/i18n';
 
 export function useLocale() {
@@ -11,10 +11,11 @@ export function useLocale() {
 
 export function useBusinessRoute() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const segments = pathname.split('/').filter(Boolean);
-  const leadingLocale = i18n.locales.includes(segments[0] as any);
-  const locale = (leadingLocale ? segments[0] : segments[1]) || i18n.defaultLocale;
-  const businessName = !leadingLocale && segments.length > 1 ? decodeURIComponent(segments[0]) : undefined;
-  const getPath = (suffix = '') => `${businessName ? `/${encodeURIComponent(businessName)}` : ''}/${locale}${suffix ? `/${suffix.replace(/^\//, '')}` : ''}`;
+  const locale = i18n.locales.includes(segments[0] as any) ? segments[0] : i18n.defaultLocale;
+  const pathBusinessName = segments[1] === 'menu' && segments[2] ? decodeURIComponent(segments[2]) : undefined;
+  const businessName = searchParams.get('businessName') || pathBusinessName;
+  const getPath = (suffix = '') => `${businessName ? `/${locale}/menu/${encodeURIComponent(businessName)}` : `/${locale}`}${suffix ? `/${suffix.replace(/^\//, '')}` : ''}`;
   return { locale, businessName, getPath };
 }

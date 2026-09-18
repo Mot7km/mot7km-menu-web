@@ -2,7 +2,7 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState, useMemo, ReactNode } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { webMenuApi } from '@/lib/api/menuApi';
 import type {
   ApiBusinessIdentity,
@@ -15,15 +15,6 @@ import { applyThemePalette, normalizeThemePalette } from '@/config/theme';
 import { StoreInfo } from '@/data/storeInfo';
 import { Product } from '@/data/menu';
 import { PromoCardData } from '@/data/menupromo';
-
-function normalizeApiFont(value: string | null | undefined) {
-  const font = value?.trim();
-  if (!font || font.toLowerCase() === 'string' || !/^[a-z0-9 _-]+$/i.test(font)) {
-    return null;
-  }
-
-  return font;
-}
 
 export interface StoreContextType {
   loading: boolean;
@@ -59,6 +50,7 @@ interface StoreProviderProps {
 
 export function StoreProvider({ children, initialData }: StoreProviderProps) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [storeNotFound, setStoreNotFound] = useState(false);
   const [businessName, setBusinessName] = useState(initialData?.businessName || '');
@@ -74,8 +66,11 @@ export function StoreProvider({ children, initialData }: StoreProviderProps) {
     try {
       setLoading(true);
       const segments = window.location.pathname.split('/').filter(Boolean);
+      const pathBusinessName = segments[0] && (segments[0] === 'en' || segments[0] === 'ar') && segments[1] === 'menu'
+        ? segments[2]
+        : undefined;
       const requestedBusinessName = new URLSearchParams(window.location.search).get('businessName') ||
-        (segments.length >= 2 && (segments[1] === 'en' || segments[1] === 'ar') ? decodeURIComponent(segments[0]) : undefined);
+        (pathBusinessName ? decodeURIComponent(pathBusinessName) : undefined);
       if (!requestedBusinessName) {
         setIdentity(null);
         setHeader(null);
@@ -119,7 +114,7 @@ export function StoreProvider({ children, initialData }: StoreProviderProps) {
 
   useEffect(() => {
     loadData();
-  }, [pathname]);
+  }, [pathname, searchParams]);
 
   // ─── Synchronize Brand Colors & Typography into DOM (Strictly 3 Colors) ───
   useEffect(() => {
@@ -127,20 +122,6 @@ export function StoreProvider({ children, initialData }: StoreProviderProps) {
     root.style.setProperty('--font-arabic', 'sans-serif');
     root.style.setProperty('--font-english', 'sans-serif');
     root.style.setProperty('--font-display', 'sans-serif');
-
-    const arabicFont = normalizeApiFont(identity?.typography?.arabicFont);
-    const englishFont = normalizeApiFont(identity?.typography?.englishFont);
-    const apiFonts = [arabicFont, englishFont].filter((font, index, fonts): font is string =>
-      Boolean(font) && fonts.indexOf(font) === index
-    );
-
-    let fontStylesheet: HTMLLinkElement | null = null;
-    if (apiFonts.length > 0) {
-      fontStylesheet = document.createElement('link');
-      fontStylesheet.rel = 'stylesheet';
-      fontStylesheet.href = `https://fonts.googleapis.com/css2?${apiFonts.map((font) => `family=${encodeURIComponent(font)}`).join('&')}&display=swap`;
-      document.head.appendChild(fontStylesheet);
-    }
 
     const resolvedPalette = identity?.colors
       ? [identity.colors.primary, identity.colors.secondary, identity.colors.accent]
@@ -154,17 +135,15 @@ export function StoreProvider({ children, initialData }: StoreProviderProps) {
       applyThemePalette(normalizeThemePalette(validPalette));
     }
 
-    if (arabicFont) {
-      root.style.setProperty('--font-arabic', `"${arabicFont}", sans-serif`);
+    if (identity?.typography) {
+      if (identity.typography.arabicFont && identity.typography.arabicFont !== 'string') {
+        root.style.setProperty('--font-arabic', identity.typography.arabicFont);
+      }
+      if (identity.typography.englishFont && identity.typography.englishFont !== 'string') {
+        root.style.setProperty('--font-english', identity.typography.englishFont);
+        root.style.setProperty('--font-display', identity.typography.englishFont);
+      }
     }
-    if (englishFont) {
-      root.style.setProperty('--font-english', `"${englishFont}", sans-serif`);
-      root.style.setProperty('--font-display', `"${englishFont}", sans-serif`);
-    }
-
-    return () => {
-      fontStylesheet?.remove();
-    };
   }, [identity]);
 
   // ─── Dynamic Browser Title / Tab Name ───
@@ -290,7 +269,9 @@ export function StoreProvider({ children, initialData }: StoreProviderProps) {
 
   // ─── Product View Tracking ───
   const recordView = (productId: string | number) => {
-    webMenuApi.recordProductView(productId);
+    if (businessName) {
+      void webMenuApi.getBusinessProductDetails(businessName, productId);
+    }
   };
 
   const value = {

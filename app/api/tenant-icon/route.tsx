@@ -12,10 +12,11 @@ export async function GET(request: Request) {
 
   try {
     const response = await fetch(
-      `${API_BASE_URL}/api/menu/by-business-name/${encodeURIComponent(businessName)}`,
+      `${API_BASE_URL}/api/menu/${encodeURIComponent(businessName)}`,
       { cache: 'no-store' }
     );
-    const store = await response.json();
+    const body = await response.text();
+    const store = JSON.parse(body);
     const logo = store?.header?.logo || store?.header?.logoUrl || store?.businessIdentity?.logo;
 
     if (!logo) {

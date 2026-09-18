@@ -1,18 +1,20 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { PromotionalCarousel } from '@/components/features/PromotionalCarousel';
 import Categories from '@/components/features/PromotionalCategories';
 import ListContainer from '@/components/common/ListContainer';
 import SearchBar from '@/components/common/SearchBar';
 import { PageShell } from '@/components/layouts/PageShell';
 import { useStore } from '@/context/StoreContext';
-import NotFound from './not-found';
+import Link from 'next/link';
+import { MenuNotFound } from '@/components/common/MenuNotFound';
 
 export default function Home() {
   const t = useTranslations();
-  const { products: storeProducts, categories: apiCategories, promoCards, loading, storeNotFound } = useStore();
+  const locale = useLocale();
+  const { products: storeProducts, categories: apiCategories, promoCards, loading, storeNotFound, businessName } = useStore();
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -60,7 +62,27 @@ export default function Home() {
     return result;
   }, [filteredProducts, t]);
 
-  if (!loading && storeNotFound) return <NotFound />;
+  if (!loading && !businessName) {
+    return (
+      <main className="min-h-screen bg-[var(--color-background)] px-6 py-16 text-[var(--color-text-primary)]">
+        <div className="mx-auto flex min-h-[70vh] max-w-3xl flex-col justify-center gap-8">
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--color-primary)]">MOT7KM</p>
+          <h1 className="max-w-2xl text-5xl font-black leading-tight sm:text-7xl">Your menu, ready to be discovered.</h1>
+          <p className="max-w-xl text-lg text-[var(--color-text-muted)]">A mock landing page for the public menu experience.</p>
+          <div className="flex flex-wrap gap-3">
+            <Link href={`/${locale}/info`} className="rounded-full bg-[var(--color-primary)] px-6 py-3 font-semibold text-[var(--color-text-on-primary)]">
+              Learn more
+            </Link>
+            <Link href={`/${locale}/menu/mot7km`} className="rounded-full border border-[var(--color-border)] px-6 py-3 font-semibold">
+              Open demo menu
+            </Link>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  if (!loading && storeNotFound) return <MenuNotFound />;
 
   return (
     <PageShell showHeader showFooter>

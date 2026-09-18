@@ -18,6 +18,7 @@ export function GlobalLoadingOverlay({ isVisible, text }: GlobalLoadingOverlayPr
       <div className="rounded-3xl border border-white/20 bg-white/90 px-8 py-8 shadow-2xl dark:bg-[color:var(--color-surface)]/95">
         <Loader
           size="lg"
+          variant="page"
           text={text || t('loading.switchingLanguage')}
           className="text-[var(--color-primary)]"
         />
