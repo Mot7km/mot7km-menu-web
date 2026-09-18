@@ -30,7 +30,6 @@ export interface StoreContextType {
   products: Product[];
   storeInfo: StoreInfo;
   promoCards: PromoCardData[];
-  recordView: (productId: string | number) => void;
   refresh: () => Promise<void>;
 }
 
@@ -273,13 +272,6 @@ export function StoreProvider({ children, initialData }: StoreProviderProps) {
     return [];
   }, [apiProducts, apiCategories]);
 
-  // ─── Product View Tracking ───
-  const recordView = (productId: string | number) => {
-    if (businessName) {
-      void webMenuApi.getBusinessProductDetails(businessName, productId);
-    }
-  };
-
   const value = {
     loading,
     storeNotFound,
@@ -294,7 +286,6 @@ export function StoreProvider({ children, initialData }: StoreProviderProps) {
     products,
     storeInfo,
     promoCards,
-    recordView,
     refresh: loadData,
   };
 

@@ -186,14 +186,6 @@ export interface ApiMenuProfile {
 }
 
 /**
- * View counter response from /api/v1/Products/{id}/views
- */
-export interface ApiProductViews {
-  productId: number | string;
-  viewsCount: number;
-}
-
-/**
  * Complete Store Data fetched from /api/menu/by-business-name/{businessName}
  * or aggregated from sub-endpoints.
  */

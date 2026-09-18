@@ -10,7 +10,6 @@ import type {
   ApiProduct,
   ApiProductDetails,
   ApiMenuProfile,
-  ApiProductViews,
   ApiBusinessMenu,
   StoreData,
 } from '../types/menuApi';
@@ -215,32 +214,6 @@ export const webMenuApi = {
    */
   async getEnrichedProduct(id: number | string): Promise<ApiProductDetails | null> {
     return fetchApi<ApiProductDetails>(`/api/menu/products/${id}`);
-  },
-
-  /**
-   * GET /api/v1/Products/{id}/views
-   * Get product views counter and tracking stats.
-   */
-  async getProductViews(id: number | string): Promise<ApiProductViews | null> {
-    return fetchApi<ApiProductViews>(`/api/v1/Products/${id}/views`);
-  },
-
-  /**
-   * POST /api/v1/Products/{id}/views
-   * Record a product view or interaction.
-   */
-  async recordProductView(id: number | string): Promise<boolean> {
-    try {
-      const path = `/api/v1/Products/${id}/views`;
-      const url = typeof window === 'undefined' ? `${API_BASE_URL}${path}` : path;
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      });
-      return res.ok;
-    } catch {
-      return false;
-    }
   },
 
   /**
