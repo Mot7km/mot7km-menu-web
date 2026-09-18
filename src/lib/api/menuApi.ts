@@ -250,6 +250,7 @@ export const webMenuApi = {
    */
   async getCompleteStoreData(customBusinessName?: string): Promise<{
     businessName: string;
+    displayBusinessName: string;
     menuId: number;
     identity: ApiBusinessIdentity | null;
     header: ApiStoreHeader | null;
@@ -262,7 +263,7 @@ export const webMenuApi = {
     const menuId = 0;
 
     if (!businessName) {
-      return { businessName: '', menuId, identity: null, header: null, sliders: null, sliderHeader: null, categories: null, products: null };
+      return { businessName: '', displayBusinessName: '', menuId, identity: null, header: null, sliders: null, sliderHeader: null, categories: null, products: null };
     }
 
     // 2. Fetch the complete menu bundle by business name
@@ -317,6 +318,7 @@ export const webMenuApi = {
 
       return {
         businessName: rawBundle.businessName || businessName,
+        displayBusinessName: rawBundle.displayBusinessName || rawBundle.businessName || businessName,
         menuId,
         identity,
         header,
@@ -327,6 +329,6 @@ export const webMenuApi = {
       };
     }
 
-    return { businessName, menuId, identity: null, header: null, sliders: null, sliderHeader: null, categories: null, products: null };
+    return { businessName, displayBusinessName: businessName, menuId, identity: null, header: null, sliders: null, sliderHeader: null, categories: null, products: null };
   },
 };

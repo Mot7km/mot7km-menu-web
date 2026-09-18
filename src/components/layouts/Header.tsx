@@ -348,7 +348,7 @@ export function Header() {
   const t = useTranslations();
   const locale = useLocale();
   const isRTL = locale === 'ar';
-  const { storeInfo, header, identity } = useStore();
+  const { storeInfo, header, identity, displayBusinessName } = useStore();
 
   const [open, setOpen] = useState(true);
   const [popoverOpen, setPopoverOpen] = useState<string | null>(null);
@@ -370,7 +370,7 @@ export function Header() {
   }, [storeInfo]);
 
   const displayAddress = isRTL ? (storeInfo.addressAr || storeInfo.address) : storeInfo.address;
-  const brandName = header?.businessName || identity?.businessName || storeInfo.name;
+  const brandName = displayBusinessName || header?.businessName || identity?.businessName || storeInfo.name;
   const slogan = header?.slogan || identity?.slogan || t('header.tagline');
   const logoUrl = header?.logo || header?.logoUrl || identity?.logo;
 

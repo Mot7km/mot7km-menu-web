@@ -20,6 +20,7 @@ export interface StoreContextType {
   loading: boolean;
   storeNotFound: boolean;
   businessName: string;
+  displayBusinessName: string;
   menuId: number;
   identity: ApiBusinessIdentity | null;
   header: ApiStoreHeader | null;
@@ -54,6 +55,7 @@ export function StoreProvider({ children, initialData }: StoreProviderProps) {
   const [loading, setLoading] = useState(true);
   const [storeNotFound, setStoreNotFound] = useState(false);
   const [businessName, setBusinessName] = useState(initialData?.businessName || '');
+  const [displayBusinessName, setDisplayBusinessName] = useState(initialData?.displayBusinessName || '');
   const [menuId, setMenuId] = useState(initialData?.menuId || 0);
   const [identity, setIdentity] = useState<ApiBusinessIdentity | null>(initialData?.identity || null);
   const [header, setHeader] = useState<ApiStoreHeader | null>(initialData?.header || null);
@@ -74,6 +76,7 @@ export function StoreProvider({ children, initialData }: StoreProviderProps) {
       if (!requestedBusinessName) {
         setIdentity(null);
         setHeader(null);
+        setDisplayBusinessName('');
         setApiSliders([]);
         setSliderHeader(null);
         setApiCategories([]);
@@ -84,6 +87,7 @@ export function StoreProvider({ children, initialData }: StoreProviderProps) {
 
       // Clear the previous tenant before applying the next tenant's branding.
       setBusinessName(requestedBusinessName);
+      setDisplayBusinessName('');
       setIdentity(null);
       setHeader(null);
       setApiSliders([]);
@@ -98,6 +102,7 @@ export function StoreProvider({ children, initialData }: StoreProviderProps) {
         !data.header && !data.identity && !data.categories?.length && !data.products?.length);
 
       if (data.businessName) setBusinessName(data.businessName);
+      setDisplayBusinessName(data.displayBusinessName || data.businessName || requestedBusinessName);
       if (data.menuId) setMenuId(data.menuId);
       setIdentity(data.identity);
       setHeader(data.header);
@@ -149,6 +154,7 @@ export function StoreProvider({ children, initialData }: StoreProviderProps) {
   // ─── Dynamic Browser Title / Tab Name ───
   useEffect(() => {
     const storeTitle =
+      displayBusinessName ||
       header?.businessName ||
       identity?.businessName ||
       businessName;
@@ -160,11 +166,11 @@ export function StoreProvider({ children, initialData }: StoreProviderProps) {
     if (storeTitle) {
       document.title = slogan ? `${storeTitle} — ${slogan}` : storeTitle;
     }
-  }, [header, identity, businessName]);
+  }, [header, identity, businessName, displayBusinessName]);
 
   // ─── Map Header / Identity into unified StoreInfo ───
   const storeInfo = useMemo<StoreInfo>(() => {
-    const name = header?.businessName || identity?.businessName || businessName;
+    const name = displayBusinessName || header?.businessName || identity?.businessName || businessName;
     const phone = header?.phoneNumber || '';
     const address = header?.address || '';
     const addressAr = header?.addressAr || address;
@@ -209,7 +215,7 @@ export function StoreProvider({ children, initialData }: StoreProviderProps) {
       workingHours,
       socials,
     };
-  }, [header, identity, businessName]);
+  }, [header, identity, businessName, displayBusinessName]);
 
   // ─── Map Sliders into PromoCardData ───
   const promoCards = useMemo<PromoCardData[]>(() => {
@@ -278,6 +284,7 @@ export function StoreProvider({ children, initialData }: StoreProviderProps) {
     loading,
     storeNotFound,
     businessName,
+    displayBusinessName,
     menuId,
     identity,
     header,

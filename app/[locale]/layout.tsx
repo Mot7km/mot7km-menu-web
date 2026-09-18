@@ -17,6 +17,7 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
     }
     const store = await webMenuApi.getCompleteStoreData(businessName);
     const brandName =
+      store.displayBusinessName ||
       store.header?.businessName ||
       store.identity?.businessName ||
       businessName;

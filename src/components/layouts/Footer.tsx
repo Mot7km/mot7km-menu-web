@@ -57,12 +57,12 @@ export function Footer() {
   const locale = useLocale();
   const isRTL = locale === 'ar';
   const currentYear = new Date().getFullYear();
-  const { storeInfo, header, identity } = useStore();
+  const { storeInfo, header, identity, displayBusinessName } = useStore();
 
   const today = new Date().getDay();
   const todayHours = storeInfo.workingHours.find((wh) => wh.day === today) || null;
   const displayAddress = isRTL ? (storeInfo.addressAr || storeInfo.address) : storeInfo.address;
-  const brandName = header?.businessName || identity?.businessName || storeInfo.name;
+  const brandName = displayBusinessName || header?.businessName || identity?.businessName || storeInfo.name;
   const slogan = header?.slogan || identity?.slogan || t('header.tagline');
   const logoUrl = header?.logo || header?.logoUrl || identity?.logo;
 
