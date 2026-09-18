@@ -19,7 +19,7 @@ import type {
  * Generic fetcher for Web Menu API endpoints.
  */
 async function fetchApi<T>(path: string, options?: RequestInit): Promise<T | null> {
-  const url = `${API_BASE_URL}${path}`;
+  const url = typeof window === 'undefined' ? `${API_BASE_URL}${path}` : path;
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 15000);
   try {
@@ -231,7 +231,9 @@ export const webMenuApi = {
    */
   async recordProductView(id: number | string): Promise<boolean> {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/v1/Products/${id}/views`, {
+      const path = `/api/v1/Products/${id}/views`;
+      const url = typeof window === 'undefined' ? `${API_BASE_URL}${path}` : path;
+      const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
       });
