@@ -135,9 +135,7 @@ export function StoreProvider({ children, initialData }: StoreProviderProps) {
       (color): color is string => Boolean(color && typeof color === 'string' && color.trim())
     );
 
-    if (validPalette.length >= 3) {
-      applyThemePalette(normalizeThemePalette(validPalette));
-    }
+    applyThemePalette(normalizeThemePalette(validPalette));
 
     if (identity?.typography) {
       if (identity.typography.arabicFont && identity.typography.arabicFont !== 'string') {

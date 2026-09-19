@@ -2,9 +2,9 @@ export const THEME_STORAGE_KEY = "mot7km-theme";
 export const THEME_PALETTE_STORAGE_KEY = "mot7km-theme-palette";
 
 export const DEFAULT_THEME_COLORS = [
-  "#111111", // Primary
-  "#FFFFFF", // Secondary
-  "#777777", // Accent
+  "#2B9FD9", // Primary
+  "#0B529E", // Secondary
+  "#F8F9FA", // Accent
 ] as const;
 
 export const themes = {

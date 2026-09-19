@@ -11,8 +11,8 @@ export default function Page() {
           <Link href="/en/info" className="rounded-full bg-[var(--color-primary)] px-6 py-3 font-semibold text-[var(--color-text-on-primary)]">
             Learn more
           </Link>
-          <Link href="/en/menu/mot7km" className="rounded-full border border-[var(--color-border)] px-6 py-3 font-semibold">
-            Open demo menu
+          <Link href="/en/menu" className="rounded-full border border-[var(--color-border)] px-6 py-3 font-semibold">
+            Open menu List
           </Link>
         </div>
       </div>

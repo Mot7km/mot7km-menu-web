@@ -88,6 +88,16 @@ export default function Home() {
     <PageShell showHeader showFooter>
       <div className="flex flex-col items-center justify-center">
         <>
+            <div className="w-full px-4 pt-6 sm:px-6 lg:px-8">
+              <div className="mx-auto flex max-w-5xl justify-end md:max-w-6xl">
+                <Link
+                  href={`/${locale}/menu`}
+                  className="rounded-full bg-[var(--color-primary)] px-5 py-2.5 font-semibold text-[var(--color-text-on-primary)] transition-colors hover:bg-[var(--color-primary-dark)]"
+                >
+                  {t('home.findMenu')}
+                </Link>
+              </div>
+            </div>
             <section className="section-glow relative w-full px-4 pt-10 pb-8 sm:px-6 sm:pt-12 sm:pb-10 lg:px-8">
               <div className="mx-auto max-w-5xl md:max-w-6xl">
                 <h2
