@@ -6,7 +6,7 @@ import useEmblaCarousel from 'embla-carousel-react';
 import Autoplay from 'embla-carousel-autoplay';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { PromoCardData } from '@/data/menupromo';
-import { useStore } from '@/context/StoreContext';
+import { useStore } from '@/store/storeHooks';
 import { useLocale, useTranslations } from 'next-intl';
 
 // -------------------------------------------------------------------

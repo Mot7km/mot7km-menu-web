@@ -3,7 +3,7 @@
 import { Phone, MapPin, Mail, Clock } from 'lucide-react';
 import { useTranslations, useLocale } from 'next-intl';
 import { isStoreOpen } from '@/data/storeInfo';
-import { useStore } from '@/context/StoreContext';
+import { useStore } from '@/store/storeHooks';
 
 // ── Social Icons ──
 function WhatsAppIcon({ className }: { className?: string }) {

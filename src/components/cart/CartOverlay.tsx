@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { useCart } from '@/context/CartContext';
+import { useCart } from '@/store/hooks';
 import { FloatingCartButton } from './CartButton';
 import { CartDrawer } from './CartDrawer';
 
@@ -36,7 +36,6 @@ export function CartOverlay() {
       */}
       <FloatingCartButton 
         itemCount={itemCount} 
-        totalPrice={totalPrice} 
         onOpenDrawer={() => setIsDrawerOpen(true)} 
         isVisible={!isDrawerOpen && itemCount > 0}
       />

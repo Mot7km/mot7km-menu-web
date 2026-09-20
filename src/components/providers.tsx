@@ -4,11 +4,11 @@ import { ThemeProvider } from 'next-themes';
 import { ReactNode, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { applyThemePalette, getStoredThemePalette, THEME_STORAGE_KEY } from '@/config/theme';
-import { CartProvider } from '@/context/CartContext';
 import { CartOverlay } from '@/components/cart/CartOverlay';
 import { GlobalLoadingOverlay } from '@/components/ui/GlobalLoadingOverlay';
 import { LocaleTransitionProvider } from '@/context/LocaleTransitionContext';
-import { StoreProvider, useStore } from '@/context/StoreContext';
+import { useStore } from '@/store/storeHooks';
+import { StoreProvider as ReduxStoreProvider } from '@/store/StoreProvider';
 
 interface ProvidersProps {
   children: ReactNode;
@@ -46,17 +46,15 @@ function ThemePaletteInitializer() {
 
 export function Providers({ children }: ProvidersProps) {
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem storageKey={THEME_STORAGE_KEY}>
-      <ThemePaletteInitializer />
-      <LocaleTransitionProvider>
-        <StoreProvider>
+    <ReduxStoreProvider>
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem storageKey={THEME_STORAGE_KEY}>
+        <ThemePaletteInitializer />
+        <LocaleTransitionProvider>
           <StoreLoadingOverlay />
-          <CartProvider>
-            {children}
-            <CartOverlay />
-          </CartProvider>
-        </StoreProvider>
-      </LocaleTransitionProvider>
-    </ThemeProvider>
+          {children}
+          <CartOverlay />
+        </LocaleTransitionProvider>
+      </ThemeProvider>
+    </ReduxStoreProvider>
   );
 }

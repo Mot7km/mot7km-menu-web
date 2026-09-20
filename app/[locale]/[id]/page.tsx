@@ -8,9 +8,9 @@ import { CustomizationOptions } from '@/components/features/CustomizationOptions
 import ListContainer from '@/components/common/ListContainer';
 import { ArrowLeft, Sparkles, Star } from 'lucide-react';
 import { use, useMemo, useState } from 'react';
-import { useCart } from '@/context/CartContext';
+import { useCart } from '@/store/hooks';
 import { AddToCartBar } from '@/components/cart/AddToCartBar';
-import { useStore } from '@/context/StoreContext';
+import { useStore } from '@/store/storeHooks';
 import { useBusinessRoute } from '@/hooks/useLocale';
 
 export default function ProductPage({ params }: { params: Promise<{ locale: string; id: string }> }) {

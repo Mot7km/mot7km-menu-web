@@ -4,7 +4,7 @@ import React, { useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { ShoppingBag, Trash2 } from 'lucide-react';
 import { FloatingWrapper, useFloatingContext } from '@/helpers/FloatingWrapper';
-import { useCart } from '@/context/CartContext';
+import { useCart } from '@/store/hooks';
 
 // ============================================================
 //  CONFIGURATION
@@ -14,7 +14,6 @@ const BUTTON_SIZE = 64;
 
 interface FloatingCartButtonProps {
   itemCount: number;
-  totalPrice: number;
   onOpenDrawer: () => void;
   isVisible?: boolean;
 }
@@ -22,8 +21,7 @@ interface FloatingCartButtonProps {
 // Inner component that consumes the floating context
 function CartButtonInner({
   itemCount,
-  totalPrice,
-}: Pick<FloatingCartButtonProps, 'itemCount' | 'totalPrice'>) {
+}: Pick<FloatingCartButtonProps, 'itemCount'>) {
   const t = useTranslations('cart');
   const {
     tuckOffsetX,
@@ -86,7 +84,6 @@ function CartButtonInner({
 // Main component – wraps the inner content with the FloatingWrapper
 export function FloatingCartButton({
   itemCount,
-  totalPrice,
   onOpenDrawer,
   isVisible = true,
 }: FloatingCartButtonProps) {
@@ -121,7 +118,7 @@ export function FloatingCartButton({
           if (droppedOnTrash) clearCart();
         }}
       >
-        <CartButtonInner itemCount={itemCount} totalPrice={totalPrice} />
+        <CartButtonInner itemCount={itemCount} />
       </FloatingWrapper>
     </>
   );

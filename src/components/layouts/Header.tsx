@@ -26,7 +26,7 @@ import {
 } from '@/config/theme';
 import { i18n } from '@/config/i18n';
 import { useLocaleTransition } from '@/context/LocaleTransitionContext';
-import { useStore } from '@/context/StoreContext';
+import { useStore } from '@/store/storeHooks';
 
 // ─── Helpers ───────────────────────────────────────────────
 

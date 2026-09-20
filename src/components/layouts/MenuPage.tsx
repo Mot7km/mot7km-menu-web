@@ -7,7 +7,7 @@ import Categories from '@/components/features/PromotionalCategories';
 import ListContainer from '@/components/common/ListContainer';
 import SearchBar from '@/components/common/SearchBar';
 import { PageShell } from '@/components/layouts/PageShell';
-import { useStore } from '@/context/StoreContext';
+import { useStore } from '@/store/storeHooks';
 import { MenuNotFound } from '@/components/common/MenuNotFound';
 
 export function MenuPage() {

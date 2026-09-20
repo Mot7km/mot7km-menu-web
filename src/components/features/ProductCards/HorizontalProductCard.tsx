@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Star, ShoppingBag } from 'lucide-react';
 import { Product } from '@/data/menu';
 import { useBusinessRoute } from '@/hooks/useLocale';
-import { useCart } from '@/context/CartContext';
+import { useCart } from '@/store/hooks';
 import { useRef, useState } from 'react';
 
 interface HorizontalProductCardProps {
@@ -15,7 +15,7 @@ interface HorizontalProductCardProps {
 export function HorizontalProductCard({ product }: HorizontalProductCardProps) {
   const { getPath } = useBusinessRoute();
   const href = getPath(product.id);
-  const { addToCart, setIsDrawerOpen } = useCart();
+  const { addToCart } = useCart();
   const [isAdding, setIsAdding] = useState(false);
   const addTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 

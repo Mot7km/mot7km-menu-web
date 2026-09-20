@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocale } from 'next-intl';
 import { usePathname } from 'next/navigation';
 import { GlobalLoadingOverlay } from '@/components/ui/GlobalLoadingOverlay';
@@ -20,17 +20,17 @@ export function LocaleTransitionProvider({ children }: { children: React.ReactNo
   const [lastLocale, setLastLocale] = useState(locale);
   const timeoutRef = useRef<number | null>(null);
 
-  const clearTimer = () => {
+  const clearTimer = useCallback(() => {
     if (timeoutRef.current !== null) {
       window.clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
     }
-  };
+  }, []);
 
-  const startLocaleTransition = () => {
+  const startLocaleTransition = useCallback(() => {
     clearTimer();
     setIsTransitioning(true);
-  };
+  }, [clearTimer]);
 
   useEffect(() => {
     if (!isTransitioning) return;
@@ -53,18 +53,18 @@ export function LocaleTransitionProvider({ children }: { children: React.ReactNo
     }, 10_000);
 
     return () => clearTimer();
-  }, [isTransitioning, pathname, locale, lastPathname, lastLocale]);
+  }, [clearTimer, isTransitioning, pathname, locale, lastPathname, lastLocale]);
 
   useEffect(() => {
     return () => clearTimer();
-  }, []);
+  }, [clearTimer]);
 
   const value = useMemo(
     () => ({
       isTransitioning,
       startLocaleTransition,
     }),
-    [isTransitioning]
+    [isTransitioning, startLocaleTransition]
   );
 
   return (
