@@ -5,6 +5,8 @@ import { usePathname } from 'next/navigation';
 import { skipToken } from '@reduxjs/toolkit/query';
 import { useGetMenuQuery } from './menuApi';
 import { applyThemePalette, normalizeThemePalette } from '@/config/theme';
+import { loadGoogleFont } from '@/helpers/fontLoader';
+import { i18n, type Locale } from '@/config/i18n';
 import type { ApiBusinessIdentity, ApiCategory, ApiProduct, ApiSliderItem, ApiStoreHeader } from '@/lib/types/menuApi';
 import type { StoreInfo } from '@/data/storeInfo';
 import type { Product } from '@/data/menu';
@@ -33,6 +35,9 @@ export interface StoreState {
 
 export function useStore(): StoreState {
   const pathname = usePathname();
+  const locale: Locale = i18n.locales.includes(pathname.split('/').filter(Boolean)[0] as Locale)
+    ? pathname.split('/').filter(Boolean)[0] as Locale
+    : i18n.defaultLocale;
   const requestedBusinessName = useMemo(() => {
     const segments = pathname.split('/').filter(Boolean);
     const businessName = segments[0] && (segments[0] === 'en' || segments[0] === 'ar') && segments[1] === 'menu'
@@ -55,9 +60,10 @@ export function useStore(): StoreState {
 
   useEffect(() => {
     const root = document.documentElement;
-    root.style.setProperty('--font-arabic', 'sans-serif');
-    root.style.setProperty('--font-english', 'sans-serif');
-    root.style.setProperty('--font-display', 'sans-serif');
+    const arabicFont = loadGoogleFont(identity?.typography?.arabicFont) || loadGoogleFont('Cairo') || 'Cairo';
+    const englishFont = loadGoogleFont(identity?.typography?.englishFont) || loadGoogleFont('Roboto') || 'Roboto';
+    const arabicStack = `"${arabicFont}", "Cairo", sans-serif`;
+    const englishStack = `"${englishFont}", "Roboto", sans-serif`;
 
     const colors = identity?.colors
       ? [identity.colors.primary, identity.colors.secondary, identity.colors.accent]
@@ -68,16 +74,10 @@ export function useStore(): StoreState {
 
     applyThemePalette(normalizeThemePalette(validColors));
 
-    if (identity?.typography) {
-      if (identity.typography.arabicFont && identity.typography.arabicFont !== 'string') {
-        root.style.setProperty('--font-arabic', identity.typography.arabicFont);
-      }
-      if (identity.typography.englishFont && identity.typography.englishFont !== 'string') {
-        root.style.setProperty('--font-english', identity.typography.englishFont);
-        root.style.setProperty('--font-display', identity.typography.englishFont);
-      }
-    }
-  }, [identity]);
+    root.style.setProperty('--font-arabic', arabicStack);
+    root.style.setProperty('--font-english', englishStack);
+    root.style.setProperty('--font-display', locale === 'ar' ? arabicStack : englishStack);
+  }, [identity, locale]);
 
   useEffect(() => {
     const title = displayBusinessName || header?.businessName || identity?.businessName || businessName;

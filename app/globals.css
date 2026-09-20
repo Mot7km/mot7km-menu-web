@@ -27,8 +27,8 @@
   --shadow-card: none;
   --shadow-card-hover: none;
   --shadow-glow: none;
-  --font-english: sans-serif;
-  --font-arabic: sans-serif;
+  --font-english: "Roboto", sans-serif;
+  --font-arabic: "Cairo", sans-serif;
   --font-display: var(--font-english);
   --radius-sm: 8px;
   --radius-md: 12px;
