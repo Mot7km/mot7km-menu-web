@@ -5,69 +5,11 @@ import { NextIntlClientProvider } from "next-intl";
 import { Providers } from "@/components/providers";
 import { i18n } from "@/config/i18n";
 
-import { webMenuApi } from "@/lib/api/menuApi";
-
-export async function generateMetadata({ searchParams }: { searchParams: Promise<{ businessName?: string }> }): Promise<Metadata> {
-  try {
-    const { businessName } = await searchParams;
-    if (!businessName) {
-      return {
-        icons: [{ url: "/default-icon.png", rel: "icon" }],
-      };
-    }
-    const store = await webMenuApi.getCompleteStoreData(businessName);
-    const brandName =
-      store.displayBusinessName ||
-      store.header?.businessName ||
-      store.identity?.businessName ||
-      businessName;
-    const title =
-      brandName ||
-      "MOT7KM — Smart Restaurant Solutions";
-    const description =
-      store.header?.slogan ||
-      store.identity?.businessDescription ||
-      store.identity?.slogan ||
-      "A modern SaaS platform for restaurants: QR menus, POS, and ERP — all in one place.";
-    const logoUrl = store.header?.logo || store.header?.logoUrl || store.identity?.logo;
-    const iconUrl = logoUrl
-      ? `/api/tenant-icon?businessName=${encodeURIComponent(businessName)}`
-      : "/default-icon.png";
-
-    const icons = [{ url: iconUrl, rel: "icon" as const }, { url: iconUrl, rel: "apple-touch-icon" as const }];
-
-    return {
-      title,
-      description,
-      icons,
-      applicationName: brandName,
-      keywords: [brandName, "digital menu", "restaurant menu", "QR menu"],
-      alternates: {
-        canonical: brandName ? `/${businessName}` : undefined,
-      },
-      openGraph: {
-        title,
-        description,
-        siteName: brandName,
-        images: store.header?.coverUrl || store.header?.backGroundImage
-          ? [{ url: (store.header?.coverUrl || store.header?.backGroundImage)! }]
-          : undefined,
-      },
-      twitter: {
-        card: "summary_large_image",
-        title,
-        description,
-        images: logoUrl ? [logoUrl] : undefined,
-      },
-    };
-  } catch {
-    return {
-      title: "MOT7KM — Smart Restaurant Solutions",
-      description: "A modern SaaS platform for restaurants: QR menus, POS, and ERP — all in one place.",
-      icons: [{ url: "/default-icon.png", rel: "icon" }],
-    };
-  }
-}
+export const metadata: Metadata = {
+  title: "MOT7KM — Digital Menus",
+  description: "Discover digital restaurant menus with MOT7KM.",
+  icons: [{ url: "/default-icon.png", rel: "icon" }],
+};
 
 interface RootLayoutProps {
   children: React.ReactNode;

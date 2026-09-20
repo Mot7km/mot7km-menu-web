@@ -1,7 +1,7 @@
 // src/context/StoreContext.tsx
 'use client';
 
-import React, { createContext, useContext, useEffect, useState, useMemo, ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, useState, useMemo, useRef, ReactNode } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { webMenuApi } from '@/lib/api/menuApi';
 import type {
@@ -62,8 +62,11 @@ export function StoreProvider({ children, initialData }: StoreProviderProps) {
   const [sliderHeader, setSliderHeader] = useState<string | null>(initialData?.sliderHeader || null);
   const [apiCategories, setApiCategories] = useState<ApiCategory[]>(initialData?.categories || []);
   const [apiProducts, setApiProducts] = useState<ApiProduct[]>(initialData?.products || []);
+  const requestIdRef = useRef(0);
 
   const loadData = async () => {
+    const requestId = ++requestIdRef.current;
+
     try {
       setLoading(true);
       const segments = window.location.pathname.split('/').filter(Boolean);
@@ -73,6 +76,7 @@ export function StoreProvider({ children, initialData }: StoreProviderProps) {
       const requestedBusinessName = new URLSearchParams(window.location.search).get('businessName') ||
         (pathBusinessName ? decodeURIComponent(pathBusinessName) : undefined);
       if (!requestedBusinessName) {
+        setBusinessName('');
         setIdentity(null);
         setHeader(null);
         setDisplayBusinessName('');
@@ -80,7 +84,7 @@ export function StoreProvider({ children, initialData }: StoreProviderProps) {
         setSliderHeader(null);
         setApiCategories([]);
         setApiProducts([]);
-        setStoreNotFound(true);
+        setStoreNotFound(false);
         return;
       }
 
@@ -96,6 +100,8 @@ export function StoreProvider({ children, initialData }: StoreProviderProps) {
       setStoreNotFound(false);
 
       const data = await webMenuApi.getCompleteStoreData(requestedBusinessName);
+      if (requestId !== requestIdRef.current) return;
+
       const returnedName = data.header?.businessName || data.identity?.businessName;
       setStoreNotFound(Boolean(returnedName && returnedName.toLowerCase() !== requestedBusinessName.toLowerCase()) ||
         !data.header && !data.identity && !data.categories?.length && !data.products?.length);
@@ -110,9 +116,10 @@ export function StoreProvider({ children, initialData }: StoreProviderProps) {
       setApiCategories(data.categories || []);
       setApiProducts(data.products || []);
     } catch (err) {
+      if (requestId !== requestIdRef.current) return;
       console.error('[StoreProvider] Failed to fetch live menu data:', err);
     } finally {
-      setLoading(false);
+      if (requestId === requestIdRef.current) setLoading(false);
     }
   };
 

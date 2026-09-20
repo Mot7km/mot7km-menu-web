@@ -101,14 +101,21 @@ export default function Categories({
                     />
                   )}
 
-                  <Image
-                    src={category.image}
-                    alt={category.label}
-                    fill
-                    sizes="(max-width: 640px) 48px, (max-width: 768px) 56px, (max-width: 1024px) 64px, 80px"
-                    className="object-cover rounded-full transition-transform duration-500 group-hover:scale-110"
-                    priority={isActive}
-                  />
+                  {category.image ? (
+                    <Image
+                      src={category.image}
+                      alt={category.label}
+                      fill
+                      sizes="(max-width: 640px) 48px, (max-width: 768px) 56px, (max-width: 1024px) 64px, 80px"
+                      className="object-cover rounded-full transition-transform duration-500 group-hover:scale-110"
+                      priority={isActive}
+                    />
+                  ) : (
+                    <div
+                      aria-hidden="true"
+                      className="absolute inset-0 rounded-full bg-[var(--color-primary-50)] transition-transform duration-500 group-hover:scale-110"
+                    />
+                  )}
                 </div>
 
                 {/* Label with gradient text for active */}

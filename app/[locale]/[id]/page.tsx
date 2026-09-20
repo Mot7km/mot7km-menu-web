@@ -7,32 +7,23 @@ import { useTranslations } from 'next-intl';
 import { CustomizationOptions } from '@/components/features/CustomizationOptions';
 import ListContainer from '@/components/common/ListContainer';
 import { ArrowLeft, Sparkles, Star } from 'lucide-react';
-import { use, useEffect, useMemo, useState } from 'react';
+import { use, useMemo, useState } from 'react';
 import { useCart } from '@/context/CartContext';
 import { AddToCartBar } from '@/components/cart/AddToCartBar';
 import { useStore } from '@/context/StoreContext';
 import { useBusinessRoute } from '@/hooks/useLocale';
-import { useSearchParams } from 'next/navigation';
-import NotFound from '../not-found';
 
 export default function ProductPage({ params }: { params: Promise<{ locale: string; id: string }> }) {
   const resolvedParams = use(params);
   const { id } = resolvedParams;
   const t = useTranslations();
-  const searchParams = useSearchParams();
   const { addToCart } = useCart();
-  const { products: storeProducts, recordView, loading } = useStore();
+  const { products: storeProducts, loading } = useStore();
   const { getPath } = useBusinessRoute();
 
   const [selections, setSelections] = useState<Record<string, string>>({});
   const [extraTotal, setExtraTotal] = useState<number>(0);
   const [quantity, setQuantity] = useState(1);
-
-  useEffect(() => {
-    if (id) {
-      recordView(id);
-    }
-  }, [id, recordView]);
 
   const product = useMemo(() => storeProducts.find((p) => p.id === id), [storeProducts, id]);
 
@@ -43,9 +34,6 @@ export default function ProductPage({ params }: { params: Promise<{ locale: stri
   }
 
   if (!product) {
-    if (!searchParams.get('businessName')) {
-      return <NotFound />;
-    }
     notFound();
   }
 

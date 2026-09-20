@@ -1,6 +1,7 @@
 import Link from 'next/link';
 
-export default function InfoPage() {
+export default async function InfoPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   return (
     <main className="min-h-screen bg-[var(--color-background)] px-6 py-16 text-[var(--color-text-primary)]">
       <div className="mx-auto flex min-h-[70vh] max-w-3xl flex-col justify-center gap-6">
@@ -9,7 +10,7 @@ export default function InfoPage() {
         <p className="max-w-2xl text-lg leading-8 text-[var(--color-text-muted)]">
           This is a mock information page for the public menu platform. Business menus live under the menu route.
         </p>
-        <Link href="/" className="w-fit rounded-full bg-[var(--color-primary)] px-6 py-3 font-semibold text-[var(--color-text-on-primary)]">
+        <Link href={`/${locale}`} className="w-fit rounded-full bg-[var(--color-primary)] px-6 py-3 font-semibold text-[var(--color-text-on-primary)]">
           Back to home
         </Link>
       </div>
