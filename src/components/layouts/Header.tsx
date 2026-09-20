@@ -373,6 +373,7 @@ export function Header() {
   const brandName = displayBusinessName || header?.businessName || identity?.businessName || storeInfo.name;
   const slogan = header?.slogan || identity?.slogan || t('header.tagline');
   const logoUrl = header?.logo || header?.logoUrl || identity?.logo;
+  const backgroundImage = header?.backGroundImage;
 
   const togglePopover = (id: string) => {
     setPopoverOpen((prev) => (prev === id ? null : id));
@@ -479,9 +480,11 @@ export function Header() {
     <header
       className="relative flex w-full flex-col items-center justify-center rounded-b-[2rem] sm:rounded-b-[2.5rem] overflow-hidden pt-8 sm:pt-10 pb-6 sm:pb-8 px-4 sm:px-6 lg:px-8"
       style={{
-        background: 'var(--gradient-hero)',
-        backgroundSize: '200% 200%',
-        animation: 'gradientShift 8s ease-in-out infinite alternate',
+        background: backgroundImage ? undefined : 'var(--gradient-hero)',
+        backgroundImage: backgroundImage ? `url("${backgroundImage}")` : undefined,
+        backgroundPosition: backgroundImage ? 'center' : undefined,
+        backgroundSize: backgroundImage ? 'cover' : '200% 200%',
+        animation: backgroundImage ? undefined : 'gradientShift 8s ease-in-out infinite alternate',
       }}
     >
       {/* Decorative layers */}

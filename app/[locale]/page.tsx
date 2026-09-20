@@ -73,7 +73,7 @@ export default function Home() {
             <Link href={`/${locale}/info`} className="rounded-full bg-[var(--color-primary)] px-6 py-3 font-semibold text-[var(--color-text-on-primary)]">
               Learn more
             </Link>
-            <Link href={`/${locale}/menu/mot7km`} className="rounded-full border border-[var(--color-border)] px-6 py-3 font-semibold">
+            <Link href={`/${locale}/menu`} className="rounded-full border border-[var(--color-border)] px-6 py-3 font-semibold">
               Open demo menu
             </Link>
           </div>
