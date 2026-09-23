@@ -1,5 +1,6 @@
 'use client';
 
+import { use, useEffect, useMemo, useState } from 'react';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -7,18 +8,19 @@ import { useTranslations } from 'next-intl';
 import { CustomizationOptions } from '@/components/features/CustomizationOptions';
 import ListContainer from '@/components/common/ListContainer';
 import { ArrowLeft, Sparkles, Star } from 'lucide-react';
-import { use, useMemo, useState } from 'react';
 import { useCart } from '@/store/hooks';
 import { AddToCartBar } from '@/components/cart/AddToCartBar';
 import { useStore } from '@/store/storeHooks';
 import { useBusinessRoute } from '@/hooks/useLocale';
+import { webMenuApi } from '@/lib/api/menuApi';
+import type { Review } from '@/data/menu';
 
 export default function ProductPage({ params }: { params: Promise<{ locale: string; id: string }> }) {
   const resolvedParams = use(params);
   const { id } = resolvedParams;
   const t = useTranslations();
   const { addToCart } = useCart();
-  const { products: storeProducts, loading } = useStore();
+  const { products: storeProducts, loading, businessName, refresh } = useStore();
   const { getPath } = useBusinessRoute();
 
   const [selections, setSelections] = useState<Record<string, string>>({});
@@ -27,7 +29,85 @@ export default function ProductPage({ params }: { params: Promise<{ locale: stri
 
   const product = useMemo(() => storeProducts.find((p) => p.id === id), [storeProducts, id]);
 
-  const reviewSections = useMemo(() => [{ type: 'reviews' as const, data: product?.reviews || [] }], [product?.reviews]);
+  const [reviews, setReviews] = useState<Review[]>(() => product?.reviews || []);
+
+  useEffect(() => {
+    if (product?.reviews && product.reviews.length > 0) {
+      setReviews(product.reviews);
+    }
+  }, [product?.reviews]);
+
+  // Fetch reviews directly from GET /api/menu/{businessName}/products/{productId}/reviews
+  useEffect(() => {
+    const numericProductId = Number(id);
+    if (!businessName || isNaN(numericProductId)) return;
+
+    let isMounted = true;
+    webMenuApi.getProductReviews(businessName, numericProductId).then((apiReviews) => {
+      if (!isMounted || !apiReviews) return;
+      const formattedReviews: Review[] = apiReviews.map((r) => ({
+        reviewer: r.nameCustomer || 'Customer',
+        date: r.createdAt || '',
+        rating: r.rating || 5,
+        comment: r.content || '',
+      }));
+      setReviews(formattedReviews);
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [businessName, id]);
+
+  const handleAsyncReviewSubmit = async (data: { reviewer: string; rating: number; comment: string }) => {
+    const numericProductId = Number(id);
+    if (businessName && !isNaN(numericProductId)) {
+      const response = await webMenuApi.postProductReview(businessName, numericProductId, {
+        rating: data.rating,
+        nameCustomer: data.reviewer,
+        content: data.comment,
+      });
+
+      if (response) {
+        const newReview: Review = {
+          reviewer: response.nameCustomer || data.reviewer || 'Anonymous',
+          rating: response.rating ?? data.rating,
+          comment: response.content || data.comment,
+          date: response.createdAt || new Date().toISOString(),
+        };
+        setReviews((prev) => [newReview, ...prev]);
+        refresh?.();
+        return newReview;
+      }
+    }
+
+    const fallbackReview: Review = {
+      reviewer: data.reviewer || 'Anonymous',
+      rating: data.rating,
+      comment: data.comment,
+      date: new Date().toISOString(),
+    };
+    setReviews((prev) => [fallbackReview, ...prev]);
+    return fallbackReview;
+  };
+
+  const reviewSections = useMemo(
+    () => [
+      {
+        type: 'reviews' as const,
+        data: reviews,
+        onAsyncReviewSubmit: handleAsyncReviewSubmit,
+      },
+    ],
+    [reviews, handleAsyncReviewSubmit]
+  );
+
+  const averageRating = useMemo(() => {
+    if (reviews.length > 0) {
+      return (reviews.reduce((acc, r) => acc + (r.rating || 5), 0) / reviews.length).toFixed(1);
+    }
+    return product?.rating || '';
+  }, [reviews, product?.rating]);
 
   if (loading) {
     return <div className="flex min-h-screen items-center justify-center text-[var(--color-text-muted)]">{t('loading.product')}</div>;
@@ -93,23 +173,23 @@ export default function ProductPage({ params }: { params: Promise<{ locale: stri
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div className="flex-1 min-w-[200px]">
                   <div className="inline-flex items-center gap-1.5 px-3 py-1 mb-3 rounded-full bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/20 animate-fade-in stagger-1">
-                      <Sparkles size={12} className="text-[var(--color-primary)]" />
-                      <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-primary)]">
-                        {product.category || t('productPage.noCategory')}
-                      </span>
+                    <Sparkles size={12} className="text-[var(--color-primary)]" />
+                    <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-primary)]">
+                      {product.category || t('productPage.noCategory')}
+                    </span>
                   </div>
                   <h1 className="font-api text-3xl sm:text-4xl md:text-5xl font-extrabold text-[var(--color-text-primary)] leading-tight tracking-tight animate-fade-in stagger-2">
                     {product.name}
                   </h1>
                   <div className="flex items-center gap-2 mt-3 animate-fade-in stagger-3">
-                      <div className="flex items-center bg-[var(--color-warning)]/10 px-2 py-1 rounded-full">
-                        <Star size={14} className="text-[var(--color-warning)] fill-[var(--color-warning)] mr-1" />
-                        <span className="text-sm font-bold text-[var(--color-text-primary)]">
-                          {product.rating || t('productPage.noRating')}
-                        </span>
-                      </div>
+                    <div className="flex items-center bg-[var(--color-warning)]/10 px-2 py-1 rounded-full">
+                      <Star size={14} className="text-[var(--color-warning)] fill-[var(--color-warning)] mr-1" />
+                      <span className="text-sm font-bold text-[var(--color-text-primary)]">
+                        {averageRating || product.rating || t('productPage.noRating')}
+                      </span>
                     </div>
                   </div>
+                </div>
 
                 {/* Price Tag */}
                 <div className="flex-shrink-0 animate-fade-in-up stagger-3">
@@ -133,35 +213,35 @@ export default function ProductPage({ params }: { params: Promise<{ locale: stri
 
             {/* Ingredients */}
             <div className="space-y-4 animate-fade-in-up stagger-6">
-                <h3 className="font-api font-bold text-lg sm:text-xl text-[var(--color-text-primary)] flex items-center gap-2">
-                  <div className="w-1.5 h-6 rounded-full bg-[var(--color-primary)]" />
-                  {t('productPage.ingredients')}
-                </h3>
-                {product.ingredients?.length ? (
-                  <div className="flex flex-wrap gap-2.5">
-                    {product.ingredients.map((ing) => (
-                      <span key={ing} className="glass-subtle px-4 py-2 rounded-full text-sm font-medium text-[var(--color-text-primary)] shadow-sm hover:shadow-md hover:scale-105 transition-all duration-300 border-[var(--color-border)]">
-                        {ing}
-                      </span>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="rounded-xl border border-dashed border-[var(--color-border)] px-4 py-5 text-center text-sm text-[var(--color-text-muted)]">{t('productPage.noIngredients')}</div>
-                )}
+              <h3 className="font-api font-bold text-lg sm:text-xl text-[var(--color-text-primary)] flex items-center gap-2">
+                <div className="w-1.5 h-6 rounded-full bg-[var(--color-primary)]" />
+                {t('productPage.ingredients')}
+              </h3>
+              {product.ingredients?.length ? (
+                <div className="flex flex-wrap gap-2.5">
+                  {product.ingredients.map((ing) => (
+                    <span key={ing} className="glass-subtle px-4 py-2 rounded-full text-sm font-medium text-[var(--color-text-primary)] shadow-sm hover:shadow-md hover:scale-105 transition-all duration-300 border-[var(--color-border)]">
+                      {ing}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <div className="rounded-xl border border-dashed border-[var(--color-border)] px-4 py-5 text-center text-sm text-[var(--color-text-muted)]">{t('productPage.noIngredients')}</div>
+              )}
             </div>
 
             {/* Customization */}
             <div className="pt-2 animate-fade-in-up stagger-7">
-                <CustomizationOptions
-                  product={product}
-                  onSelectionsChange={setSelections}
-                  onPriceChange={(total, extras) => setExtraTotal(extras)}
-                />
+              <CustomizationOptions
+                product={product}
+                onSelectionsChange={setSelections}
+                onPriceChange={(total, extras) => setExtraTotal(extras)}
+              />
             </div>
 
             {/* Reviews */}
             <div className="pt-6 animate-fade-in-up stagger-8">
-                <ListContainer sections={reviewSections} />
+              <ListContainer sections={reviewSections} />
             </div>
           </div>
         </div>

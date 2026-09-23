@@ -1,11 +1,12 @@
 export const THEME_STORAGE_KEY = "mot7km-theme";
-export const THEME_PALETTE_STORAGE_KEY = "mot7km-theme-palette";
 
 export const DEFAULT_THEME_COLORS = [
   "#2B9FD9", // Primary
   "#0B529E", // Secondary
   "#F8F9FA", // Accent
 ] as const;
+
+let activeThemePalette: [string, string, string] = [...DEFAULT_THEME_COLORS];
 
 export const themes = {
   light: {
@@ -267,24 +268,11 @@ export function generateThemeVariables(colors: string[] = [...DEFAULT_THEME_COLO
   return { light, dark };
 }
 
-export function getStoredThemePalette() {
-  if (typeof window === "undefined") return [...DEFAULT_THEME_COLORS];
-
-  try {
-    const saved = window.localStorage.getItem(THEME_PALETTE_STORAGE_KEY);
-    if (!saved) return [...DEFAULT_THEME_COLORS];
-
-    const parsed = JSON.parse(saved);
-    return normalizeThemePalette(Array.isArray(parsed) ? parsed : DEFAULT_THEME_COLORS);
-  } catch {
-    return [...DEFAULT_THEME_COLORS];
-  }
-}
-
 export function applyThemePalette(colors: string[] = [...DEFAULT_THEME_COLORS]) {
   if (typeof document === "undefined") return;
 
   const normalized = normalizeThemePalette(colors);
+  activeThemePalette = normalized;
   const root = document.documentElement;
   const { light, dark } = generateThemeVariables(normalized);
   const isDark = root.classList.contains("dark");
@@ -298,11 +286,10 @@ export function applyThemePalette(colors: string[] = [...DEFAULT_THEME_COLORS]) 
     root.style.setProperty(key, value);
   });
 
-  try {
-    window.localStorage.setItem(THEME_PALETTE_STORAGE_KEY, JSON.stringify(normalized));
-  } catch {
-    // no-op
-  }
+}
+
+export function getActiveThemePalette() {
+  return [...activeThemePalette] as [string, string, string];
 }
 
 export function setThemePalette(colors: ReadonlyArray<string> = DEFAULT_THEME_COLORS) {

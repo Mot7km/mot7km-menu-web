@@ -14,6 +14,8 @@ interface ReviewSectionProps {
   loadMoreCount?: number;
   /** Optional: callback to notify parent of new review (e.g., for API updates) */
   onNewReview?: (review: Review) => void;
+  /** Optional: async handler for posting review to the API */
+  onAsyncReviewSubmit?: (data: { reviewer: string; rating: number; comment: string }) => Promise<Review | null | boolean>;
 }
 
 export default function ReviewSection({
@@ -22,6 +24,7 @@ export default function ReviewSection({
   initialCount = 1,
   loadMoreCount = 1,
   onNewReview,
+  onAsyncReviewSubmit,
 }: ReviewSectionProps) {
   const t = useTranslations();
   const [visibleCount, setVisibleCount] = useState(initialCount);
@@ -41,22 +44,40 @@ export default function ReviewSection({
     setVisibleCount(Math.min(visibleCount + loadMoreCount, localReviews.length));
   };
 
-  const handleReviewSubmit = (data: { reviewer: string; rating: number; comment: string }) => {
+  const handleReviewSubmit = async (data: { reviewer: string; rating: number; comment: string }) => {
     setIsSubmitting(true);
 
-    // Simulate async submission (replace with actual API call)
-    setTimeout(() => {
-      const newReview: Review = {
-        reviewer: data.reviewer || 'Anonymous',
-        rating: data.rating,
-        comment: data.comment,
-        date: new Date().toISOString(),
-      };
-
-      setLocalReviews((prev) => [newReview, ...prev]);
+    try {
+      if (onAsyncReviewSubmit) {
+        const result = await onAsyncReviewSubmit(data);
+        if (result && typeof result === 'object') {
+          setLocalReviews((prev) => [result, ...prev]);
+          onNewReview?.(result);
+        } else if (result !== false) {
+          const fallbackReview: Review = {
+            reviewer: data.reviewer || 'Anonymous',
+            rating: data.rating,
+            comment: data.comment,
+            date: new Date().toISOString(),
+          };
+          setLocalReviews((prev) => [fallbackReview, ...prev]);
+          onNewReview?.(fallbackReview);
+        }
+      } else {
+        const newReview: Review = {
+          reviewer: data.reviewer || 'Anonymous',
+          rating: data.rating,
+          comment: data.comment,
+          date: new Date().toISOString(),
+        };
+        setLocalReviews((prev) => [newReview, ...prev]);
+        onNewReview?.(newReview);
+      }
+    } catch (err) {
+      console.error('Failed to submit review:', err);
+    } finally {
       setIsSubmitting(false);
-      onNewReview?.(newReview);
-    }, 800);
+    }
   };
 
   const avgRating = localReviews.length

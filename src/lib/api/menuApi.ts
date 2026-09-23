@@ -1,21 +1,18 @@
 // src/lib/api/menuApi.ts
 import { API_BASE_URL } from '../constants';
 import type {
-  ApiBusinessIdentity,
-  ApiStoreHeader,
-  ApiSlider,
-  ApiSliderItem,
+  ApiBusinessMenu,
   ApiSlidersResponse,
   ApiCategory,
   ApiProduct,
   ApiProductDetails,
-  ApiMenuProfile,
-  ApiBusinessMenu,
-  StoreData,
+  ApiReviewItem,
+  ApiReviewRequest,
 } from '../types/menuApi';
 
 /**
  * Generic fetcher for Web Menu API endpoints.
+ * Response media type: text/plain (JSON body).
  */
 async function fetchApi<T>(path: string, options?: RequestInit): Promise<T | null> {
   const url = typeof window === 'undefined' ? `${API_BASE_URL}${path}` : path;
@@ -47,8 +44,8 @@ async function fetchApi<T>(path: string, options?: RequestInit): Promise<T | nul
       json = body;
     }
     // Support either direct data or { success, data } envelope
-    if (json && typeof json === 'object' && 'data' in json && json.data !== undefined) {
-      return json.data as T;
+    if (json && typeof json === 'object' && 'data' in json && (json as Record<string, unknown>).data !== undefined) {
+      return (json as Record<string, unknown>).data as T;
     }
     return json as T;
   } catch (error) {
@@ -60,199 +57,142 @@ async function fetchApi<T>(path: string, options?: RequestInit): Promise<T | nul
 }
 
 /**
- * Web Menu API Client service implementing all endpoints specified in the Swagger spec.
+ * Web Menu API Client — implements exactly the endpoints defined in the API spec.
  */
 export const webMenuApi = {
-  /** GET /api/menu/businesses */
+  /** GET /api/menu/businesses — Get all business names. */
   async getBusinesses(): Promise<string[] | null> {
     return fetchApi<string[]>('/api/menu/businesses');
   },
 
-  /** GET /api/menu/{businessName} */
+  /** GET /api/menu/{businessName} — Get complete store menu. */
   async getMenu(businessName: string): Promise<ApiBusinessMenu | null> {
     return fetchApi<ApiBusinessMenu>(`/api/menu/${encodeURIComponent(businessName)}`);
   },
 
-  /** GET /api/menu/{businessName}/info */
+  /** GET /api/menu/{businessName}/info — Get business information and branding. */
   async getBusinessInfo(businessName: string): Promise<ApiBusinessMenu | null> {
     return fetchApi<ApiBusinessMenu>(`/api/menu/${encodeURIComponent(businessName)}/info`);
   },
 
-  /** GET /api/menu/{businessName}/sliders */
+  /** GET /api/menu/{businessName}/sliders — Get promotional sliders and carousel banners. */
   async getBusinessSliders(businessName: string): Promise<ApiSlidersResponse | null> {
     return fetchApi<ApiSlidersResponse>(`/api/menu/${encodeURIComponent(businessName)}/sliders`);
   },
 
-  /** GET /api/menu/{businessName}/categories */
+  /** GET /api/menu/{businessName}/categories — Get all categories for the business menu. */
   async getBusinessCategories(businessName: string): Promise<ApiCategory[] | null> {
     return fetchApi<ApiCategory[]>(`/api/menu/${encodeURIComponent(businessName)}/categories`);
   },
 
-  /** GET /api/menu/{businessName}/products?categoryId={categoryId} */
+  /**
+   * GET /api/menu/{businessName}/products — Get all products, optionally filtered by category.
+   * @param categoryId Optional category filter (integer).
+   */
   async getBusinessProducts(businessName: string, categoryId?: number): Promise<ApiProduct[] | null> {
     const query = categoryId === undefined ? '' : `?categoryId=${encodeURIComponent(categoryId)}`;
     return fetchApi<ApiProduct[]>(`/api/menu/${encodeURIComponent(businessName)}/products${query}`);
   },
 
-  /** GET /api/menu/{businessName}/products/{productId} */
-  async getBusinessProductDetails(businessName: string, productId: number | string): Promise<ApiProductDetails | null> {
+  /**
+   * GET /api/menu/{businessName}/products/{productId} — Get detailed information for a specific product.
+   * Automatically increments view counter.
+   */
+  async getBusinessProductDetails(businessName: string, productId: number): Promise<ApiProductDetails | null> {
     return fetchApi<ApiProductDetails>(
       `/api/menu/${encodeURIComponent(businessName)}/products/${encodeURIComponent(productId)}`
     );
   },
 
   /**
-   * GET /api/menu/profile
-   * Returns current store BusinessName and MenuID (parameterless)
+   * GET /api/menu/{businessName}/products/{productId}/reviews — Get all available reviews for a product.
    */
-  async getProfile(): Promise<ApiMenuProfile | null> {
-    return fetchApi<ApiMenuProfile>('/api/menu/profile');
-  },
-
-  /**
-   * GET /api/menu/by-business-name/{businessName}
-   * Get complete store menu (identity, header, sliders, categories, and products) in a single request.
-   */
-  async getByBusinessName(businessName: string): Promise<Partial<StoreData> | null> {
-    return fetchApi<Partial<StoreData>>(`/api/menu/by-business-name/${encodeURIComponent(businessName)}`);
-  },
-
-  /**
-   * GET /api/menu/by-username/{businessName}
-   * Get complete store menu in a single request by username.
-   */
-  async getByUsername(businessName: string): Promise<Partial<StoreData> | null> {
-    return fetchApi<Partial<StoreData>>(`/api/menu/by-username/${encodeURIComponent(businessName)}`);
-  },
-
-  /**
-   * GET /api/menu/business-identity/by-business-name/{businessName}
-   * Get business identity (brand colors, typography, fonts) by store business name.
-   */
-  async getBusinessIdentity(businessName: string): Promise<ApiBusinessIdentity | null> {
-    return fetchApi<ApiBusinessIdentity>(
-      `/api/menu/business-identity/by-business-name/${encodeURIComponent(businessName)}`
+  async getProductReviews(businessName: string, productId: number): Promise<ApiReviewItem[] | null> {
+    return fetchApi<ApiReviewItem[]>(
+      `/api/menu/${encodeURIComponent(businessName)}/products/${encodeURIComponent(productId)}/reviews`
     );
   },
 
   /**
-   * GET /api/menu/business-identity/by-username/{businessName}
-   * Get business identity by username.
+   * POST /api/menu/{businessName}/products/{productId}/reviews — Submit a customer review.
+   * Returns 201 Created with the saved review on success, or null on failure.
    */
-  async getBusinessIdentityByUsername(businessName: string): Promise<ApiBusinessIdentity | null> {
-    return fetchApi<ApiBusinessIdentity>(
-      `/api/menu/business-identity/by-username/${encodeURIComponent(businessName)}`
-    );
-  },
+  async postProductReview(
+    businessName: string,
+    productId: number,
+    review: ApiReviewRequest
+  ): Promise<ApiReviewItem | null> {
+    const path = `/api/menu/${encodeURIComponent(businessName)}/products/${encodeURIComponent(productId)}/reviews`;
+    const url = typeof window === 'undefined' ? `${API_BASE_URL}${path}` : path;
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        signal: controller.signal,
+        headers: {
+          Accept: 'text/plain, application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(review),
+      });
 
-  /**
-   * GET /api/menu/header/by-business-name/{businessName}
-   * Get store header information (logo, cover background, branches, contact, and social links).
-   */
-  async getHeader(businessName: string): Promise<ApiStoreHeader | null> {
-    return fetchApi<ApiStoreHeader>(
-      `/api/menu/header/by-business-name/${encodeURIComponent(businessName)}`
-    );
-  },
+      if (!res.ok) {
+        console.warn(`[WebMenuAPI] POST ${path} responded with status ${res.status}`);
+        return null;
+      }
 
-  /**
-   * GET /api/menu/header/by-username/{businessName}
-   * Get store header information by username.
-   */
-  async getHeaderByUsername(businessName: string): Promise<ApiStoreHeader | null> {
-    return fetchApi<ApiStoreHeader>(
-      `/api/menu/header/by-username/${encodeURIComponent(businessName)}`
-    );
-  },
-
-  /**
-   * GET /api/menu/sliders
-   * Get promotional sliders and carousel banners.
-   */
-  async getSliders(): Promise<ApiSlidersResponse | ApiSlider[] | null> {
-    return fetchApi<ApiSlidersResponse | ApiSlider[]>('/api/menu/sliders');
-  },
-
-  /**
-   * GET /api/menu/all-categories/{menuId}
-   * Get all categories belonging to a menu ID.
-   */
-  async getCategories(menuId: number): Promise<ApiCategory[] | null> {
-    return fetchApi<ApiCategory[]>(`/api/menu/all-categories/${menuId}`);
-  },
-
-  /**
-   * GET /api/menu/all-products/{categoryId}
-   * Get all products belonging to a category ID.
-   */
-  async getProductsByCategory(categoryId: number): Promise<ApiProduct[] | null> {
-    return fetchApi<ApiProduct[]>(`/api/menu/all-products/${categoryId}`);
-  },
-
-  /**
-   * GET /api/menu/products-by-category/{Id}
-   * Get list of products by multiple product IDs.
-   */
-  async getProductsByIds(categoryId: number | string, productIds?: number[]): Promise<ApiProduct[] | null> {
-    const qs = productIds && productIds.length > 0
-      ? `?${productIds.map((id) => `productIds=${id}`).join('&')}`
-      : '';
-    return fetchApi<ApiProduct[]>(`/api/menu/products-by-category/${categoryId}${qs}`);
-  },
-
-  /**
-   * GET /api/menu/product-details/{id}
-   * Get public product details by ID (automatically increments view counter on backend).
-   */
-  async getProductDetails(id: number | string): Promise<ApiProductDetails | null> {
-    return fetchApi<ApiProductDetails>(`/api/menu/product-details/${id}`);
-  },
-
-  /**
-   * GET /api/menu/products/{id}
-   * Get full enriched product details by ID (Basic Info, Ingredients, Customizations, Reviews Section).
-   */
-  async getEnrichedProduct(id: number | string): Promise<ApiProductDetails | null> {
-    return fetchApi<ApiProductDetails>(`/api/menu/products/${id}`);
+      const body = await res.text();
+      let json: unknown;
+      try {
+        json = JSON.parse(body);
+      } catch {
+        json = body;
+      }
+      if (json && typeof json === 'object' && 'data' in json && (json as Record<string, unknown>).data !== undefined) {
+        return (json as Record<string, unknown>).data as ApiReviewItem;
+      }
+      return json as ApiReviewItem;
+    } catch (error) {
+      console.error(`[WebMenuAPI] Error posting review to ${path}:`, error);
+      return null;
+    } finally {
+      clearTimeout(timeout);
+    }
   },
 
   /**
    * High-level aggregator that resolves the complete store data for the subsite.
-   * Checks /api/menu/profile and /api/menu/by-business-name/{businessName},
-   * accurately handling the real backend schema.
+   * Fetches GET /api/menu/{businessName} and normalises the response.
    */
   async getCompleteStoreData(customBusinessName?: string): Promise<{
     businessName: string;
     displayBusinessName: string;
     menuId: number;
-    identity: ApiBusinessIdentity | null;
-    header: ApiStoreHeader | null;
-    sliders: ApiSliderItem[] | null;
+    identity: import('../types/menuApi').ApiBusinessIdentity | null;
+    header: import('../types/menuApi').ApiStoreHeader | null;
+    sliders: import('../types/menuApi').ApiSliderItem[] | null;
     sliderHeader: string | null;
     categories: ApiCategory[] | null;
     products: ApiProduct[] | null;
   }> {
-    let businessName = customBusinessName;
-    const menuId = 0;
+    const businessName = customBusinessName;
 
     if (!businessName) {
-      return { businessName: '', displayBusinessName: '', menuId, identity: null, header: null, sliders: null, sliderHeader: null, categories: null, products: null };
+      return { businessName: '', displayBusinessName: '', menuId: 0, identity: null, header: null, sliders: null, sliderHeader: null, categories: null, products: null };
     }
 
-    // 2. Fetch the complete menu bundle by business name
     const rawBundle = await this.getMenu(businessName);
 
     if (rawBundle) {
-      const identity: ApiBusinessIdentity | null = rawBundle.businessIdentity || null;
+      const identity = rawBundle.businessIdentity || null;
 
-      // Normalize header
-      const header: ApiStoreHeader | null = rawBundle.header || null;
+      const header = rawBundle.header || null;
       if (rawBundle.businessDescription && header && !header.slogan) {
         header.slogan = rawBundle.businessDescription;
       }
 
-      // Normalize sliders (backend might return { sliderHeader, sliderItems: [...] } or an array)
-      let sliders: ApiSliderItem[] | null = null;
+      let sliders: import('../types/menuApi').ApiSliderItem[] | null = null;
       let sliderHeader: string | null = null;
       if (rawBundle.sliders) {
         if (Array.isArray(rawBundle.sliders.sliderItems)) {
@@ -261,12 +201,11 @@ export const webMenuApi = {
         }
       }
 
-      // Normalize categories and products
       let categories: ApiCategory[] | null = null;
-      let products: ApiProduct[] = [];
+      const products: ApiProduct[] = [];
 
       if (Array.isArray(rawBundle.categories) && rawBundle.categories.length > 0) {
-        categories = rawBundle.categories.map((c: any) => ({
+        categories = rawBundle.categories.map((c: ApiCategory) => ({
           id: c.id,
           categoryName: c.categoryName || c.category_Name || c.name || `Category ${c.id}`,
           categoryImageUrl: c.categoryImageUrl || c.imageUrl,
@@ -275,13 +214,12 @@ export const webMenuApi = {
           products: c.products,
         }));
 
-        // Flatten all nested products from the categories
-        rawBundle.categories.forEach((cat: any) => {
+        rawBundle.categories.forEach((cat: ApiCategory) => {
           if (Array.isArray(cat.products)) {
-            cat.products.forEach((p: any) => {
+            cat.products.forEach((p: ApiProduct) => {
               products.push({
                 ...p,
-                categoryId: p.categoryId ?? cat.id,
+                categoryId: p.categoryId ?? Number(cat.id),
                 categoryName: p.categoryName ?? cat.categoryName,
               });
             });
@@ -292,7 +230,7 @@ export const webMenuApi = {
       return {
         businessName: rawBundle.businessName || businessName,
         displayBusinessName: rawBundle.displayBusinessName || rawBundle.businessName || businessName,
-        menuId,
+        menuId: 0,
         identity,
         header,
         sliders,
@@ -302,6 +240,6 @@ export const webMenuApi = {
       };
     }
 
-    return { businessName, displayBusinessName: businessName, menuId, identity: null, header: null, sliders: null, sliderHeader: null, categories: null, products: null };
+    return { businessName, displayBusinessName: businessName, menuId: 0, identity: null, header: null, sliders: null, sliderHeader: null, categories: null, products: null };
   },
 };

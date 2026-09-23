@@ -3,7 +3,7 @@
 import { ThemeProvider } from 'next-themes';
 import { ReactNode, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { applyThemePalette, getStoredThemePalette, THEME_STORAGE_KEY } from '@/config/theme';
+import { applyThemePalette, getActiveThemePalette, THEME_STORAGE_KEY } from '@/config/theme';
 import { CartOverlay } from '@/components/cart/CartOverlay';
 import { GlobalLoadingOverlay } from '@/components/ui/GlobalLoadingOverlay';
 import { LocaleTransitionProvider } from '@/context/LocaleTransitionContext';
@@ -24,7 +24,7 @@ function StoreLoadingOverlay() {
 function ThemePaletteInitializer() {
   useEffect(() => {
     const syncPalette = () => {
-      applyThemePalette(getStoredThemePalette());
+      applyThemePalette(getActiveThemePalette());
     };
 
     syncPalette();

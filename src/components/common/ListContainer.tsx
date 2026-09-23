@@ -13,6 +13,8 @@ export interface SectionConfig {
   initialCount?: number;
   loadMoreCount?: number;
   showCount?: boolean;
+  onNewReview?: (review: Review) => void;
+  onAsyncReviewSubmit?: (data: { reviewer: string; rating: number; comment: string }) => Promise<Review | null | boolean>;
 }
 
 interface ListContainerProps {
@@ -47,6 +49,8 @@ export default function ListContainer({ sections = [], loading = false }: ListCo
                 reviews={section.data as Review[]}
                 initialCount={section.initialCount ?? 1}
                 loadMoreCount={section.loadMoreCount ?? 1}
+                onNewReview={section.onNewReview}
+                onAsyncReviewSubmit={section.onAsyncReviewSubmit}
               />
             );
           default:

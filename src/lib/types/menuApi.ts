@@ -1,4 +1,4 @@
-// src/lib/types/menuApi.ts
+﻿// src/lib/types/menuApi.ts
 
 /**
  * Brand color definition returned by the Web Menu API.
@@ -108,6 +108,7 @@ export interface ApiProduct {
   badgesId?: unknown[];
   customizationOptions?: ApiCustomizationOption[];
   reviews?: ApiReview[];
+  isAvailable?: boolean;
 }
 
 export interface ApiCategory {
@@ -142,7 +143,7 @@ export interface ApiCustomizationOption {
 }
 
 /**
- * Review item.
+ * Legacy review shape used internally by storeHooks for normalisation.
  */
 export interface ApiReview {
   id: number | string;
@@ -156,10 +157,29 @@ export interface ApiReview {
 }
 
 /**
- * Product item returned by /api/menu/all-products/{categoryId} or /api/menu/products-by-category/{Id}
+ * Review item returned by GET /api/menu/{businessName}/products/{productId}/reviews
+ * and the 201 Created response of POST to the same endpoint.
  */
+export interface ApiReviewItem {
+  reviewID: number;
+  rating: number;
+  nameCustomer: string;
+  content: string;
+  isAvailable: boolean;
+  createdAt: string;
+}
+
 /**
- * Enriched product details from /api/menu/products/{id} or /api/menu/product-details/{id}
+ * Request body for POST /api/menu/{businessName}/products/{productId}/reviews
+ */
+export interface ApiReviewRequest {
+  rating: number;
+  nameCustomer: string;
+  content: string;
+}
+
+/**
+ * Enriched product details from GET /api/menu/{businessName}/products/{productId}
  */
 export interface ApiProductDetails extends Omit<ApiProduct, 'ingredients'> {
   views?: number;
@@ -178,16 +198,8 @@ export interface ApiBusinessMenu {
 }
 
 /**
- * Profile returned by /api/menu/profile
- */
-export interface ApiMenuProfile {
-  businessName?: string;
-  menuId?: number;
-}
-
-/**
- * Complete Store Data fetched from /api/menu/by-business-name/{businessName}
- * or aggregated from sub-endpoints.
+ * Normalised store data used internally by the app after aggregation.
+ * Not a direct API response shape.
  */
 export interface StoreData {
   businessName: string;
