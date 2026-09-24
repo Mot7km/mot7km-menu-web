@@ -6,6 +6,8 @@ interface BusinessMenuPageProps {
   params: Promise<{ locale: string; businessName: string }>;
 }
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://menu.mot7km.store';
+
 export async function generateMetadata({ params }: BusinessMenuPageProps): Promise<Metadata> {
   const { locale, businessName } = await params;
   const decodedBusinessName = decodeURIComponent(businessName);
@@ -34,7 +36,12 @@ export async function generateMetadata({ params }: BusinessMenuPageProps): Promi
         { url: iconUrl, rel: 'apple-touch-icon' },
       ],
       alternates: {
-        canonical: `/${locale}/menu/${encodeURIComponent(decodedBusinessName)}`,
+        canonical: `${siteUrl}/${locale}/menu/${encodeURIComponent(decodedBusinessName)}`,
+        languages: {
+          en: `${siteUrl}/en/menu/${encodeURIComponent(decodedBusinessName)}`,
+          ar: `${siteUrl}/ar/menu/${encodeURIComponent(decodedBusinessName)}`,
+          'x-default': `${siteUrl}/en/menu/${encodeURIComponent(decodedBusinessName)}`,
+        },
       },
       openGraph: {
         title: brandName,
@@ -55,6 +62,16 @@ export async function generateMetadata({ params }: BusinessMenuPageProps): Promi
   }
 }
 
-export default function BusinessMenuPage() {
-  return <MenuPage />;
+export default async function BusinessMenuPage({ params }: BusinessMenuPageProps) {
+  const { businessName } = await params;
+  const decodedBusinessName = decodeURIComponent(businessName);
+  let storeData = null;
+
+  try {
+    storeData = await webMenuApi.getCompleteStoreData(decodedBusinessName);
+  } catch {
+    storeData = null;
+  }
+
+  return <MenuPage initialStoreData={storeData} />;
 }

@@ -189,19 +189,23 @@ export function PromotionalCarousel() {
                 key={index}
                 onClick={() => scrollTo(index)}
                 aria-label={`Go to slide ${index + 1}`}
-                className={`h-2 rounded-full transition-all duration-400 ease-out cursor-pointer
-                  ${
+                className="group flex items-center justify-center p-2 min-w-[36px] min-h-[36px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] rounded-full"
+              >
+                <span
+                  className={`h-2 rounded-full transition-all duration-400 ease-out block
+                    ${
+                      index === selectedIndex
+                        ? 'w-7'
+                        : 'w-2 bg-[var(--color-border-strong)] group-hover:bg-[var(--color-primary)]/40'
+                    }
+                  `}
+                  style={
                     index === selectedIndex
-                      ? 'w-7'
-                      : 'w-2 bg-[var(--color-border-strong)] hover:bg-[var(--color-primary)]/40'
+                      ? { background: 'var(--gradient-primary)' }
+                      : undefined
                   }
-                `}
-                style={
-                  index === selectedIndex
-                    ? { background: 'var(--gradient-primary)' }
-                    : undefined
-                }
-              />
+                />
+              </button>
             ))}
           </div>
         )}
@@ -289,7 +293,7 @@ function PromoCard({
 
         <h3
           className={`text-xl sm:text-2xl md:text-[1.7rem] font-bold leading-tight tracking-tight
-            ${hasImage || backgroundColor ? 'text-[var(--color-text-on-primary)]' : 'text-[var(--color-text-primary)]'}
+            ${hasImage || backgroundColor ? 'text-white' : 'text-[var(--color-text-primary)]'}
             line-clamp-2
           `}
           style={{ fontFamily: 'var(--font-display)' }}
@@ -299,8 +303,8 @@ function PromoCard({
 
         {description && (
           <p
-            className={`mt-1 text-xs sm:text-sm font-normal leading-5 max-w-sm
-              ${hasImage || backgroundColor ? 'text-[var(--color-text-on-primary)]/85' : 'text-[var(--color-text-muted)]'}
+            className={`mt-1 text-xs sm:text-sm font-medium leading-5 max-w-sm
+              ${hasImage || backgroundColor ? 'text-white/95' : 'text-[var(--color-text-secondary)]'}
               line-clamp-2 sm:line-clamp-3
             `}
           >

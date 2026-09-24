@@ -3,7 +3,7 @@
 import { useEffect, useMemo } from 'react';
 import { usePathname } from 'next/navigation';
 import { skipToken } from '@reduxjs/toolkit/query';
-import { useGetMenuQuery } from './menuApi';
+import { useGetMenuQuery, type CompleteStoreData } from './menuApi';
 import { applyThemePalette, normalizeThemePalette } from '@/config/theme';
 import { loadGoogleFont } from '@/helpers/fontLoader';
 import { i18n, type Locale } from '@/config/i18n';
@@ -33,7 +33,7 @@ export interface StoreState {
   refresh: () => Promise<void>;
 }
 
-export function useStore(): StoreState {
+export function useStore(initialData?: CompleteStoreData | null): StoreState {
   const pathname = usePathname();
   const locale: Locale = i18n.locales.includes(pathname.split('/').filter(Boolean)[0] as Locale)
     ? pathname.split('/').filter(Boolean)[0] as Locale
@@ -47,21 +47,24 @@ export function useStore(): StoreState {
     return businessName ? decodeURIComponent(businessName) : undefined;
   }, [pathname]);
   const menuQuery = useGetMenuQuery(requestedBusinessName || skipToken);
-  const data = menuQuery.data;
-  const loading = menuQuery.isLoading || menuQuery.isFetching;
-  const businessName = data?.businessName || requestedBusinessName || '';
-  const displayBusinessName = data?.displayBusinessName || businessName;
-  const identity = data?.identity || null;
-  const header = data?.header || null;
-  const sliders = data?.sliders ?? EMPTY_SLIDERS;
-  const categories = data?.categories ?? EMPTY_CATEGORIES;
-  const apiProducts = data?.products ?? EMPTY_PRODUCTS;
-  const storeNotFound = Boolean(requestedBusinessName && !loading && (menuQuery.isError || !data));
+  const hasInitialData = Boolean(initialData && initialData.businessName);
+  const data = menuQuery.data || (hasInitialData ? initialData! : undefined);
+  const loading = (menuQuery.isLoading || menuQuery.isFetching) && !data;
+  const businessName = data?.businessName || initialData?.businessName || requestedBusinessName || '';
+  const displayBusinessName = data?.displayBusinessName || initialData?.displayBusinessName || businessName;
+  const identity = data?.identity || initialData?.identity || null;
+  const header = data?.header || initialData?.header || null;
+  const sliders = data?.sliders ?? initialData?.sliders ?? EMPTY_SLIDERS;
+  const categories = data?.categories ?? initialData?.categories ?? EMPTY_CATEGORIES;
+  const apiProducts = data?.products ?? initialData?.products ?? EMPTY_PRODUCTS;
+  const storeNotFound = Boolean(requestedBusinessName && !loading && !data && (menuQuery.isError || !hasInitialData));
 
   useEffect(() => {
     const root = document.documentElement;
-    const arabicFont = loadGoogleFont(identity?.typography?.arabicFont) || loadGoogleFont('Cairo') || 'Cairo';
-    const englishFont = loadGoogleFont(identity?.typography?.englishFont) || loadGoogleFont('Roboto') || 'Roboto';
+    const isCustomArabic = Boolean(identity?.typography?.arabicFont && identity.typography.arabicFont !== 'Cairo');
+    const isCustomEnglish = Boolean(identity?.typography?.englishFont && identity.typography.englishFont !== 'Roboto');
+    const arabicFont = isCustomArabic ? (loadGoogleFont(identity?.typography?.arabicFont) || 'Cairo') : 'Cairo';
+    const englishFont = isCustomEnglish ? (loadGoogleFont(identity?.typography?.englishFont) || 'Roboto') : 'Roboto';
     const arabicStack = `"${arabicFont}", "Cairo", sans-serif`;
     const englishStack = `"${englishFont}", "Roboto", sans-serif`;
 

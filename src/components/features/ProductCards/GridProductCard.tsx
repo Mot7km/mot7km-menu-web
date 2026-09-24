@@ -101,13 +101,13 @@ export function GridProductCard({ product }: ProductCardProps) {
 
       {/* Content Section */}
       <div className="flex flex-col flex-1 p-4 gap-3 bg-[var(--color-surface)]">
-        <h4 
+        <h3 
           className="font-bold text-base leading-snug text-[var(--color-text-primary)] break-words
             group-hover:text-[var(--color-accent)] transition-colors duration-300"
           style={{ fontFamily: 'var(--font-display)' }}
         >
           {product.name}
-        </h4>
+        </h3>
 
         <div className="flex items-center justify-between mt-auto pt-3 border-t border-[var(--color-border)]">
           {/* Category Badge */}

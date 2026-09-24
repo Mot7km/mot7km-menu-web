@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import { createPortal } from 'react-dom';
 import { useTranslations, useLocale } from 'next-intl';
 import { useTheme } from '@/hooks/useTheme';
@@ -481,12 +482,19 @@ export function Header() {
       className="relative flex w-full flex-col items-center justify-center rounded-b-[2rem] sm:rounded-b-[2.5rem] overflow-hidden pt-8 sm:pt-10 pb-6 sm:pb-8 px-4 sm:px-6 lg:px-8"
       style={{
         background: backgroundImage ? undefined : 'var(--gradient-hero)',
-        backgroundImage: backgroundImage ? `url("${backgroundImage}")` : undefined,
-        backgroundPosition: backgroundImage ? 'center' : undefined,
-        backgroundSize: backgroundImage ? 'cover' : '200% 200%',
-        animation: backgroundImage ? undefined : 'gradientShift 8s ease-in-out infinite alternate',
+        backgroundSize: backgroundImage ? undefined : '200% 200%',
       }}
     >
+      {backgroundImage && (
+        <Image
+          src={backgroundImage}
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover -z-10"
+        />
+      )}
       {/* Decorative layers */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute inset-0 bg-gradient-to-br from-black/10 via-transparent to-black/20" />
@@ -515,9 +523,12 @@ export function Header() {
               "
           >
             {logoUrl ? (
-              <img
+              <Image
                 src={logoUrl}
                 alt={brandName}
+                width={137}
+                height={137}
+                priority
                 className="w-full h-full object-cover"
               />
             ) : (

@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next';
 import { webMenuApi } from '@/lib/api/menuApi';
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://menu.mot7km.store';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes = ['', '/info', '/menu'].flatMap((route) =>

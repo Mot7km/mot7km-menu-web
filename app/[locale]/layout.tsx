@@ -2,11 +2,32 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getMessages } from "next-intl/server";
 import { NextIntlClientProvider } from "next-intl";
+import { Roboto, Cairo } from "next/font/google";
 import { Providers } from "@/components/providers";
 import { i18n } from "@/config/i18n";
 
+const roboto = Roboto({
+  subsets: ["latin"],
+  weight: ["400", "500", "700"],
+  display: "swap",
+  variable: "--font-roboto",
+});
+
+const cairo = Cairo({
+  subsets: ["arabic", "latin"],
+  weight: ["400", "600", "700"],
+  display: "swap",
+  variable: "--font-cairo",
+});
+
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://menu.mot7km.store";
+
 export const metadata: Metadata = {
-  title: "MOT7KM — Digital Menus",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "MOT7KM — Digital Menus",
+    template: "%s | MOT7KM",
+  },
   description: "Discover digital restaurant menus with MOT7KM.",
   icons: [{ url: "/default-icon.png", rel: "icon" }],
 };
@@ -37,7 +58,7 @@ export default async function LocaleLayout({
     <html
       lang={locale}
       dir={isRTL ? "rtl" : "ltr"}
-      className="h-full antialiased"
+      className={`h-full antialiased ${roboto.variable} ${cairo.variable}`}
       suppressHydrationWarning
     >
       <body

@@ -1,0 +1,14 @@
+{
+  "$schema": "https://agenticresourcediscovery.org/spec/v1/schema.json",
+  "name": "MOT7KM Digital Menus",
+  "description": "Digital restaurant menus and ordering API catalog",
+  "url": "https://menu.mot7km.store",
+  "resources": [
+    {
+      "id": "menu-service",
+      "name": "Store Menus",
+      "type": "api",
+      "description": "Online food and beverage digital menus for registered restaurants"
+    }
+  ]
+}

@@ -111,7 +111,8 @@
     "todayHours": "Today's Hours",
     "viewOnMap": "View on Map",
     "todayFromTo": "{from} – {to}",
-    "todayClosed": "today closed"
+    "todayClosed": "today closed",
+    "socials": "Social Media"
   },
   "cart": {
     "total": "Total",

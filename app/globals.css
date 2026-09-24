@@ -27,8 +27,8 @@
   --shadow-card: none;
   --shadow-card-hover: none;
   --shadow-glow: none;
-  --font-english: "Roboto", sans-serif;
-  --font-arabic: "Cairo", sans-serif;
+  --font-english: var(--font-roboto), "Roboto", sans-serif;
+  --font-arabic: var(--font-cairo), "Cairo", sans-serif;
   --font-display: var(--font-english);
   --radius-sm: 8px;
   --radius-md: 12px;
@@ -200,14 +200,17 @@ body {
    ================================================================= */
 .animate-fade-in-up {
   animation: fadeInUp 0.5s ease-out both;
+  will-change: transform, opacity;
 }
 
 .animate-fade-in {
   animation: fadeIn 0.4s ease-out both;
+  will-change: opacity;
 }
 
 .animate-scale-in {
   animation: scaleIn 0.4s ease-out both;
+  will-change: transform, opacity;
 }
 
 .animate-shimmer {

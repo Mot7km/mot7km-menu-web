@@ -1,0 +1,7 @@
+# MOT7KM Digital Menus
+
+> High-performance digital restaurant menus, interactive catalogs, and QR ordering powered by MOT7KM.
+
+## Core Documentation & Menus
+- [MOT7KM Platform](https://mot7km.store): Main platform for store management and digital menus.
+- [Digital Menus Portal](https://menu.mot7km.store): Multi-tenant digital menu exploration and ordering.

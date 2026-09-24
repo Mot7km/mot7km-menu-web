@@ -9,5 +9,5 @@ const intlMiddleware = createMiddleware({
 export default intlMiddleware;
 
 export const config = {
-  matcher: ['/', '/((?!api|_next|.*\\..*).*)'],
+  matcher: ['/', '/((?!api|_next|_vercel|robots\\.txt|sitemap\\.xml|llms\\.txt|ai-catalog\\.json|.*\\..*).*)'],
 };

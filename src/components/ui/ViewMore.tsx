@@ -47,7 +47,7 @@ export function ThatsIt() {
   return (
     <div className="flex flex-col items-center justify-center gap-2 py-2">
       <div className="section-divider w-24" />
-      <p className="text-xs text-[var(--color-text-muted)] opacity-60">
+      <p className="text-xs font-medium text-[var(--color-text-secondary)]">
         {t('productList.thatsIt')}
       </p>
     </div>

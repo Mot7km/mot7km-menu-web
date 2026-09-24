@@ -111,7 +111,8 @@
     "todayHours": "مواعيد اليوم",
     "viewOnMap": "عرض على الخريطة",
     "todayFromTo": ": {from} – {to}",
-    "todayClosed": "اليوم مغلق"
+    "todayClosed": "اليوم مغلق",
+    "socials": "وسائل التواصل الاجتماعي"
   },
   "cart": {
     "total": "الإجمالي",

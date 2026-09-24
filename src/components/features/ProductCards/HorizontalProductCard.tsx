@@ -93,11 +93,11 @@ export function HorizontalProductCard({ product }: HorizontalProductCardProps) {
         
         {/* Row 1: Product name */}
         <div className="flex items-start justify-between gap-2">
-          <h4 className="font-bold text-sm sm:text-base md:text-lg text-[var(--color-text-primary)] leading-tight
+          <h3 className="font-bold text-sm sm:text-base md:text-lg text-[var(--color-text-primary)] leading-tight
             group-hover:text-[var(--color-primary)] transition-colors duration-300 line-clamp-2"
             style={{ fontFamily: 'var(--font-display)' }}>
             {product.name}
-          </h4>
+          </h3>
         </div>
 
         {/* Row 2: Description */}

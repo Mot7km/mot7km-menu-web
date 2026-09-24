@@ -104,7 +104,7 @@ export default function Categories({
                   {category.image ? (
                     <Image
                       src={category.image}
-                      alt={category.label}
+                      alt=""
                       fill
                       sizes="(max-width: 640px) 48px, (max-width: 768px) 56px, (max-width: 1024px) 64px, 80px"
                       className="object-cover rounded-full transition-transform duration-500 group-hover:scale-110"
