@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { Phone, MapPin, Mail, Clock } from 'lucide-react';
 import { useTranslations, useLocale } from 'next-intl';
 import { isStoreOpen } from '@/data/storeInfo';
@@ -88,7 +89,7 @@ export function Footer() {
             <div className="flex items-center gap-2.5">
               <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-[var(--color-border-strong)] bg-[var(--color-surface)] shadow-md">
                 {logoUrl ? (
-                  <img src={logoUrl} alt={brandName} className="h-full w-full object-cover" />
+                  <Image src={logoUrl} alt={brandName} width={40} height={40} className="h-full w-full object-cover" />
                 ) : (
                   <span className="text-sm font-bold text-[var(--color-primary)]">{brandName.slice(0, 1)}</span>
                 )}

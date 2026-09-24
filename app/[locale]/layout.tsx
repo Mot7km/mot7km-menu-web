@@ -61,6 +61,14 @@ export default async function LocaleLayout({
       className={`h-full antialiased ${roboto.variable} ${cairo.variable}`}
       suppressHydrationWarning
     >
+      <head>
+        <link rel="preconnect" href="https://mjrnltqsxgqyhfjqbain.supabase.co" crossOrigin="" />
+        <link rel="dns-prefetch" href="https://mjrnltqsxgqyhfjqbain.supabase.co" />
+        <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="" />
+        <link rel="dns-prefetch" href="https://images.unsplash.com" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      </head>
       <body
         className="flex min-h-full flex-col bg-[var(--color-background)] text-[var(--color-text-primary)] transition-colors duration-300"
         style={{ fontFamily: isRTL ? "var(--font-arabic)" : "var(--font-english)" }}

@@ -19,6 +19,10 @@ export function loadGoogleFont(fontName: string | null | undefined) {
     const link = document.createElement('link');
     link.id = linkId;
     link.rel = 'stylesheet';
+    link.media = 'print';
+    link.onload = () => {
+      link.media = 'all';
+    };
     link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(normalizedName).replace(/%20/g, '+')}&display=swap`;
     document.head.appendChild(link);
   }

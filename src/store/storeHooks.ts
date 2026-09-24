@@ -11,6 +11,7 @@ import type { ApiBusinessIdentity, ApiCategory, ApiProduct, ApiSliderItem, ApiSt
 import type { StoreInfo } from '@/data/storeInfo';
 import type { Product } from '@/data/menu';
 import type { PromoCardData } from '@/data/menupromo';
+import { useInitialStoreContext } from '@/context/InitialStoreContext';
 
 const EMPTY_SLIDERS: ApiSliderItem[] = [];
 const EMPTY_CATEGORIES: ApiCategory[] = [];
@@ -33,7 +34,9 @@ export interface StoreState {
   refresh: () => Promise<void>;
 }
 
-export function useStore(initialData?: CompleteStoreData | null): StoreState {
+export function useStore(directInitialData?: CompleteStoreData | null): StoreState {
+  const contextInitialData = useInitialStoreContext();
+  const initialData = directInitialData || contextInitialData;
   const pathname = usePathname();
   const locale: Locale = i18n.locales.includes(pathname.split('/').filter(Boolean)[0] as Locale)
     ? pathname.split('/').filter(Boolean)[0] as Locale

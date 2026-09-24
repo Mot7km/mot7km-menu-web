@@ -187,7 +187,7 @@ export function CartDrawer({
                             text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]
                             transition-all duration-200 cursor-pointer
                             disabled:opacity-40 disabled:cursor-not-allowed"
-                          aria-label={t('decreaseQuantity') || 'Decrease quantity'}
+                          aria-label={t('cart.decreaseQuantity')}
                           disabled={quantity <= 1}
                         >
                           <Minus size={16} />
@@ -201,7 +201,7 @@ export function CartDrawer({
                             hover:bg-[var(--color-surface)] active:scale-90 
                             text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]
                             transition-all duration-200 cursor-pointer"
-                          aria-label={t('increaseQuantity') || 'Increase quantity'}
+                          aria-label={t('cart.increaseQuantity')}
                         >
                           <Plus size={16} />
                         </button>

@@ -30,6 +30,10 @@
     "copyrightText": "© {year} {brand}. مدعوم من {provider}"
   },
   "productList": {
+    "menu": "قائمة الطعام",
+    "empty": "لا توجد منتجات متاحة",
+    "emptyDescription": "جرب تعديل خيارات التصفية أو عد لاحقاً.",
+    "emptyHint": "يتم إضافة أصناف جديدة بانتظام",
     "noProducts": "لا توجد منتجات تطابق هذا البحث في الفئة المحددة.",
     "viewMore": "عرض المزيد",
     "thatsIt": "هذا كل شيء!",
@@ -82,6 +86,18 @@
     "empty": "لا توجد تقييمات حتى الآن. كن أول من يشارك تجربته.",
     "viewMore": "عرض المزيد"
   },
+  "review": {
+    "writeReview": "أضف تقييمك",
+    "name": "اسمك",
+    "optional": "اختياري",
+    "namePlaceholder": "أدخل اسمك...",
+    "rating": "التقييم",
+    "comment": "رأيك",
+    "commentPlaceholder": "شاركنا برأيك وتجربتك مع هذا المنتج...",
+    "tooShort": "يجب ألا يقل التقييم عن 3 أحرف",
+    "submitting": "جاري الإرسال...",
+    "submit": "إرسال التقييم"
+  },
   "trustBadges": {
     "fastDelivery": "توصيل سريع",
     "premiumQuality": "جودة ممتازة",
@@ -122,6 +138,14 @@
     "clearCart": "إفراغ السلة",
     "openCart": "فتح سلة التسوق",
     "discardCart": "حذف السلة",
-    "qty": "الكمية"
+    "qty": "الكمية",
+    "empty": "سلة التسوق فارغة",
+    "decreaseQuantity": "تقليل الكمية",
+    "increaseQuantity": "زيادة الكمية"
+  },
+  "notFound": {
+    "title": "الصفحة غير موجودة",
+    "description": "الصفحة التي تبحث عنها قد تم نقلها أو حذفها أو أنها غير متاحة مؤقتاً.",
+    "goHome": "العودة للرئيسية"
   }
 }

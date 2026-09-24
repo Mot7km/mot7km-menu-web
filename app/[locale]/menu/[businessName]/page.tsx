@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { MenuPage } from '@/components/layouts/MenuPage';
+import { InitialStoreProvider } from '@/context/InitialStoreContext';
 import { webMenuApi } from '@/lib/api/menuApi';
 
 interface BusinessMenuPageProps {
@@ -73,5 +74,9 @@ export default async function BusinessMenuPage({ params }: BusinessMenuPageProps
     storeData = null;
   }
 
-  return <MenuPage initialStoreData={storeData} />;
+  return (
+    <InitialStoreProvider data={storeData}>
+      <MenuPage initialStoreData={storeData} />
+    </InitialStoreProvider>
+  );
 }

@@ -282,10 +282,13 @@ function PromoCard({
       <div className="relative z-10 flex h-full flex-col justify-center px-4 sm:px-6 py-4 sm:py-5">
         {badge && (
           <span
-            className="mb-2 sm:mb-3 inline-flex w-fit items-center rounded-full
+            className={`mb-2 sm:mb-3 inline-flex w-fit items-center rounded-full
               px-2.5 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-semibold tracking-wider uppercase
-              bg-white/15 text-white/95
-              backdrop-blur-sm border border-white/10"
+              backdrop-blur-sm border ${
+                hasImage || backgroundColor
+                  ? 'bg-black/40 text-white border-white/20'
+                  : 'bg-[var(--color-primary-50)] text-[var(--color-primary)] border-[var(--color-primary-100)]'
+              }`}
           >
             {badge}
           </span>
