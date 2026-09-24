@@ -153,7 +153,7 @@ function Popover({
         createPortal(
           <div
             ref={popoverRef}
-            className="fixed w-60 max-h-[calc(100vh-120px)] overflow-y-auto rounded-2xl glass shadow-xl p-3 z-[9999] animate-scale-in origin-top-right"
+            className="fixed w-60 max-h-[calc(100vh-120px)] overflow-y-auto rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] shadow-2xl p-3 z-[9999] animate-scale-in origin-top-right text-[var(--color-text-primary)]"
             style={{
               top: position.top,
               left: position.left,
@@ -321,11 +321,11 @@ export function SettingsMenu() {
       className={`
         flex items-center justify-center
         w-8 h-8 sm:w-9 sm:h-9 rounded-full
-        bg-white/10 border border-white/20
-        text-white hover:bg-white/20
+        bg-[var(--color-surface)]/20 border border-[var(--color-border-strong)]/30
+        text-[var(--color-on-secondary)] hover:bg-[var(--color-surface)]/30
         transition-all duration-250 ease-out
         cursor-pointer hover:scale-105 active:scale-95
-        ${open ? 'bg-white/20' : ''}
+        ${open ? 'bg-[var(--color-surface)]/30' : ''}
       `}
       role="button"
       tabIndex={0}
@@ -374,7 +374,12 @@ export function Header() {
   const brandName = displayBusinessName || header?.businessName || identity?.businessName || storeInfo.name;
   const slogan = header?.slogan || identity?.slogan || t('header.tagline');
   const logoUrl = header?.logo || header?.logoUrl || identity?.logo;
-  const backgroundImage = header?.backGroundImage;
+  const rawBg =
+    header?.coverUrl ||
+    header?.backGroundImage ||
+    (header as Record<string, unknown>)?.backgroundImage ||
+    (header as Record<string, unknown>)?.cover;
+  const backgroundImage = typeof rawBg === 'string' && rawBg.trim() ? rawBg.trim() : null;
 
   const togglePopover = (id: string) => {
     setPopoverOpen((prev) => (prev === id ? null : id));
@@ -414,7 +419,7 @@ export function Header() {
   );
 
   const iconButton = (icon: React.ReactNode) => (
-    <div className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[var(--color-surface)]/10 border border-[var(--color-border-strong)] text-[var(--color-text-on-primary)] hover:bg-[var(--color-surface)]/20 transition-colors group">
+    <div className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[var(--color-surface)]/20 border border-[var(--color-border-strong)]/30 text-[var(--color-on-secondary)] hover:bg-[var(--color-surface)]/30 transition-colors group">
       {icon}
     </div>
   );
@@ -423,13 +428,13 @@ export function Header() {
     <div
       className={`flex items-center gap-2 px-2.5 py-1 rounded-full border backdrop-blur-sm transition-all
         ${open
-          ? 'border-[var(--color-success)]/40 bg-[var(--color-success)]/10 text-[var(--color-success)]'
-          : 'border-[var(--color-error)]/40 bg-[var(--color-error)]/10 text-[var(--color-error)]'
+          ? 'border-[var(--color-success)]/40 bg-[var(--color-success)]/20 text-[var(--color-success)]'
+          : 'border-[var(--color-danger)]/40 bg-[var(--color-danger)]/20 text-[var(--color-danger)]'
         }`}
     >
       <span
         className={`inline-block w-2 h-2 rounded-full animate-pulse ${
-          open ? 'bg-[var(--color-success)]' : 'bg-[var(--color-error)]'
+          open ? 'bg-[var(--color-success)]' : 'bg-[var(--color-danger)]'
         }`}
       />
       <span className="text-xs font-medium whitespace-nowrap">
@@ -479,29 +484,38 @@ export function Header() {
 
   return (
     <header
-      className="relative flex w-full flex-col items-center justify-center rounded-b-[2rem] sm:rounded-b-[2.5rem] overflow-hidden pt-8 sm:pt-10 pb-6 sm:pb-8 px-4 sm:px-6 lg:px-8"
+      className="relative isolate flex w-full flex-col items-center justify-center rounded-b-[2rem] sm:rounded-b-[2.5rem] overflow-hidden pt-8 sm:pt-10 pb-6 sm:pb-8 px-4 sm:px-6 lg:px-8 transition-colors duration-300"
       style={{
-        background: backgroundImage ? undefined : 'var(--gradient-hero)',
-        backgroundSize: backgroundImage ? undefined : '200% 200%',
+        backgroundColor: 'var(--color-secondary)',
       }}
     >
-      {backgroundImage && (
-        <Image
-          src={backgroundImage}
-          alt=""
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover -z-10"
-        />
+      {backgroundImage ? (
+        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+          <Image
+            src={backgroundImage}
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center"
+          />
+          {/* Subtle gradient overlay to keep cover image vivid while ensuring text contrast */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-[var(--color-secondary)]/80" />
+        </div>
+      ) : (
+        <div
+          className="absolute inset-0 z-0 pointer-events-none"
+          style={{
+            background: 'linear-gradient(135deg, var(--color-secondary) 0%, var(--color-primary) 100%)',
+          }}
+        >
+          {/* Decorative ambient orbs only shown when there is no cover image */}
+          <div className="absolute inset-0 bg-gradient-to-br from-black/10 via-transparent to-black/20" />
+          <div className="absolute -top-20 -end-20 w-64 h-64 rounded-full bg-[var(--color-accent)]/20 opacity-60 animate-orb-1" />
+          <div className="absolute -bottom-12 -start-12 w-48 h-48 rounded-full bg-[var(--color-primary)]/25 opacity-50 animate-orb-2" />
+          <div className="absolute bottom-0 inset-x-0 h-12 bg-gradient-to-t from-black/10 to-transparent" />
+        </div>
       )}
-      {/* Decorative layers */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-br from-black/10 via-transparent to-black/20" />
-        <div className="absolute -top-20 -end-20 w-64 h-64 rounded-full bg-[var(--color-accent)]/20 opacity-60 animate-orb-1" />
-        <div className="absolute -bottom-12 -start-12 w-48 h-48 rounded-full bg-[var(--color-primary)]/25 opacity-50 animate-orb-2" />
-        <div className="absolute bottom-0 inset-x-0 h-12 bg-gradient-to-t from-black/10 to-transparent" />
-      </div>
 
       {/* Settings gear */}
       <div className="absolute end-3 top-3 z-20 sm:end-5 sm:top-5">
@@ -515,7 +529,7 @@ export function Header() {
           <div
             className="flex h-20 w-20 sm:h-24 sm:w-24 md:h-28 md:w-28
               items-center justify-center rounded-2xl
-              border border-[var(--color-border-strong)] bg-[var(--color-surface)]/20 backdrop-blur-md
+              border border-[var(--color-border-strong)]/40 bg-[var(--color-surface)]/20 backdrop-blur-md
               shadow-[var(--shadow-card)]
               transition-all duration-300 hover:scale-105 hover:border-[var(--color-accent)]
               hover:shadow-[var(--shadow-glow-strong)]
@@ -534,7 +548,7 @@ export function Header() {
             ) : (
               <UtensilsCrossed
                 strokeWidth={2.2}
-                className="h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14 drop-shadow-lg text-[var(--color-text-on-primary)]"
+                className="h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14 drop-shadow-lg text-[var(--color-on-secondary)]"
               />
             )}
           </div>
@@ -545,10 +559,9 @@ export function Header() {
           {/* Row: brand name + desktop status */}
           <div className="flex items-center gap-2 flex-wrap">
             <h1
-              className="text-xl sm:text-2xl md:text-3xl font-extrabold text-[var(--color-text-on-primary)] drop-shadow-xl tracking-tight leading-none"
+              className="text-xl sm:text-2xl md:text-3xl font-extrabold text-[var(--color-on-secondary)] drop-shadow-md tracking-tight leading-none"
               style={{
                 fontFamily: 'var(--font-display)',
-                textShadow: '0 2px 16px var(--color-primary)',
               }}
             >
               {brandName}
@@ -558,12 +571,12 @@ export function Header() {
           </div>
 
           {/* Tagline */}
-          <p className="text-xs sm:text-sm md:text-base font-medium text-[var(--color-text-on-primary)]/90 drop-shadow-md -mt-0.5">
+          <p className="text-xs sm:text-sm md:text-base font-medium text-[var(--color-on-secondary)]/90 drop-shadow-sm -mt-0.5">
             {slogan}
           </p>
 
           {/* Decorative line */}
-          <div className="mt-1 h-0.5 w-12 sm:w-16 rounded-full bg-gradient-to-r from-[var(--color-text-on-primary)]/80 to-transparent shadow-[var(--shadow-glow)] animate-fade-in" />
+          <div className="mt-1 h-0.5 w-12 sm:w-16 rounded-full bg-gradient-to-r from-[var(--color-on-secondary)]/80 to-transparent shadow-sm animate-fade-in" />
 
           {/* Bottom row: mobile status + icon bar */}
           <div className="flex flex-wrap items-center gap-2 mt-1">

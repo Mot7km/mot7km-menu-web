@@ -179,7 +179,7 @@ export function CartDrawer({
 
                     {/* Quantity control - replaces static badge */}
                     <div className="flex items-center gap-1 sm:gap-2">
-                      <div className="flex items-center bg-[var(--color-background)] rounded-full border border-[var(--color-border)] p-0.5 shadow-sm">
+                      <div className="flex items-center bg-[var(--color-surface-subtle)] rounded-full border border-[var(--color-border)] p-0.5 shadow-sm">
                         <button
                           onClick={() => handleQuantityChange(group, -1)}
                           className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full 
@@ -240,7 +240,7 @@ export function CartDrawer({
           </div>
 
           <div className="flex flex-col gap-3">
-            <button className="w-full py-3.5 sm:py-4 lg:py-5 rounded-xl bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-accent)] text-white font-bold text-base sm:text-lg lg:text-xl shadow-[0_4px_15px_rgba(22,131,199,0.3)] hover:shadow-[0_4px_25px_rgba(22,131,199,0.4)] transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer">
+            <button className="w-full py-3.5 sm:py-4 lg:py-5 rounded-xl bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-accent)] text-[var(--color-on-primary)] font-bold text-base sm:text-lg lg:text-xl shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer">
               {t('cart.checkout')}
             </button>
 

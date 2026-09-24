@@ -96,7 +96,7 @@ export default function Categories({
                     <div
                       className="absolute inset-0 rounded-full pointer-events-none"
                       style={{
-                        boxShadow: '0 4px 20px rgba(22, 131, 199, 0.25), 0 0 40px rgba(22, 131, 199, 0.1)',
+                        boxShadow: 'var(--shadow-glow)',
                       }}
                     />
                   )}

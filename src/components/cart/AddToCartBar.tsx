@@ -47,7 +47,7 @@ export function AddToCartBar({
         </div>
 
         <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
-          <div className="flex items-center bg-[var(--color-background)] rounded-full border border-[var(--color-border)] p-0.5 shadow-sm">
+          <div className="flex items-center bg-[var(--color-surface-subtle)] rounded-full border border-[var(--color-border)] p-0.5 shadow-sm">
             <button
               onClick={() => onQuantityChange(Math.max(1, quantity - 1))}
               className="w-9 h-9 flex items-center justify-center rounded-full 
@@ -79,11 +79,11 @@ export function AddToCartBar({
             onClick={onAddToCart}
             className="flex items-center gap-2 
               bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-accent)] 
-              text-white font-bold 
+              text-[var(--color-on-primary)] font-bold 
               px-5 sm:px-7 py-3 sm:py-3.5 
               rounded-full 
-              shadow-[0_4px_20px_rgba(22,131,199,0.35)] 
-              hover:shadow-[0_8px_30px_rgba(22,131,199,0.5)] 
+              shadow-[var(--shadow-card)] 
+              hover:shadow-[var(--shadow-card-hover)] 
               hover:-translate-y-1 
               active:scale-95 
               transition-all duration-300 

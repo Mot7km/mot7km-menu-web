@@ -71,14 +71,7 @@ export function useStore(directInitialData?: CompleteStoreData | null): StoreSta
     const arabicStack = `"${arabicFont}", "Cairo", sans-serif`;
     const englishStack = `"${englishFont}", "Roboto", sans-serif`;
 
-    const colors = identity?.colors
-      ? [identity.colors.primary, identity.colors.secondary, identity.colors.accent]
-      : [];
-    const validColors = colors.filter(
-      (color): color is string => Boolean(color && typeof color === 'string' && color.trim())
-    );
-
-    applyThemePalette(normalizeThemePalette(validColors));
+    applyThemePalette(identity?.colors);
 
     root.style.setProperty('--font-arabic', arabicStack);
     root.style.setProperty('--font-english', englishStack);

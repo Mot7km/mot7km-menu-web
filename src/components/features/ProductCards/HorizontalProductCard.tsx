@@ -81,7 +81,7 @@ export function HorizontalProductCard({ product }: HorizontalProductCardProps) {
             text-[var(--color-primary)] transition-all duration-300 
             shadow-[0_4px_10px_rgba(0,0,0,0.15)] hover:shadow-[0_4px_15px_rgba(22,131,199,0.3)] 
             hover:scale-110 active:scale-95 cursor-pointer
-            ${isAdding ? 'opacity-50 pointer-events-none' : 'hover:bg-[var(--color-primary)] hover:text-white'}`}
+            ${isAdding ? 'opacity-50 pointer-events-none' : 'hover:bg-[var(--color-primary)] hover:text-[var(--color-on-primary)]'}`}
           aria-label="Add to cart"
         >
           <ShoppingBag size={16} className="sm:w-4 sm:h-4" />

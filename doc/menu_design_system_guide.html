@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>دليل استخدامات وتوزيع ألوان المنيو للواجهات الأمامية (Frontend Color Specification)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    @page {
+      size: A4;
+      margin: 12mm 15mm;
+    }
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif;
+      color: #0F172A;
+      background-color: #FFFFFF;
+      line-height: 1.6;
+      font-size: 12px;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .header-banner {
+      background: linear-gradient(135deg, #0B0F19 0%, #1E293B 100%);
+      color: #FFFFFF;
+      padding: 22px 26px;
+      border-radius: 12px;
+      margin-bottom: 18px;
+      border-right: 6px solid #FF6B00;
+    }
+    .header-tag {
+      display: inline-block;
+      background: rgba(255, 107, 0, 0.25);
+      color: #FF8533;
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+      font-family: 'Outfit', sans-serif;
+    }
+    .header-title {
+      font-size: 21px;
+      font-weight: 800;
+      margin-bottom: 5px;
+    }
+    .header-desc {
+      color: #94A3B8;
+      font-size: 11.5px;
+      max-width: 680px;
+    }
+    .rule-box {
+      background: #FFFBEB;
+      border-right: 4px solid #F59E0B;
+      padding: 10px 14px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      color: #92400E;
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: #0F172A;
+      border-bottom: 2px solid #E2E8F0;
+      padding-bottom: 5px;
+      margin-top: 18px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      page-break-after: avoid;
+    }
+    .section-title .badge {
+      background: #FF6B00;
+      color: #FFFFFF;
+      font-size: 10.5px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+    .token-card {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 12px;
+      page-break-inside: avoid;
+    }
+    .token-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #F1F5F9;
+    }
+    .token-name-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .token-name {
+      font-family: 'Outfit', Consolas, monospace;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #0F172A;
+    }
+    .token-arabic-role {
+      font-size: 11.5px;
+      color: #64748B;
+      font-weight: 600;
+    }
+    .token-swatches {
+      display: flex;
+      gap: 12px;
+      font-family: 'Outfit', monospace;
+      font-size: 11px;
+    }
+    .swatch-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      padding: 2px 8px;
+      border-radius: 5px;
+    }
+    .color-circle {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: 1px solid rgba(0,0,0,0.15);
+      display: inline-block;
+    }
+    .token-details-grid {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 6px 12px;
+      font-size: 11.5px;
+      margin-top: 6px;
+    }
+    .td-label {
+      color: #64748B;
+      font-weight: 700;
+    }
+    .td-value {
+      color: #1E293B;
+    }
+    .tag-css {
+      font-family: 'Outfit', Consolas, monospace;
+      background: #F1F5F9;
+      color: #0F172A;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 10.5px;
+      border: 1px solid #CBD5E1;
+    }
+    .page-break {
+      page-break-before: always;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+      margin-bottom: 14px;
+      font-size: 11px;
+      page-break-inside: avoid;
+    }
+    th, td {
+      border: 1px solid #E2E8F0;
+      padding: 6px 9px;
+      text-align: right;
+    }
+    th {
+      background: #F8FAFC;
+      color: #0F172A;
+      font-weight: 700;
+    }
+    .code-box {
+      background: #0B0F19;
+      color: #E2E8F0;
+      padding: 12px 14px;
+      border-radius: 8px;
+      font-family: 'Outfit', Consolas, monospace;
+      font-size: 10.5px;
+      direction: ltr;
+      text-align: left;
+      line-height: 1.45;
+      overflow: hidden;
+      page-break-inside: avoid;
+      margin-top: 8px;
+      margin-bottom: 12px;
+    }
+    .footer-note {
+      text-align: center;
+      margin-top: 18px;
+      padding-top: 10px;
+      border-top: 1px solid #E2E8F0;
+      font-size: 11px;
+      color: #64748B;
+    }
+    .tip-box {
+      background: #F0FDF4;
+      border-right: 4px solid #10B981;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 11px;
+      color: #166534;
+      margin-top: 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header Banner -->
+  <div class="header-banner">
+    <div class="header-tag">FRONTEND ARCHITECTURE SPECIFICATION</div>
+    <h1 class="header-title">دليل استخدامات وتوزيع ألوان المنيو للواجهات الأمامية</h1>
+    <p class="header-desc">
+      توثيق تقني دقيق موجه لمطوري الـ Frontend (React / Next.js / Flutter / Tailwind) يوضح بالتفصيل أين وكيف يُطبق كل لون في كافة مكونات وشاشات المنيو الرقمي.
+    </p>
+  </div>
+
+  <div class="rule-box">
+    <strong>قاعدة التنفيذ الأساسية للفرونت إند:</strong>
+    ممنوع منعاً باتاً استخدام ألوان ثابتة كـ Hex codes داخل الكومبوننتس. يجب ربط كل عنصر بمتغير الـ CSS المناسب:
+    <code>var(--color-primary)</code>, <code>var(--color-surface)</code>, <code>var(--color-bg)</code> وهكذا.
+  </div>
+
+  <!-- Section 1: Detailed Color Tokens Breakdown -->
+  <h2 class="section-title"><span class="badge">1</span> تفصيل كل لون واستخداماته الدقيقة في المنيو (Token Breakdown)</h2>
+
+  <!-- 1. PRIMARY -->
+  <div class="token-card">
+    <div class="token-header">
+      <div class="token-name-group">
+        <span class="token-name">primary</span>
+        <span class="token-arabic-role">• لون هوية المتجر والتحفيز على الشراء (Action Hero)</span>
+      </div>
+      <div class="token-swatches">
+        <span class="swatch-item">Light: <span class="color-circle" style="background:#FF6B00;"></span> #FF6B00</span>
+        <span class="swatch-item">Dark: <span class="color-circle" style="background:#FF7A1A;"></span> #FF7A1A</span>
+      </div>
+    </div>
+    <div class="token-details-grid">
+      <div class="td-label">خصائص الـ CSS:</div>
+      <div class="td-value"><span class="tag-css">background-color</span>, <span class="tag-css">color</span> (للسعر), <span class="tag-css">border-color</span> (عند التحديد)</div>
+      
+      <div class="td-label">أين يُستخدم في الشاشة؟</div>
+      <div class="td-value">
+        1. <strong>أزرار الشراء الأساسية (Primary CTA):</strong> زر "+" للإضافة السريعة على كارت الطبق، وزر "أضف إلى السلة" الكبير.<br>
+        2. <strong>زر إتمام الطلب / الدفع:</strong> الزر العائم في السلة (Checkout Button).<br>
+        3. <strong>القسم النشط (Active Category Pill):</strong> خلفية التبويب المحدد حالياً في شريط الأقسام العلوي.<br>
+        4. <strong>سعر الوجبة البارز:</strong> رقم السعر الرئيسي لجذب عين الزبون للقيمة.<br>
+        5. <strong>خيارات التحديد النشطة:</strong> إطار ونقطة الاختيار (Radio / Checkbox) عند اختيار حجم الوجبة.
+      </div>
+
+      <div class="td-label">قاعدة للمطور:</div>
+      <div class="td-value" style="color: #B45309;">
+        لا تجعل كل شيء في الشاشة ملوناً بالـ primary حتى لا تفقد أزرار الشراء قوتها وجاذبيتها البصرية.
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. ON_PRIMARY -->
+  <div class="token-card">
+    <div class="token-header">
+      <div class="token-name-group">
+        <span class="token-name">onPrimary</span>
+        <span class="token-arabic-role">• لون النصوص والأيقونات الواقعة فوق الـ Primary</span>
+      </div>
+      <div class="token-swatches">
+        <span class="swatch-item">Light: <span class="color-circle" style="background:#FFFFFF;"></span> #FFFFFF</span>
+        <span class="swatch-item">Dark: <span class="color-circle" style="background:#FFFFFF;"></span> #FFFFFF</span>
+      </div>
+    </div>
+    <div class="token-details-grid">
+      <div class="td-label">خصائص الـ CSS:</div>
+      <div class="td-value"><span class="tag-css">color</span>, <span class="tag-css">fill / stroke</span> للأيقونات</div>
+      
+      <div class="td-label">أين يُستخدم في الشاشة؟</div>
+      <div class="td-value">
+        1. نص وأيقونة زر "أضف للسلة" (مثل علامة + وكلمة أضف).<br>
+        2. نص القسم النشط المكتوب داخل كبسولة الأقسام المفعلة.<br>
+        3. نص وأيقونة زر المتابعة إلى الدفع في أسفل السلة.
+      </div>
+
+      <div class="td-label">قاعدة للمطور:</div>
+      <div class="td-value" style="color: #DC2626;">
+        <strong>حرج جداً:</strong> لا تفترض أبداً أن لون النص فوق الزر أبيض ثابت (#FFF)! إذا اختار المطعم لون براند أصفر ليموني، الباك إند سيرسل <code>onPrimary: #0F172A</code> ليظل النص مقروءاً.
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. SECONDARY -->
+  <div class="token-card">
+    <div class="token-header">
+      <div class="token-name-group">
+        <span class="token-name">secondary</span>
+        <span class="token-arabic-role">• لون الهوية الثانوي والإجراءات المساندة</span>
+      </div>
+      <div class="token-swatches">
+        <span class="swatch-item">Light: <span class="color-circle" style="background:#1E293B;"></span> #1E293B</span>
+        <span class="swatch-item">Dark: <span class="color-circle" style="background:#334155;"></span> #334155</span>
+      </div>
+    </div>
+    <div class="token-details-grid">
+      <div class="td-label">خصائص الـ CSS:</div>
+      <div class="td-value"><span class="tag-css">background-color</span>, <span class="tag-css">border-color</span></div>
+      
+      <div class="td-label">أين يُستخدم في الشاشة؟</div>
+      <div class="td-value">
+        1. <strong>الأزرار الثانوية (Secondary Actions):</strong> زر "تخصيص الوجبة" (Customize) بجانب زر الإضافة السريعة.<br>
+        2. <strong>أزرار التراجع والإلغاء:</strong> مثل زر "إلغاء" أو "إغلاق النافذة المنبثقة".<br>
+        3. <strong>هيدر المتجر وبطاقة معلومات الفرع:</strong> كخلفية لبطاقة الفرع (اسم المتجر، أوقات العمل، والتقييم).<br>
+        4. <strong>بادج عداد السلة (Cart Badge):</strong> الدائرة العائمة التي تُظهر عدد السندوتشات المختارة فوق السلة.
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. ON_SECONDARY -->
+  <div class="token-card">
+    <div class="token-header">
+      <div class="token-name-group">
+        <span class="token-name">onSecondary</span>
+        <span class="token-arabic-role">• لون النصوص والأيقونات الواقعة فوق الـ Secondary</span>
+      </div>
+      <div class="token-swatches">
+        <span class="swatch-item">Light: <span class="color-circle" style="background:#FFFFFF;"></span> #FFFFFF</span>
+        <span class="swatch-item">Dark: <span class="color-circle" style="background:#F8FAFC;"></span> #F8FAFC</span>
+      </div>
+    </div>
+    <div class="token-details-grid">
+      <div class="td-label">خصائص الـ CSS:</div>
+      <div class="td-value"><span class="tag-css">color</span>, <span class="tag-css">fill</span></div>
+      <div class="td-label">أين يُستخدم في الشاشة؟</div>
+      <div class="td-value">نصوص وأيقونات الأزرار الثانوية، ورقم العداد الصغير داخل دائرة عداد السلة.</div>
+    </div>
+  </div>
+
+  <!-- Page Break -->
+  <div class="page-break"></div>
+
+  <!-- 5. BACKGROUND -->
+  <div class="token-card">
+    <div class="token-header">
+      <div class="token-name-group">
+        <span class="token-name">background</span>
+        <span class="token-arabic-role">• أرضية التطبيق الأساسية (The Canvas)</span>
+      </div>
+      <div class="token-swatches">
+        <span class="swatch-item">Light: <span class="color-circle" style="background:#F8FAFC;"></span> #F8FAFC</span>
+        <span class="swatch-item">Dark: <span class="color-circle" style="background:#0B0F19;"></span> #0B0F19</span>
+      </div>
+    </div>
+    <div class="token-details-grid">
+      <div class="td-label">خصائص الـ CSS:</div>
+      <div class="td-value"><span class="tag-css">background-color</span> على مستوى <code>&lt;body&gt;</code> أو الحاوية الرئيسية</div>
+      
+      <div class="td-label">أين يُستخدم في الشاشة؟</div>
+      <div class="td-value">
+        أرضية صفحة المنيو بالكامل أثناء السكرول.<br>
+        • <strong>في اللايت:</strong> رمادي هادئ ونظيف (Off-white) ليعطي كروت الأطباق البيضاء بروزاً ثلاثي الأبعاد.<br>
+        • <strong>في الدارك:</strong> درجة ليلية عميقة فاخرة (Obsidian) تمنع إجهاد العين وتبرز صور الأطباق الملونة.
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. SURFACE -->
+  <div class="token-card">
+    <div class="token-header">
+      <div class="token-name-group">
+        <span class="token-name">surface</span>
+        <span class="token-arabic-role">• أسطح الكروت والحاويات المرتفعة (Containers)</span>
+      </div>
+      <div class="token-swatches">
+        <span class="swatch-item">Light: <span class="color-circle" style="background:#FFFFFF;"></span> #FFFFFF</span>
+        <span class="swatch-item">Dark: <span class="color-circle" style="background:#151C2C;"></span> #151C2C</span>
+      </div>
+    </div>
+    <div class="token-details-grid">
+      <div class="td-label">خصائص الـ CSS:</div>
+      <div class="td-value"><span class="tag-css">background-color</span> للكروت والحاويات</div>
+      
+      <div class="td-label">أين يُستخدم في الشاشة؟</div>
+      <div class="td-value">
+        1. <strong>كروت الوجبات (Dish Cards):</strong> خلفية الكارت الذي يحتوي على الصورة، الاسم، والسعر.<br>
+        2. <strong>نافذة تفاصيل الوجبة (Bottom Sheet Modal):</strong> خلفية النافذة المنبثقة لاختيار الحجم والمكونات.<br>
+        3. <strong>كارت شريط السلة العائم:</strong> البار السفلي أو صفحة مراجعة الطلب والفاتورة.<br>
+        4. <strong>خلفية البار العلوي (Sticky App Bar):</strong> عند تثبيت الهيدر أعلى الشاشة أثناء التمرير.
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. SURFACE_SUBTLE -->
+  <div class="token-card">
+    <div class="token-header">
+      <div class="token-name-group">
+        <span class="token-name">surfaceSubtle</span>
+        <span class="token-arabic-role">• الأسطح التفاعلية المدمجة داخل الكروت</span>
+      </div>
+      <div class="token-swatches">
+        <span class="swatch-item">Light: <span class="color-circle" style="background:#F1F5F9;"></span> #F1F5F9</span>
+        <span class="swatch-item">Dark: <span class="color-circle" style="background:#1E293B;"></span> #1E293B</span>
+      </div>
+    </div>
+    <div class="token-details-grid">
+      <div class="td-label">خصائص الـ CSS:</div>
+      <div class="td-value"><span class="tag-css">background-color</span> للمدخلات والكبسولات</div>
+      
+      <div class="td-label">أين يُستخدم في الشاشة؟</div>
+      <div class="td-value">
+        1. <strong>حقل شريط البحث (Search Input):</strong> لكي يتمايز عن سطح الهيدر.<br>
+        2. <strong>كبسولات الأقسام غير المحددة (Inactive Tabs):</strong> التبويبات التي لم يضغط عليها العميل بعد.<br>
+        3. <strong>خلفية عداد الكمية [ - 1 + ]:</strong> الحاوية الصغيرة التي تجمع أزرار الزيادة والنقصان.<br>
+        4. <strong>صندوق كتابة الملاحظات:</strong> Textarea لكتابة "ملاحظات إضافية للشيف" داخل تفاصيل الوجبة.
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. TEXT_PRIMARY -->
+  <div class="token-card">
+    <div class="token-header">
+      <div class="token-name-group">
+        <span class="token-name">textPrimary</span>
+        <span class="token-arabic-role">• النصوص الأساسية عالية التباين (High Emphasis)</span>
+      </div>
+      <div class="token-swatches">
+        <span class="swatch-item">Light: <span class="color-circle" style="background:#0F172A;"></span> #0F172A</span>
+        <span class="swatch-item">Dark: <span class="color-circle" style="background:#F8FAFC;"></span> #F8FAFC</span>
+      </div>
+    </div>
+    <div class="token-details-grid">
+      <div class="td-label">خصائص الـ CSS:</div>
+      <div class="td-value"><span class="tag-css">color</span> على العناوين والأسماء</div>
+      
+      <div class="td-label">أين يُستخدم في الشاشة؟</div>
+      <div class="td-value">
+        1. <strong>اسم الوجبة:</strong> (مثال: "برجر ترافل بالمشروم").<br>
+        2. <strong>عناوين الأقسام الرئيسية:</strong> (مثال: "الأطباق الرئيسية"، "المشروبات").<br>
+        3. <strong>أسماء خيارات الإضافات والحجم:</strong> (مثال: "حجم عائلي كبير + 20 ر.س").<br>
+        4. <strong>المجموع الكلي للفاتورة:</strong> الرقم النهائي في ملخص الدفع.
+      </div>
+    </div>
+  </div>
+
+  <!-- 9. TEXT_SECONDARY -->
+  <div class="token-card">
+    <div class="token-header">
+      <div class="token-name-group">
+        <span class="token-name">textSecondary</span>
+        <span class="token-arabic-role">• النصوص التوضيحية والبيانات الفرعية (Muted Text)</span>
+      </div>
+      <div class="token-swatches">
+        <span class="swatch-item">Light: <span class="color-circle" style="background:#64748B;"></span> #64748B</span>
+        <span class="swatch-item">Dark: <span class="color-circle" style="background:#94A3B8;"></span> #94A3B8</span>
+      </div>
+    </div>
+    <div class="token-details-grid">
+      <div class="td-label">خصائص الـ CSS:</div>
+      <div class="td-value"><span class="tag-css">color</span> للنصوص الثانوية</div>
+      
+      <div class="td-label">أين يُستخدم في الشاشة؟</div>
+      <div class="td-value">
+        1. <strong>وصف مكونات الوجبة:</strong> (مثال: "لحم أنجوس فاخر، شيدر معتق، صوص باربكيو").<br>
+        2. <strong>السعرات الحرارية ومعلومات الحساسية:</strong> (مثال: "🔥 580 سعرة حرارية • يحتوي على الجلوتين").<br>
+        3. <strong>نصوص التلميح (Placeholders):</strong> "ابحث عن طبقك المفضل..." داخل شريط البحث.<br>
+        4. <strong>تفاصيل الفاتورة الفرعية:</strong> مثل رسوم الخدمة، الضريبة، والتوصيل.
+      </div>
+    </div>
+  </div>
+
+  <!-- Page Break -->
+  <div class="page-break"></div>
+
+  <!-- 10. BORDER -->
+  <div class="token-card">
+    <div class="token-header">
+      <div class="token-name-group">
+        <span class="token-name">border</span>
+        <span class="token-arabic-role">• الحدود والفواصل الدقيقة (Hairline Borders & Dividers)</span>
+      </div>
+      <div class="token-swatches">
+        <span class="swatch-item">Light: <span class="color-circle" style="background:#E2E8F0;"></span> #E2E8F0</span>
+        <span class="swatch-item">Dark: <span class="color-circle" style="background:#1E293B;"></span> #1E293B</span>
+      </div>
+    </div>
+    <div class="token-details-grid">
+      <div class="td-label">خصائص الـ CSS:</div>
+      <div class="td-value"><span class="tag-css">border-color</span>, <span class="tag-css">outline-color</span>, <span class="tag-css">border-bottom</span></div>
+      
+      <div class="td-label">أين يُستخدم في الشاشة؟</div>
+      <div class="td-value">
+        1. <strong>إطار كروت الوجبات (1px Border):</strong> يعطي الكارت تحديداً أنيقاً ويفصله عن الخلفية.<br>
+        2. <strong>الفواصل الأفقية بين الخيارات (Dividers):</strong> الفاصل بين الإضافات في شيت تفاصيل الوجبة.<br>
+        3. <strong>إطار خيارات الإضافات غير المحددة:</strong> إطار الراديو والـ Checkbox قبل الضغط عليه.<br>
+        4. <strong>إطار حقل إدخال كود الخصم (Coupon Input Border):</strong> في صفحة السلة.
+      </div>
+    </div>
+  </div>
+
+  <!-- 11. ACCENT -->
+  <div class="token-card">
+    <div class="token-header">
+      <div class="token-name-group">
+        <span class="token-name">accent</span>
+        <span class="token-arabic-role">• شارات التميز والعروض الترويجية (Promotional Badges)</span>
+      </div>
+      <div class="token-swatches">
+        <span class="swatch-item">Light: <span class="color-circle" style="background:#10B981;"></span> #10B981</span>
+        <span class="swatch-item">Dark: <span class="color-circle" style="background:#34D399;"></span> #34D399</span>
+      </div>
+    </div>
+    <div class="token-details-grid">
+      <div class="td-label">خصائص الـ CSS:</div>
+      <div class="td-value"><span class="tag-css">background-color</span> للبادجات، <span class="tag-css">color</span> للأيقونات والنصوص الترويجية</div>
+      
+      <div class="td-label">أين يُستخدم في الشاشة؟</div>
+      <div class="td-value">
+        1. <strong>شارة العروض والخصومات:</strong> البادج الصغير فوق زاوية صورة الوجبة (مثلاً: "وفر 25%").<br>
+        2. <strong>شارات الأطباق المميزة:</strong> "الأكثر مبيعاً ⭐" (Best Seller)، أو طبق "جديد 🔥".<br>
+        3. <strong>شطب السعر القديم:</strong> إبراز قيمة التوفير للزبون بجانب السعر الأصلي.
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 2: Functional Colors -->
+  <h2 class="section-title"><span class="badge">2</span> الألوان الوظيفية الثابتة في الفرونت إند (Functional Constants)</h2>
+  
+  <p style="font-size: 11.5px; color: #475569; margin-bottom: 8px;">
+    هذه الألوان لا يغيرها صاحب المطعم، بل يحتفظ بها الفرونت إند كثوابت قياسية لأنها ترتبط بالسلامة وسلوك المستخدم:
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>اللون الوظيفي</th>
+        <th>الكود في اللايت</th>
+        <th>الكود في الدارك</th>
+        <th>الاستخدام في المنيو</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Danger / Error</strong></td>
+        <td>#EF4444</td>
+        <td>#F87171</td>
+        <td>زر حذف وجبة من السلة، علامة الفلفل الحار (Spicy)، شارة "نفذت الكمية" (Sold Out)، أخطاء الكوبون.</td>
+      </tr>
+      <tr>
+        <td><strong>Success</strong></td>
+        <td>#10B981</td>
+        <td>#34D399</td>
+        <td>إشعار "تم تطبيق كود الخصم بنجاح"، رسالة إتمام الطلب، شارة الوجبات النباتية (Vegan).</td>
+      </tr>
+      <tr>
+        <td><strong>Warning</strong></td>
+        <td>#F59E0B</td>
+        <td>#FBBF24</td>
+        <td>تنبيه "الكمية المتبقية محدودة (3 فقط!)"، تنبيهات وقت إغلاق المطبخ.</td>
+      </tr>
+      <tr>
+        <td><strong>Shimmer / Loading</strong></td>
+        <td>rgba(0,0,0, 0.06)</td>
+        <td>rgba(255,255,255, 0.08)</td>
+        <td>هياكل التحميل العظمية (Skeleton Placeholders) أثناء جلب بيانات الوجبات.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Section 3: Frontend Implementation Code Snippet -->
+  <h2 class="section-title"><span class="badge">3</span> كيفية تطبيق الألوان برمجياً في الـ CSS / Tailwind</h2>
+
+  <div class="code-box">
+/* عند استلام الـ JSON من الـ API، يقوم الفرونت إند بحقن القيم في :root */
+:root {
+  --color-primary: #FF6B00;
+  --color-on-primary: #FFFFFF;
+  --color-secondary: #1E293B;
+  --color-on-secondary: #FFFFFF;
+  --color-bg: #F8FAFC;
+  --color-surface: #FFFFFF;
+  --color-surface-subtle: #F1F5F9;
+  --color-text-primary: #0F172A;
+  --color-text-secondary: #64748B;
+  --color-border: #E2E8F0;
+  --color-accent: #10B981;
+}
+
+/* عند تفعيل الـ Dark Mode */
+[data-theme="dark"] {
+  --color-primary: #FF7A1A;
+  --color-on-primary: #FFFFFF;
+  --color-secondary: #334155;
+  --color-on-secondary: #F8FAFC;
+  --color-bg: #0B0F19;
+  --color-surface: #151C2C;
+  --color-surface-subtle: #1E293B;
+  --color-text-primary: #F8FAFC;
+  --color-text-secondary: #94A3B8;
+  --color-border: #1E293B;
+  --color-accent: #34D399;
+}
+  </div>
+
+  <div class="tip-box">
+    <strong>جاهز للربط مع Tailwind CSS:</strong>
+    بمجرد تسمية الكلاسات مثل <code>bg-[var(--color-surface)]</code> أو <code>text-[var(--color-primary)]</code> يتحول المنيو بالكامل فوراً بين اللايت والدارك بسلاسة 100%.
+  </div>
+
+  <div class="footer-note">
+    نظام تحكّم (Mot7km SaaS ERP) • قسم إدارة الهوية وتصميم المنيو • موجه لفرق Frontend & Backend
+  </div>
+
+</body>
+</html>

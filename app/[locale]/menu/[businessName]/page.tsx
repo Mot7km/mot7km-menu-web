@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { MenuPage } from '@/components/layouts/MenuPage';
 import { InitialStoreProvider } from '@/context/InitialStoreContext';
 import { webMenuApi } from '@/lib/api/menuApi';
+import { generateThemeVariables } from '@/config/theme';
 
 interface BusinessMenuPageProps {
   params: Promise<{ locale: string; businessName: string }>;
@@ -74,8 +75,24 @@ export default async function BusinessMenuPage({ params }: BusinessMenuPageProps
     storeData = null;
   }
 
+  let themeStyles = null;
+  if (storeData?.identity?.colors) {
+    const { light, dark } = generateThemeVariables(storeData.identity.colors);
+    const lightCss = Object.entries(light).map(([k, v]) => `${k}:${v};`).join('');
+    const darkCss = Object.entries(dark).map(([k, v]) => `${k}:${v};`).join('');
+    themeStyles = (
+      <style
+        id="tenant-theme-tokens"
+        dangerouslySetInnerHTML={{
+          __html: `:root { ${lightCss} } .dark { ${darkCss} }`,
+        }}
+      />
+    );
+  }
+
   return (
     <InitialStoreProvider data={storeData}>
+      {themeStyles}
       <MenuPage initialStoreData={storeData} />
     </InitialStoreProvider>
   );

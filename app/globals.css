@@ -4,29 +4,42 @@
   Runtime theme tokens. Values are populated from the tenant identity.
   ================================================================= */
 :root {
-  --color-primary: currentColor;
-  --color-secondary: currentColor;
-  --color-accent: currentColor;
-  --color-background: transparent;
-  --color-surface: transparent;
-  --color-card-light: transparent;
-  --color-surface-elevated: transparent;
-  --color-text-primary: currentColor;
-  --color-text-secondary: currentColor;
-  --color-text-muted: currentColor;
-  --color-text-light: currentColor;
-  --color-text-on-primary: currentColor;
-  --color-border: currentColor;
-  --color-border-strong: currentColor;
-  --color-divider: currentColor;
-  --gradient-primary: none;
-  --gradient-brand: none;
-  --gradient-accent: none;
-  --gradient-hero: none;
-  --gradient-subtle: none;
-  --shadow-card: none;
-  --shadow-card-hover: none;
-  --shadow-glow: none;
+  --color-primary: #2B9FD9;
+  --color-secondary: #0B529E;
+  --color-accent: #10B981;
+  --color-on-primary: #FFFFFF;
+  --color-text-on-primary: #FFFFFF;
+  --color-on-secondary: #FFFFFF;
+  --color-text-on-secondary: #FFFFFF;
+  --color-text-on-accent: #FFFFFF;
+  --color-background: #F8FAFC;
+  --color-bg: #F8FAFC;
+  --color-surface: #FFFFFF;
+  --color-surface-subtle: #F1F5F9;
+  --color-surface-elevated: #F1F5F9;
+  --color-card-light: #FFFFFF;
+  --color-text-primary: #0F172A;
+  --color-text-secondary: #64748B;
+  --color-text-muted: #94A3B8;
+  --color-text-light: #CBD5E1;
+  --color-border: #E2E8F0;
+  --color-border-strong: #CBD5E1;
+  --color-divider: rgba(226, 232, 240, 0.6);
+  --color-danger: #EF4444;
+  --color-error: #EF4444;
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  --color-info: #3B82F6;
+  --color-shimmer: rgba(0, 0, 0, 0.06);
+  --gradient-primary: linear-gradient(135deg, #2B9FD9, #10B981);
+  --gradient-brand: linear-gradient(135deg, #2B9FD9, #0B529E, #10B981);
+  --gradient-accent: linear-gradient(135deg, #10B981, #2B9FD9);
+  --gradient-hero: linear-gradient(135deg, rgba(43, 159, 217, 0.92), rgba(11, 82, 158, 0.88), rgba(16, 185, 129, 0.8));
+  --gradient-subtle: linear-gradient(135deg, rgba(43, 159, 217, 0.08), transparent, rgba(16, 185, 129, 0.08));
+  --shadow-card: 0 4px 20px rgba(43, 159, 217, 0.08);
+  --shadow-card-hover: 0 12px 32px rgba(43, 159, 217, 0.16);
+  --shadow-glow: 0 0 20px rgba(16, 185, 129, 0.2);
+  --shadow-glow-strong: 0 0 30px rgba(16, 185, 129, 0.35);
   --font-english: var(--font-roboto), "Roboto", sans-serif;
   --font-arabic: var(--font-cairo), "Cairo", sans-serif;
   --font-display: var(--font-english);
@@ -39,8 +52,34 @@
 }
 
 .dark {
-  --color-card-dark: var(--color-surface-elevated);
-  --color-elevated-dark: var(--color-surface-elevated);
+  --color-primary: #3DA9E0;
+  --color-secondary: #1E6BB8;
+  --color-accent: #34D399;
+  --color-on-primary: #FFFFFF;
+  --color-text-on-primary: #FFFFFF;
+  --color-on-secondary: #F8FAFC;
+  --color-text-on-secondary: #F8FAFC;
+  --color-text-on-accent: #0F172A;
+  --color-background: #0B0F19;
+  --color-bg: #0B0F19;
+  --color-surface: #151C2C;
+  --color-surface-subtle: #1E293B;
+  --color-surface-elevated: #1E293B;
+  --color-card-dark: #151C2C;
+  --color-elevated-dark: #1E293B;
+  --color-text-primary: #F8FAFC;
+  --color-text-secondary: #94A3B8;
+  --color-text-muted: #64748B;
+  --color-text-light: #475569;
+  --color-border: #1E293B;
+  --color-border-strong: #334155;
+  --color-divider: rgba(30, 41, 59, 0.6);
+  --color-danger: #F87171;
+  --color-error: #F87171;
+  --color-success: #34D399;
+  --color-warning: #FBBF24;
+  --color-info: #60A5FA;
+  --color-shimmer: rgba(255, 255, 255, 0.08);
 }
 
 /* =================================================================

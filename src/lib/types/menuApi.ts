@@ -1,10 +1,33 @@
-﻿// src/lib/types/menuApi.ts
+// src/lib/types/menuApi.ts
+
+/**
+ * Semantic 11-token color palette definition for a single theme mode (light or dark).
+ */
+export interface ApiColorPalette {
+  primary?: string | null;
+  onPrimary?: string | null;
+  secondary?: string | null;
+  onSecondary?: string | null;
+  background?: string | null;
+  surface?: string | null;
+  surfaceSubtle?: string | null;
+  textPrimary?: string | null;
+  textSecondary?: string | null;
+  border?: string | null;
+  accent?: string | null;
+}
 
 /**
  * Brand color definition returned by the Web Menu API.
- * Constrained to exactly 3 colors: primary, secondary, accent.
+ * Supports the full light & dark semantic palette schema,
+ * with backward-compatible fallback to the legacy 3-color palette.
  */
 export interface ApiBrandColors {
+  // New API structure
+  light?: ApiColorPalette | null;
+  dark?: ApiColorPalette | null;
+
+  // Legacy flat 3-color structure
   primary?: string | null;
   secondary?: string | null;
   accent?: string | null;

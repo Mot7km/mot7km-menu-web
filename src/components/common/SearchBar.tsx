@@ -29,16 +29,16 @@ export default function SearchBar({ value, onChange }: SearchBarProps) {
           </div>
 
           <div
-            className="relative rounded-full glass-card overflow-hidden
+            className="relative rounded-full bg-[var(--color-surface-subtle)] border border-[var(--color-border)] overflow-hidden
               transition-all duration-400
-              group-focus-within:shadow-[var(--shadow-glow-primary)]"
+              group-focus-within:border-[var(--color-primary)] group-focus-within:shadow-[var(--shadow-card)]"
           >
             {/* Search Icon */}
             <div className="absolute left-1 top-1 bottom-1 flex items-center pl-4 pointer-events-none">
               <Search
                 className="w-5 h-5 text-[var(--color-primary)]
                   transition-all duration-300
-                  group-focus-within:scale-110 group-focus-within:drop-shadow-[0_0_6px_rgba(22,131,199,0.5)]"
+                  group-focus-within:scale-110"
               />
             </div>
 

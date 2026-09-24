@@ -63,7 +63,7 @@ export default function ReviewForm({
           onChange={(e) => setReviewer(e.target.value)}
           placeholder={t('review.namePlaceholder')}
           className="w-full px-4 py-2.5 rounded-lg
-            bg-[var(--color-background)]
+            bg-[var(--color-surface-subtle)]
             border border-[var(--color-border)]
             text-[var(--color-text-primary)]
             placeholder:text-[var(--color-text-muted)]/70
@@ -120,7 +120,7 @@ export default function ReviewForm({
           placeholder={t('review.commentPlaceholder')}
           rows={4}
           className="w-full px-4 py-2.5 rounded-lg
-            bg-[var(--color-background)]
+            bg-[var(--color-surface-subtle)]
             border border-[var(--color-border)]
             text-[var(--color-text-primary)]
             placeholder:text-[var(--color-text-muted)]/70
