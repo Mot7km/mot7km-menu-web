@@ -4,6 +4,7 @@ import { getMessages } from "next-intl/server";
 import { NextIntlClientProvider } from "next-intl";
 import { Roboto, Cairo } from "next/font/google";
 import { Providers } from "@/components/providers";
+import { FaviconController } from "@/components/common/FaviconController";
 import { i18n } from "@/config/i18n";
 
 const roboto = Roboto({
@@ -75,6 +76,7 @@ export default async function LocaleLayout({
       >
         <NextIntlClientProvider messages={messages}>
           <Providers>
+            <FaviconController />
             {children}
           </Providers>
         </NextIntlClientProvider>
