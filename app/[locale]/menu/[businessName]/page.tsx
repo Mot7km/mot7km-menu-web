@@ -93,7 +93,7 @@ export default async function BusinessMenuPage({ params }: BusinessMenuPageProps
   return (
     <InitialStoreProvider data={storeData}>
       {themeStyles}
-      <MenuPage initialStoreData={storeData} />
+      <MenuPage />
     </InitialStoreProvider>
   );
 }

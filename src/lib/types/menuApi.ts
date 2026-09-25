@@ -210,6 +210,14 @@ export interface ApiProductDetails extends Omit<ApiProduct, 'ingredients'> {
   customizations?: Array<{ id: number | string; name: string; price: number }>;
 }
 
+export interface ApiBusinessInfo {
+  businessName: string;
+  displayBusinessName?: string | null;
+  businessDescription?: string | null;
+  businessIdentity?: ApiBusinessIdentity | null;
+  header?: ApiStoreHeader | null;
+}
+
 export interface ApiBusinessMenu {
   businessName: string;
   displayBusinessName?: string | null;

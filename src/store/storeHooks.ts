@@ -3,15 +3,19 @@
 import { useEffect, useMemo } from 'react';
 import { usePathname } from 'next/navigation';
 import { skipToken } from '@reduxjs/toolkit/query';
-import { useGetMenuQuery, type CompleteStoreData } from './menuApi';
-import { applyThemePalette, normalizeThemePalette } from '@/config/theme';
+import {
+  useGetBusinessInfoQuery,
+  useGetSlidersQuery,
+  useGetCategoriesQuery,
+  useGetProductsQuery,
+} from './menuApi';
+import { applyThemePalette } from '@/config/theme';
 import { loadGoogleFont } from '@/helpers/fontLoader';
 import { i18n, type Locale } from '@/config/i18n';
 import type { ApiBusinessIdentity, ApiCategory, ApiProduct, ApiSliderItem, ApiStoreHeader } from '@/lib/types/menuApi';
 import type { StoreInfo } from '@/data/storeInfo';
 import type { Product } from '@/data/menu';
 import type { PromoCardData } from '@/data/menupromo';
-import { useInitialStoreContext } from '@/context/InitialStoreContext';
 
 const EMPTY_SLIDERS: ApiSliderItem[] = [];
 const EMPTY_CATEGORIES: ApiCategory[] = [];
@@ -34,9 +38,7 @@ export interface StoreState {
   refresh: () => Promise<void>;
 }
 
-export function useStore(directInitialData?: CompleteStoreData | null): StoreState {
-  const contextInitialData = useInitialStoreContext();
-  const initialData = directInitialData || contextInitialData;
+export function useStore(): StoreState {
   const pathname = usePathname();
   const locale: Locale = i18n.locales.includes(pathname.split('/').filter(Boolean)[0] as Locale)
     ? pathname.split('/').filter(Boolean)[0] as Locale
@@ -49,18 +51,51 @@ export function useStore(directInitialData?: CompleteStoreData | null): StoreSta
 
     return businessName ? decodeURIComponent(businessName) : undefined;
   }, [pathname]);
-  const menuQuery = useGetMenuQuery(requestedBusinessName || skipToken);
-  const hasInitialData = Boolean(initialData && initialData.businessName);
-  const data = menuQuery.data || (hasInitialData ? initialData! : undefined);
-  const loading = (menuQuery.isLoading || menuQuery.isFetching) && !data;
-  const businessName = data?.businessName || initialData?.businessName || requestedBusinessName || '';
-  const displayBusinessName = data?.displayBusinessName || initialData?.displayBusinessName || businessName;
-  const identity = data?.identity || initialData?.identity || null;
-  const header = data?.header || initialData?.header || null;
-  const sliders = data?.sliders ?? initialData?.sliders ?? EMPTY_SLIDERS;
-  const categories = data?.categories ?? initialData?.categories ?? EMPTY_CATEGORIES;
-  const apiProducts = data?.products ?? initialData?.products ?? EMPTY_PRODUCTS;
-  const storeNotFound = Boolean(requestedBusinessName && !loading && !data && (menuQuery.isError || !hasInitialData));
+
+  const queryArg = requestedBusinessName || skipToken;
+  const infoQuery = useGetBusinessInfoQuery(queryArg);
+  const slidersQuery = useGetSlidersQuery(queryArg);
+  const categoriesQuery = useGetCategoriesQuery(queryArg);
+  const productsQuery = useGetProductsQuery(requestedBusinessName ? { businessName: requestedBusinessName } : skipToken);
+
+  const loading = infoQuery.isLoading || slidersQuery.isLoading || categoriesQuery.isLoading || productsQuery.isLoading;
+  const isFetching = infoQuery.isFetching || slidersQuery.isFetching || categoriesQuery.isFetching || productsQuery.isFetching;
+
+  const infoData = infoQuery.data;
+  const slidersData = slidersQuery.data;
+  const categoriesData = categoriesQuery.data;
+  const productsData = productsQuery.data;
+
+  const businessName = infoData?.businessName || requestedBusinessName || '';
+  const displayBusinessName = infoData?.displayBusinessName || businessName;
+  const identity = infoData?.businessIdentity || null;
+  const header = infoData?.header || null;
+  const sliders = slidersData?.sliderItems ?? EMPTY_SLIDERS;
+  const sliderHeader = slidersData?.sliderHeader || null;
+
+  const rawCategories = categoriesData ?? EMPTY_CATEGORIES;
+  const apiProducts = productsData ?? EMPTY_PRODUCTS;
+
+  // Build categories with productCount matching products from the dedicated products endpoint
+  const categories = useMemo<ApiCategory[]>(() => {
+    return rawCategories.map((c) => {
+      const catProducts = apiProducts.filter((p) => Number(p.categoryId) === Number(c.id));
+      return {
+        ...c,
+        categoryName: c.categoryName || c.category_Name || c.name || `Category ${c.id}`,
+        categoryImageUrl: c.categoryImageUrl || c.imageUrl,
+        productCount: catProducts.length,
+        products: catProducts,
+      };
+    });
+  }, [rawCategories, apiProducts]);
+
+  const storeNotFound = Boolean(
+    requestedBusinessName &&
+    !loading &&
+    !isFetching &&
+    (infoQuery.isError || (!infoData && !categoriesData && !productsData))
+  );
 
   useEffect(() => {
     const root = document.documentElement;
@@ -158,15 +193,22 @@ export function useStore(directInitialData?: CompleteStoreData | null): StoreSta
     storeNotFound,
     businessName,
     displayBusinessName,
-    menuId: data?.menuId || 0,
+    menuId: 0,
     identity,
     header,
     sliders,
-    sliderHeader: data?.sliderHeader || null,
+    sliderHeader,
     categories,
     products,
     storeInfo,
     promoCards,
-    refresh: async () => { await menuQuery.refetch(); },
+    refresh: async () => {
+      await Promise.all([
+        infoQuery.refetch(),
+        slidersQuery.refetch(),
+        categoriesQuery.refetch(),
+        productsQuery.refetch(),
+      ]);
+    },
   };
 }

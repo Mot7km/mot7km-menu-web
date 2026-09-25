@@ -8,21 +8,16 @@ import ListContainer from '@/components/common/ListContainer';
 import SearchBar from '@/components/common/SearchBar';
 import { PageShell } from '@/components/layouts/PageShell';
 import { useStore } from '@/store/storeHooks';
-import type { CompleteStoreData } from '@/store/menuApi';
 import { MenuNotFound } from '@/components/common/MenuNotFound';
 
-interface MenuPageProps {
-  initialStoreData?: CompleteStoreData | null;
-}
-
-export function MenuPage({ initialStoreData }: MenuPageProps = {}) {
+export function MenuPage() {
   const t = useTranslations();
   const {
     products: storeProducts,
     categories: apiCategories,
     loading,
     storeNotFound,
-  } = useStore(initialStoreData);
+  } = useStore();
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
 

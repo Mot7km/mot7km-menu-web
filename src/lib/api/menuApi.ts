@@ -1,6 +1,7 @@
 // src/lib/api/menuApi.ts
 import { API_BASE_URL } from '../constants';
 import type {
+  ApiBusinessInfo,
   ApiBusinessMenu,
   ApiSlidersResponse,
   ApiCategory,
@@ -70,9 +71,9 @@ export const webMenuApi = {
     return fetchApi<ApiBusinessMenu>(`/api/menu/${encodeURIComponent(businessName)}`);
   },
 
-  /** GET /api/menu/{businessName}/info — Get business information and branding. */
-  async getBusinessInfo(businessName: string): Promise<ApiBusinessMenu | null> {
-    return fetchApi<ApiBusinessMenu>(`/api/menu/${encodeURIComponent(businessName)}/info`);
+  /** GET /api/menu/{businessName}/info — Get business information, branding and theme. */
+  async getBusinessInfo(businessName: string): Promise<ApiBusinessInfo | null> {
+    return fetchApi<ApiBusinessInfo>(`/api/menu/${encodeURIComponent(businessName)}/info`);
   },
 
   /** GET /api/menu/{businessName}/sliders — Get promotional sliders and carousel banners. */
@@ -162,8 +163,12 @@ export const webMenuApi = {
   },
 
   /**
-   * High-level aggregator that resolves the complete store data for the subsite.
-   * Fetches GET /api/menu/{businessName} and normalises the response.
+   * High-level aggregator that resolves the complete store data by calling
+   * specialised endpoints:
+   * - GET /api/menu/{businessName}/info for theme, branding, headers, identity
+   * - GET /api/menu/{businessName}/sliders for promotional sliders
+   * - GET /api/menu/{businessName}/categories for category taxonomy
+   * - GET /api/menu/{businessName}/products for products list
    */
   async getCompleteStoreData(customBusinessName?: string): Promise<{
     businessName: string;
@@ -179,67 +184,70 @@ export const webMenuApi = {
     const businessName = customBusinessName;
 
     if (!businessName) {
-      return { businessName: '', displayBusinessName: '', menuId: 0, identity: null, header: null, sliders: null, sliderHeader: null, categories: null, products: null };
-    }
-
-    const rawBundle = await this.getMenu(businessName);
-
-    if (rawBundle) {
-      const identity = rawBundle.businessIdentity || null;
-
-      const header = rawBundle.header || null;
-      if (rawBundle.businessDescription && header && !header.slogan) {
-        header.slogan = rawBundle.businessDescription;
-      }
-
-      let sliders: import('../types/menuApi').ApiSliderItem[] | null = null;
-      let sliderHeader: string | null = null;
-      if (rawBundle.sliders) {
-        if (Array.isArray(rawBundle.sliders.sliderItems)) {
-          sliders = rawBundle.sliders.sliderItems;
-          sliderHeader = rawBundle.sliders.sliderHeader || null;
-        }
-      }
-
-      let categories: ApiCategory[] | null = null;
-      const products: ApiProduct[] = [];
-
-      if (Array.isArray(rawBundle.categories) && rawBundle.categories.length > 0) {
-        categories = rawBundle.categories.map((c: ApiCategory) => ({
-          id: c.id,
-          categoryName: c.categoryName || c.category_Name || c.name || `Category ${c.id}`,
-          categoryImageUrl: c.categoryImageUrl || c.imageUrl,
-          menuId: c.menuId,
-          productCount: c.products?.length ?? c.productCount,
-          products: c.products,
-        }));
-
-        rawBundle.categories.forEach((cat: ApiCategory) => {
-          if (Array.isArray(cat.products)) {
-            cat.products.forEach((p: ApiProduct) => {
-              products.push({
-                ...p,
-                categoryId: p.categoryId ?? Number(cat.id),
-                categoryName: p.categoryName ?? cat.categoryName,
-              });
-            });
-          }
-        });
-      }
-
       return {
-        businessName: rawBundle.businessName || businessName,
-        displayBusinessName: rawBundle.displayBusinessName || rawBundle.businessName || businessName,
+        businessName: '',
+        displayBusinessName: '',
         menuId: 0,
-        identity,
-        header,
-        sliders,
-        sliderHeader,
-        categories,
-        products: products.length > 0 ? products : null,
+        identity: null,
+        header: null,
+        sliders: null,
+        sliderHeader: null,
+        categories: null,
+        products: null,
       };
     }
 
-    return { businessName, displayBusinessName: businessName, menuId: 0, identity: null, header: null, sliders: null, sliderHeader: null, categories: null, products: null };
+    const [infoRes, slidersRes, categoriesRes, productsRes] = await Promise.all([
+      this.getBusinessInfo(businessName),
+      this.getBusinessSliders(businessName),
+      this.getBusinessCategories(businessName),
+      this.getBusinessProducts(businessName),
+    ]);
+
+    const identity = infoRes?.businessIdentity || null;
+    const header = infoRes?.header || null;
+    if (infoRes?.businessDescription && header && !header.slogan) {
+      header.slogan = infoRes.businessDescription;
+    }
+
+    const sliders = slidersRes?.sliderItems || null;
+    const sliderHeader = slidersRes?.sliderHeader || null;
+
+    const rawCategories = categoriesRes || [];
+    const rawProducts = productsRes || [];
+
+    // Map categories with accurate productCount and product links
+    const categories: ApiCategory[] = rawCategories.map((c) => {
+      const catProducts = rawProducts.filter((p) => Number(p.categoryId) === Number(c.id));
+      return {
+        id: c.id,
+        categoryName: c.categoryName || c.category_Name || c.name || `Category ${c.id}`,
+        categoryImageUrl: c.categoryImageUrl || c.imageUrl,
+        menuId: c.menuId,
+        productCount: catProducts.length,
+        products: catProducts,
+      };
+    });
+
+    // Ensure all products have categoryName populated
+    const products: ApiProduct[] = rawProducts.map((p) => {
+      const matchedCat = categories.find((c) => Number(c.id) === Number(p.categoryId));
+      return {
+        ...p,
+        categoryName: p.categoryName || matchedCat?.categoryName,
+      };
+    });
+
+    return {
+      businessName: infoRes?.businessName || businessName,
+      displayBusinessName: infoRes?.displayBusinessName || infoRes?.businessName || businessName,
+      menuId: 0,
+      identity,
+      header,
+      sliders,
+      sliderHeader,
+      categories: categories.length > 0 ? categories : null,
+      products: products.length > 0 ? products : null,
+    };
   },
 };

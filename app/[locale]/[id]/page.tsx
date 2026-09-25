@@ -1,6 +1,6 @@
 'use client';
 
-import { use, useEffect, useMemo, useState } from 'react';
+import { use, useMemo, useState } from 'react';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -12,7 +12,8 @@ import { useCart } from '@/store/hooks';
 import { AddToCartBar } from '@/components/cart/AddToCartBar';
 import { useStore } from '@/store/storeHooks';
 import { useBusinessRoute } from '@/hooks/useLocale';
-import { webMenuApi } from '@/lib/api/menuApi';
+import { skipToken } from '@reduxjs/toolkit/query';
+import { useGetProductDetailsQuery, useGetProductReviewsQuery } from '@/store/menuApi';
 import type { Review } from '@/data/menu';
 
 export default function ProductPage({ params }: { params: Promise<{ locale: string; id: string }> }) {
@@ -27,37 +28,56 @@ export default function ProductPage({ params }: { params: Promise<{ locale: stri
   const [extraTotal, setExtraTotal] = useState<number>(0);
   const [quantity, setQuantity] = useState(1);
 
-  const product = useMemo(() => storeProducts.find((p) => p.id === id), [storeProducts, id]);
+  const baseProduct = useMemo(() => storeProducts.find((p) => p.id === id), [storeProducts, id]);
 
-  const [reviews, setReviews] = useState<Review[]>(() => product?.reviews || []);
+  // RTK Query — deduplicates the request so the view counter increments exactly once,
+  // even across client-side navigation where businessName loads asynchronously.
+  const productQueryArg = businessName && !isNaN(Number(id))
+    ? { businessName, productId: Number(id) }
+    : skipToken;
 
-  useEffect(() => {
-    if (product?.reviews && product.reviews.length > 0) {
-      setReviews(product.reviews);
-    }
-  }, [product?.reviews]);
+  const { data: productDetails } = useGetProductDetailsQuery(productQueryArg);
+  const { data: apiReviews } = useGetProductReviewsQuery(productQueryArg);
 
-  // Fetch reviews directly from GET /api/menu/{businessName}/products/{productId}/reviews
-  useEffect(() => {
-    const numericProductId = Number(id);
-    if (!businessName || isNaN(numericProductId)) return;
+  const product = useMemo<Product | undefined>(() => {
+    if (!baseProduct && !productDetails) return undefined;
+    
+    // Normalize ingredients from productDetails
+    const detailIngredients = productDetails?.ingredients?.map((ing) =>
+      typeof ing === 'string' ? ing : ing.name
+    );
 
-    let isMounted = true;
-    webMenuApi.getProductReviews(businessName, numericProductId).then((apiReviews) => {
-      if (!isMounted || !apiReviews) return;
-      const formattedReviews: Review[] = apiReviews.map((r) => ({
+    return {
+      id: id,
+      name: productDetails?.productName || baseProduct?.name || '',
+      description: productDetails?.description || baseProduct?.description || '',
+      price: productDetails?.price !== undefined && productDetails.price !== null
+        ? String(productDetails.price)
+        : (baseProduct?.price || ''),
+      rating: baseProduct?.rating || '',
+      image: productDetails?.productImageUrl || baseProduct?.image || '',
+      featured: true,
+      category: productDetails?.categoryName || baseProduct?.category || '',
+      ingredients: detailIngredients || baseProduct?.ingredients || [],
+      customizationOptions: baseProduct?.customizationOptions || [],
+      reviews: baseProduct?.reviews || [],
+    };
+  }, [baseProduct, productDetails, id]);
+
+  const reviews = useMemo<Review[]>(() => {
+    if (apiReviews && apiReviews.length > 0) {
+      return apiReviews.map((r) => ({
         reviewer: r.nameCustomer || 'Customer',
         date: r.createdAt || '',
         rating: r.rating || 5,
         comment: r.content || '',
       }));
-      setReviews(formattedReviews);
-    });
+    }
+    return product?.reviews || [];
+  }, [apiReviews, product?.reviews]);
 
-    return () => {
-      isMounted = false;
-    };
-  }, [businessName, id]);
+  const [pendingReviews, setPendingReviews] = useState<Review[]>([]);
+  const allReviews = useMemo(() => [...pendingReviews, ...reviews], [pendingReviews, reviews]);
 
   const handleAsyncReviewSubmit = async (data: { reviewer: string; rating: number; comment: string }) => {
     const numericProductId = Number(id);
@@ -75,7 +95,7 @@ export default function ProductPage({ params }: { params: Promise<{ locale: stri
           comment: response.content || data.comment,
           date: response.createdAt || new Date().toISOString(),
         };
-        setReviews((prev) => [newReview, ...prev]);
+        setPendingReviews((prev) => [newReview, ...prev]);
         refresh?.();
         return newReview;
       }
@@ -87,7 +107,7 @@ export default function ProductPage({ params }: { params: Promise<{ locale: stri
       comment: data.comment,
       date: new Date().toISOString(),
     };
-    setReviews((prev) => [fallbackReview, ...prev]);
+    setPendingReviews((prev) => [fallbackReview, ...prev]);
     return fallbackReview;
   };
 
@@ -95,19 +115,19 @@ export default function ProductPage({ params }: { params: Promise<{ locale: stri
     () => [
       {
         type: 'reviews' as const,
-        data: reviews,
+        data: allReviews,
         onAsyncReviewSubmit: handleAsyncReviewSubmit,
       },
     ],
-    [reviews, handleAsyncReviewSubmit]
+    [allReviews, handleAsyncReviewSubmit]
   );
 
   const averageRating = useMemo(() => {
-    if (reviews.length > 0) {
-      return (reviews.reduce((acc, r) => acc + (r.rating || 5), 0) / reviews.length).toFixed(1);
+    if (allReviews.length > 0) {
+      return (allReviews.reduce((acc, r) => acc + (r.rating || 5), 0) / allReviews.length).toFixed(1);
     }
     return product?.rating || '';
-  }, [reviews, product?.rating]);
+  }, [allReviews, product?.rating]);
 
   if (loading) {
     return <div className="flex min-h-screen items-center justify-center text-[var(--color-text-muted)]">{t('loading.product')}</div>;
