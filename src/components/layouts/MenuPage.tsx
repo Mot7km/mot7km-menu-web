@@ -15,11 +15,14 @@ export function MenuPage() {
   const {
     products: storeProducts,
     categories: apiCategories,
+    promoCards,
     loading,
     storeNotFound,
   } = useStore();
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
+
+  const hasPromos = Boolean(promoCards?.length);
 
   const categories = useMemo(() => {
     if (!apiCategories?.length) return [];
@@ -69,18 +72,22 @@ export function MenuPage() {
   return (
     <PageShell showHeader showFooter>
       <div className="flex flex-col items-center justify-center">
-        <section className="section-glow relative w-full px-4 pt-10 pb-8 sm:px-6 sm:pt-12 sm:pb-10 lg:px-8">
-          <div className="mx-auto max-w-5xl md:max-w-6xl">
-            <h2
-              className="accent-line mb-6 text-2xl font-bold text-[var(--color-text-primary)] sm:text-3xl"
-              style={{ fontFamily: 'var(--font-display)' }}
-            >
-              {t('home.specialOffers')}
-            </h2>
-            <PromotionalCarousel />
-          </div>
-        </section>
-        <div className="section-divider-premium w-full max-w-3xl mx-auto" />
+        {hasPromos && (
+          <>
+            <section className="section-glow relative w-full px-4 pt-10 pb-8 sm:px-6 sm:pt-12 sm:pb-10 lg:px-8">
+              <div className="mx-auto max-w-5xl md:max-w-6xl">
+                <h2
+                  className="accent-line mb-6 text-2xl font-bold text-[var(--color-text-primary)] sm:text-3xl"
+                  style={{ fontFamily: 'var(--font-display)' }}
+                >
+                  {t('home.specialOffers')}
+                </h2>
+                <PromotionalCarousel />
+              </div>
+            </section>
+            <div className="section-divider-premium w-full max-w-3xl mx-auto" />
+          </>
+        )}
 
         <section className="section-glow relative w-full px-4 pb-8 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-5xl md:max-w-6xl">

@@ -89,20 +89,7 @@ export function PromotionalCarousel() {
   // ---------------- Loading / empty state ----------------
   if (loading || !promoCards?.length) {
     return (
-      <section className="relative flex min-h-56 items-center justify-center overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-6 py-10 text-center shadow-[var(--shadow-card)]">
-        <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-primary)]/[0.08] via-transparent to-[var(--color-accent)]/[0.12]" />
-        <div className="relative flex max-w-sm flex-col items-center gap-3">
-          <Sparkles className="h-7 w-7 text-[var(--color-primary)]" />
-          <h3 className="text-lg font-bold text-[var(--color-text-primary)]">
-            {loading ? t('loading.store') : t('home.noOffersTitle')}
-          </h3>
-          {!loading && (
-            <p className="text-sm text-[var(--color-text-muted)]">
-              {t('home.noOffers')}
-            </p>
-          )}
-        </div>
-      </section>
+      <></>
     );
   }
 
