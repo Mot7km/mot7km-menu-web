@@ -426,7 +426,7 @@ export function Header() {
 
   const statusIndicator = (
     <div
-      className={`flex items-center gap-2 px-2.5 py-1 rounded-full border backdrop-blur-sm transition-all
+      className={`flex items-center gap-2 px-2.5 py-1 rounded-full border backdrop-blur-md transition-all
         ${open
           ? 'border-[var(--color-success)]/40 bg-[var(--color-success)]/20 text-[var(--color-success)]'
           : 'border-[var(--color-danger)]/40 bg-[var(--color-danger)]/20 text-[var(--color-danger)]'
@@ -484,11 +484,20 @@ export function Header() {
 
   return (
     <header
-      className="relative isolate flex w-full flex-col items-center justify-center rounded-b-[2rem] sm:rounded-b-[2.5rem] overflow-hidden pt-8 sm:pt-10 pb-6 sm:pb-8 px-4 sm:px-6 lg:px-8 transition-colors duration-300"
+      className="
+        relative isolate w-full overflow-hidden
+        flex items-center justify-center
+        rounded-b-[1.75rem] sm:rounded-b-[2.25rem]
+        px-4 sm:px-6 lg:px-8
+        py-5 sm:py-6
+        transition-colors duration-300
+      "
       style={{
         backgroundColor: 'var(--color-secondary)',
+        minHeight: 'clamp(170px, 22vw, 240px)',
       }}
     >
+      {/* ─── Background ─────────────────────────────────── */}
       {backgroundImage ? (
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
           <Image
@@ -499,42 +508,62 @@ export function Header() {
             sizes="100vw"
             className="object-cover object-center"
           />
-          {/* Subtle gradient overlay to keep cover image vivid while ensuring text contrast */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-[var(--color-secondary)]/80" />
+          {/* Horizontal scrim so the text column is always readable */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-black/20 rtl:bg-gradient-to-l" />
+          {/* Vertical scrim to blend top/bottom into the rounded edges */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-[var(--color-secondary)]/70" />
+          {/* Subtle vignette for depth */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                'radial-gradient(120% 80% at 20% 50%, transparent 40%, rgba(0,0,0,0.35) 100%)',
+            }}
+          />
         </div>
       ) : (
         <div
           className="absolute inset-0 z-0 pointer-events-none"
           style={{
-            background: 'linear-gradient(135deg, var(--color-secondary) 0%, var(--color-primary) 100%)',
+            background:
+              'linear-gradient(135deg, var(--color-secondary) 0%, var(--color-primary) 100%)',
           }}
         >
-          {/* Decorative ambient orbs only shown when there is no cover image */}
-          <div className="absolute inset-0 bg-gradient-to-br from-black/10 via-transparent to-black/20" />
-          <div className="absolute -top-20 -end-20 w-64 h-64 rounded-full bg-[var(--color-accent)]/20 opacity-60 animate-orb-1" />
-          <div className="absolute -bottom-12 -start-12 w-48 h-48 rounded-full bg-[var(--color-primary)]/25 opacity-50 animate-orb-2" />
-          <div className="absolute bottom-0 inset-x-0 h-12 bg-gradient-to-t from-black/10 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-br from-black/10 via-transparent to-black/25" />
+          <div className="absolute -top-20 -end-20 w-64 h-64 rounded-full bg-[var(--color-accent)]/20 opacity-50 animate-orb-1" />
+          <div className="absolute -bottom-12 -start-12 w-48 h-48 rounded-full bg-[var(--color-primary)]/25 opacity-40 animate-orb-2" />
+          <div className="absolute bottom-0 inset-x-0 h-12 bg-gradient-to-t from-black/15 to-transparent" />
         </div>
       )}
 
-      {/* Settings gear */}
-      <div className="absolute end-3 top-3 z-20 sm:end-5 sm:top-5">
+      {/* ─── Settings gear ──────────────────────────────── */}
+      <div className="absolute end-3 top-3 z-20 sm:end-5 sm:top-4">
         <SettingsMenu />
       </div>
 
-      {/* ─── Fixed two‑column layout ── */}
-      <div className="relative z-10 flex flex-row items-center gap-4 sm:gap-6 w-full max-w-7xl mx-auto">
-        {/* Left column: Logo – fixed width, always its own column */}
+      {/* ─── Content ────────────────────────────────────── */}
+      <div
+        className="
+          relative z-10 w-full max-w-7xl mx-auto
+          flex flex-row items-center
+          gap-4 sm:gap-6 lg:gap-8
+        "
+      >
+        {/* Logo */}
         <div className="flex-shrink-0">
           <div
-            className="flex h-20 w-20 sm:h-24 sm:w-24 md:h-28 md:w-28
-              items-center justify-center rounded-2xl
-              border border-[var(--color-border-strong)]/40 bg-[var(--color-surface)]/20 backdrop-blur-md
-              shadow-[var(--shadow-card)]
-              transition-all duration-300 hover:scale-105 hover:border-[var(--color-accent)]
+            className="
+              flex items-center justify-center
+              h-16 w-16 sm:h-20 sm:w-20 lg:h-24 lg:w-24
+              rounded-2xl
+              border border-white/25
+              bg-white/10 backdrop-blur-md
+              shadow-[0_8px_24px_rgba(0,0,0,0.25)]
+              transition-all duration-300
+              hover:scale-105 hover:border-[var(--color-accent)]/70
               hover:shadow-[var(--shadow-glow-strong)]
               overflow-hidden relative
-              "
+            "
           >
             {logoUrl ? (
               <Image
@@ -548,43 +577,63 @@ export function Header() {
             ) : (
               <UtensilsCrossed
                 strokeWidth={2.2}
-                className="h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14 drop-shadow-lg text-[var(--color-on-secondary)]"
+                className="h-8 w-8 sm:h-10 sm:w-10 lg:h-12 lg:w-12 drop-shadow-lg text-[var(--color-on-secondary)]"
               />
             )}
           </div>
         </div>
 
-        {/* Right column: everything else, never wraps under the logo */}
+        {/* Text + controls column */}
         <div className="flex-1 flex flex-col min-w-0">
-          {/* Row: brand name + desktop status */}
-          <div className="flex items-center gap-2 flex-wrap">
+          {/* Brand name + desktop status */}
+          <div className="flex items-center gap-3 flex-wrap">
             <h1
-              className="text-xl sm:text-2xl md:text-3xl font-extrabold text-[var(--color-on-secondary)] drop-shadow-md tracking-tight leading-none"
-              style={{
-                fontFamily: 'var(--font-display)',
-              }}
+              className="
+                text-2xl sm:text-3xl lg:text-4xl
+                font-extrabold tracking-tight leading-none
+                text-white
+                drop-shadow-[0_2px_8px_rgba(0,0,0,0.55)]
+                truncate
+              "
+              style={{ fontFamily: 'var(--font-display)' }}
             >
               {brandName}
             </h1>
-            {/* Desktop status – hidden on small screens */}
             <div className="hidden lg:inline-flex">{statusIndicator}</div>
           </div>
 
           {/* Tagline */}
-          <p className="text-xs sm:text-sm md:text-base font-medium text-[var(--color-on-secondary)]/90 drop-shadow-sm -mt-0.5">
-            {slogan}
-          </p>
+          {slogan && (
+            <p
+              className="
+                mt-1.5
+                text-sm sm:text-base
+                font-medium
+                text-white/90
+                drop-shadow-[0_1px_4px_rgba(0,0,0,0.55)]
+                line-clamp-1
+              "
+            >
+              {slogan}
+            </p>
+          )}
 
-          {/* Decorative line */}
-          <div className="mt-1 h-0.5 w-12 sm:w-16 rounded-full bg-gradient-to-r from-[var(--color-on-secondary)]/80 to-transparent shadow-sm animate-fade-in" />
+          {/* Decorative accent line */}
+          <div className="mt-2 h-[3px] w-14 sm:w-20 rounded-full bg-gradient-to-r from-[var(--color-accent)] to-transparent shadow-sm" />
 
           {/* Bottom row: mobile status + icon bar */}
-          <div className="flex flex-wrap items-center gap-2 mt-1">
-            {/* Mobile status – visible only on small screens */}
+          <div className="flex flex-wrap items-center gap-2 mt-2.5">
             <div className="lg:hidden">{statusIndicator}</div>
 
-            {/* Icons */}
-            <div className="flex items-center gap-1 sm:gap-1.5 flex-wrap">
+            <div
+              className="
+                flex items-center gap-1 sm:gap-1.5 flex-wrap
+                rounded-full
+                bg-black/20 backdrop-blur-sm
+                px-1.5 py-1
+                border border-white/10
+              "
+            >
               {storeInfo.phone && (
                 <Popover
                   open={popoverOpen === 'phone'}
@@ -644,13 +693,13 @@ export function Header() {
         </div>
       </div>
 
-      {/* Shimmer overlay */}
+      {/* Shimmer (subtle) */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div
           className="absolute top-0 left-0 w-1/3 h-full
-            bg-gradient-to-r from-transparent via-white/[0.04] to-transparent
+            bg-gradient-to-r from-transparent via-white/[0.03] to-transparent
             -skew-x-12"
-          style={{ animation: 'shimmerLine 6s ease-in-out infinite' }}
+          style={{ animation: 'shimmerLine 8s ease-in-out infinite' }}
         />
       </div>
     </header>
