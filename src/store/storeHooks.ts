@@ -69,7 +69,14 @@ export function useStore(): StoreState {
   const businessName = infoData?.businessName || requestedBusinessName || '';
   const displayBusinessName = infoData?.displayBusinessName || businessName;
   const identity = infoData?.businessIdentity || null;
-  const header = infoData?.header || null;
+  const header = useMemo<ApiStoreHeader | null>(() => {
+    if (!infoData?.header && !infoData?.businessDescription) return null;
+
+    return {
+      ...infoData?.header,
+      slogan: infoData?.header?.slogan || infoData?.businessDescription || null,
+    };
+  }, [infoData]);
   const sliders = slidersData?.sliderItems ?? EMPTY_SLIDERS;
   const sliderHeader = slidersData?.sliderHeader || null;
 

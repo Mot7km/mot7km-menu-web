@@ -18,6 +18,7 @@ export interface SocialLink {
 }
 
 export interface StoreInfo {
+  businessDescription: any;
   name: string;
   nameAr: string;
   phone: string;
@@ -57,6 +58,7 @@ export const storeInfo: StoreInfo = {
     { platform: 'facebook', url: 'https://facebook.com/gourmetkitchen' },
     { platform: 'tiktok', url: 'https://tiktok.com/@gourmetkitchen' },
   ],
+  businessDescription: undefined
 };
 
 // ─────────────────────────────────────────────────────────────────────

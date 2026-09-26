@@ -372,7 +372,11 @@ export function Header() {
 
   const displayAddress = isRTL ? (storeInfo.addressAr || storeInfo.address) : storeInfo.address;
   const brandName = displayBusinessName || header?.businessName || identity?.businessName || storeInfo.name;
-  const slogan = header?.slogan || identity?.slogan || t('header.tagline');
+  const slogan =
+    header?.slogan ||
+    identity?.businessDescription ||
+    identity?.slogan ||
+    t('header.noslogan');
   const logoUrl = header?.logo || header?.logoUrl || identity?.logo;
   const rawBg =
     header?.coverUrl ||
