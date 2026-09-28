@@ -113,15 +113,8 @@ export function GridProductCard({ product }: ProductCardProps) {
           </h3>
         </Link>
 
-        {/* Description */}
-        {product.description && (
-          <p className="text-xs text-[var(--color-text-secondary)] line-clamp-2 leading-relaxed">
-            {product.description}
-          </p>
-        )}
-
         {/* ── 3. Footer: Price & Apple-Grade Touch Target Action ── */}
-        <div className="mt-auto pt-3 flex items-center justify-between gap-2 border-t border-[var(--color-border)]/60">
+        <div className="mt-auto pt-2 flex items-center justify-between border-t border-[var(--color-border)]/60">
           <div className="flex flex-col min-w-0">
             <span className="text-[10px] sm:text-[11px] font-medium uppercase tracking-wider text-[var(--color-text-muted)]">
               {t('productCard.price')}
@@ -136,7 +129,7 @@ export function GridProductCard({ product }: ProductCardProps) {
             <Link
               href={href}
               prefetch={false}
-              className="min-w-[44px] min-h-[44px] w-11 h-11 rounded-full
+              className="min-w-[33px] min-h-[33px] w-11 h-11 rounded-full
                 flex items-center justify-center
                 bg-[var(--color-primary)]/10 text-[var(--color-primary)]
                 border border-[var(--color-primary)]/20
@@ -153,7 +146,7 @@ export function GridProductCard({ product }: ProductCardProps) {
             <button
               onClick={handleQuickAdd}
               type="button"
-              className={`min-w-[44px] min-h-[44px] w-11 h-11 rounded-full
+              className={`min-w-[33px] min-h-[33px] w-9 h-9 rounded-full
                 flex items-center justify-center
                 transition-all duration-200 ease-out cursor-pointer active:scale-90
                 ${
