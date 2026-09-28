@@ -97,7 +97,7 @@ export function MenuPage() {
           <div className="mx-auto max-w-5xl md:max-w-6xl">
             <div className="relative">
               {categories.length > 0 && (
-                <div className="sticky top-0 z-30 bg-[var(--color-background)]/90 backdrop-blur-xl border-b border-[var(--color-border)]/50 pt-3 pb-1 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 mb-6 shadow-sm transition-all duration-300">
+                <div className="sticky top-0 z-30 bg-[var(--color-background)]/90 backdrop-blur-xl border-b border-[var(--color-border)]/50 pt-3 pb-1 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 mb-6 transition-all duration-300">
                   <SearchBar value={searchQuery} onChange={setSearchQuery} />
                   <div className="flex w-full justify-center pt-1 pb-2">
                     <Categories

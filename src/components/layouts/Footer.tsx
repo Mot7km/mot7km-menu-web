@@ -166,7 +166,7 @@ export function Footer() {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center justify-center w-10 h-10 rounded-xl
-                        bg-[var(--color-card-light)] dark:bg-[var(--color-elevated-dark)]
+              
                         border border-[var(--color-border)]
                         hover:border-[var(--color-primary)]/50
                         hover:scale-110 active:scale-95
