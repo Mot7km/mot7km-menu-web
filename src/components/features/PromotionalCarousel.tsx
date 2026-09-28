@@ -160,13 +160,13 @@ export function PromotionalCarousel() {
 
         {/* Dots — driven by actual snap count, not card count */}
         {showNav && (
-          <div className="mt-5 flex justify-center gap-2">
+          <div className="flex justify-center gap-2">
             {Array.from({ length: snapCount }).map((_, index) => (
               <button
                 key={index}
                 onClick={() => scrollTo(index)}
                 aria-label={`Go to slide ${index + 1}`}
-                className="group flex items-center justify-center p-2 min-w-[36px] min-h-[36px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] rounded-full"
+                className="group flex items-center justify-center min-w-[16px] min-h-[36px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] rounded-full"
               >
                 <span
                   className={`h-2 rounded-full transition-all duration-400 ease-out block
