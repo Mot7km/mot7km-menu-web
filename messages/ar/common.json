@@ -115,7 +115,13 @@
     "button": "اشترك الآن"
   },
   "productCard": {
-    "addToCart": "أضف للسلة"
+    "addToCart": "أضف للسلة",
+    "addToCartSpecific": "إضافة {name} إلى السلة",
+    "customize": "تخصيص",
+    "customizeSpecific": "تخصيص {name}",
+    "added": "تمت الإضافة",
+    "ratingOutOfFive": "{rating} من 5",
+    "price": "السعر"
   },
   "storeInfo": {
     "open": "مفتوح",

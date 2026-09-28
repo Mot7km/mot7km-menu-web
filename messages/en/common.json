@@ -115,7 +115,13 @@
     "button": "Subscribe"
   },
   "productCard": {
-    "addToCart": "Add to Cart"
+    "addToCart": "Add to Cart",
+    "addToCartSpecific": "Add {name} to cart",
+    "customize": "Customize",
+    "customizeSpecific": "Customize {name}",
+    "added": "Added",
+    "ratingOutOfFive": "{rating} out of 5",
+    "price": "Price"
   },
   "storeInfo": {
     "open": "Open Now",

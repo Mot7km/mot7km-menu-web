@@ -97,21 +97,11 @@ export function PromotionalCarousel() {
   const showNav = snapCount > 1;
 
   return (
-    // Full‑width breakout on mobile, respect container on larger screens
-    <section
-      className="relative overflow-x-hidden py-2
-        w-full left-1/2 -translate-x-1/2
-        sm:w-auto sm:left-0 sm:translate-x-0"
-    >
-      <div className="relative">
-        {sliderHeader && (
-          <h2 className="mb-2 px-2 text-lg font-bold text-[var(--color-text-primary)] font-api">
-            {sliderHeader}
-          </h2>
-        )}
+    <section className="relative overflow-x-hidden w-full py-1">
+      <div className="relative w-full">
         {/* Carousel Viewport */}
         <div
-          className="overflow-hidden rounded-2xl touch-pan-y"
+          className="overflow-hidden touch-pan-y"
           ref={emblaRef}
           dir={isRTL ? 'rtl' : 'ltr'}
         >
@@ -119,7 +109,7 @@ export function PromotionalCarousel() {
             {promoCards.map((card) => (
               <div
                 key={card.id}
-                className="min-w-0 shrink-0 grow-0 basis-[85%] sm:basis-[75%] md:basis-[60%] lg:basis-[50%] px-2 py-2"
+                className="min-w-0 shrink-0 grow-0 basis-[85%] sm:basis-[72%] md:basis-[58%] lg:basis-[48%] px-1.5 sm:px-2 py-1"
               >
                 <PromoCard {...card} />
               </div>
@@ -134,10 +124,10 @@ export function PromotionalCarousel() {
               onClick={scrollPrev}
               disabled={!loop && !canPrev}
               aria-label={isRTL ? 'التالي' : 'Previous'}
-              className="absolute top-1/2 left-0 -translate-y-1/2 z-10
+              className="absolute top-1/2 left-3 sm:left-6 -translate-y-1/2 z-10
                 hidden sm:flex items-center justify-center
                 w-11 h-11 rounded-full
-                glass
+                glass shadow-lg
                 text-[var(--color-text-secondary)] hover:text-[var(--color-primary)]
                 transition-all duration-200
                 hover:scale-110 active:scale-95
@@ -152,10 +142,10 @@ export function PromotionalCarousel() {
               onClick={scrollNext}
               disabled={!loop && !canNext}
               aria-label={isRTL ? 'السابق' : 'Next'}
-              className="absolute top-1/2 right-0 -translate-y-1/2 z-10
+              className="absolute top-1/2 right-3 sm:right-6 -translate-y-1/2 z-10
                 hidden sm:flex items-center justify-center
                 w-11 h-11 rounded-full
-                glass
+                glass shadow-lg
                 text-[var(--color-text-secondary)] hover:text-[var(--color-primary)]
                 transition-all duration-200
                 hover:scale-110 active:scale-95

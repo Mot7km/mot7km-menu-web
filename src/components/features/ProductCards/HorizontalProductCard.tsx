@@ -1,150 +1,178 @@
 'use client';
 
+import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Star, ShoppingBag } from 'lucide-react';
+import { Star, ShoppingBag, Check, SlidersHorizontal } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { Product } from '@/data/menu';
 import { useBusinessRoute } from '@/hooks/useLocale';
 import { useCart } from '@/store/hooks';
-import { useRef, useState } from 'react';
 
 interface HorizontalProductCardProps {
   product: Product;
 }
 
 export function HorizontalProductCard({ product }: HorizontalProductCardProps) {
+  const t = useTranslations();
   const { getPath } = useBusinessRoute();
   const href = getPath(product.id);
   const { addToCart } = useCart();
-  const [isAdding, setIsAdding] = useState(false);
-  const addTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const [justAdded, setJustAdded] = useState(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
+
+  const hasOptions = Boolean(product.customizationOptions && product.customizationOptions.length > 0);
+  const reviewCount = product.reviews?.length || 0;
+  const ratingNum = parseFloat(product.rating || '0');
+  const hasRating = !isNaN(ratingNum) && ratingNum > 0;
 
   const handleQuickAdd = (e: React.MouseEvent) => {
     e.preventDefault();
-    e.stopPropagation();
 
-    if (isAdding) return;
-    setIsAdding(true);
+    if (justAdded) return;
 
-    const defaults: Record<string, string> = {};
-    if (product.customizationOptions) {
-      for (const opt of product.customizationOptions) {
-        if (opt.defaultChoice) defaults[opt.name] = opt.defaultChoice;
-        else if (opt.choices.length > 0) defaults[opt.name] = opt.choices[0].label;
-      }
-    }
+    addToCart(product, {}, 1);
+    setJustAdded(true);
 
-    addToCart(product, defaults, 1);
-
-    if (addTimeoutRef.current) clearTimeout(addTimeoutRef.current);
-    addTimeoutRef.current = setTimeout(() => {
-      setIsAdding(false);
-    }, 500);
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => {
+      setJustAdded(false);
+    }, 1200);
   };
 
-  const reviewCount = product.reviews?.length || 0;
-
   return (
-    <Link
-      href={href}
-      prefetch={false}
-      className="group relative flex flex-row w-full h-36 sm:h-44 md:h-52
+    <article
+      className="group relative flex flex-row w-full min-h-[150px] sm:min-h-[170px] md:min-h-[185px]
         bg-[var(--color-surface)] rounded-2xl
         border border-[var(--color-border)]
-        overflow-hidden
-        transition-all duration-400 ease-out
         hover:border-[var(--color-primary)]/40
-        active:scale-[0.98]
-        cursor-pointer
-        shadow-[var(--shadow-card)]
-        hover:shadow-[var(--shadow-card-hover)]
-        hover:translate-y-[-4px]"
+        shadow-[0_4px_20px_-4px_rgba(0,0,0,0.04)]
+        hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.07)]
+        hover:-translate-y-0.5
+        transition-all duration-300 ease-out
+        overflow-hidden"
     >
-      {/* Image Section – fixed 40% width, fills height */}
-      <div className="relative w-2/5 h-full flex-shrink-0 bg-[var(--color-card-light)] dark:bg-[var(--color-card-dark)] overflow-hidden">
+      {/* ── 1. Image Column (Expanded 38%-42% Hero Display) ── */}
+      <Link
+        href={href}
+        prefetch={false}
+        className="group/img relative w-[36%] sm:w-[38%] md:w-[42%] min-w-[135px] max-w-[280px] flex-shrink-0 overflow-hidden bg-[var(--color-surface-subtle)] cursor-pointer"
+        aria-label={product.name}
+      >
         <Image
           src={product.image}
           alt={product.name}
           fill
-          className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
-          sizes="(max-width: 640px) 40vw, 33vw"
+          sizes="(max-width: 640px) 40vw, (max-width: 1024px) 35vw, 25vw"
+          className="object-cover transition-transform duration-500 ease-out group-hover/img:scale-105"
         />
-        {/* Subtle gradient overlay for better contrast */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-80 pointer-events-none" />
+      </Link>
 
-        {/* Quick Add button – Moved to Top Right of the Image */}
-        <button
-          onClick={handleQuickAdd}
-          disabled={isAdding}
-          className={`absolute top-2 sm:top-3 end-2 sm:end-3 z-20 flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 
-            rounded-full bg-white/90 dark:bg-black/70 backdrop-blur-md border border-[var(--color-border)] 
-            text-[var(--color-primary)] transition-all duration-300 
-            shadow-[0_4px_10px_rgba(0,0,0,0.15)] hover:shadow-[0_4px_15px_rgba(22,131,199,0.3)] 
-            hover:scale-110 active:scale-95 cursor-pointer
-            ${isAdding ? 'opacity-50 pointer-events-none' : 'hover:bg-[var(--color-primary)] hover:text-[var(--color-on-primary)]'}`}
-          aria-label="Add to cart"
-        >
-          <ShoppingBag size={16} className="sm:w-4 sm:h-4" />
-        </button>
-      </div>
-
-      {/* Info Section – clean stacked layout */}
-      <div className="flex flex-col flex-1 p-3 sm:p-4 md:p-5 justify-between min-w-0 gap-1.5 sm:gap-2">
-        
-        {/* Row 1: Product name */}
-        <div className="flex items-start justify-between gap-2">
-          <h3 className="font-bold text-sm sm:text-base md:text-lg text-[var(--color-text-primary)] leading-tight
-            group-hover:text-[var(--color-primary)] transition-colors duration-300 line-clamp-2"
-            style={{ fontFamily: 'var(--font-display)' }}>
-            {product.name}
-          </h3>
-        </div>
-
-        {/* Row 2: Description */}
-        {product.description && (
-          <p className="text-xs sm:text-sm text-[var(--color-text-secondary)] leading-relaxed line-clamp-2">
-            {product.description}
-          </p>
-        )}
-
-        {/* Row 3: Category (Left) and Price + Rating (Right) */}
-        <div className="flex items-center justify-between pt-2 border-t border-[var(--color-divider)] mt-auto">
-          
-          {/* Left: Category Badge */}
-          {product.category && (
-            <span className="inline-flex items-center px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full
-              bg-[var(--color-primary-50)] border border-[var(--color-border)]
-              font-medium text-[10px] sm:text-xs text-[var(--color-primary)]
-              shadow-sm transition-all duration-300
-              group-hover:shadow-[0_0_15px_rgba(22,131,199,0.15)]
-              whitespace-nowrap uppercase tracking-wider">
+      {/* ── 2. Information Column ── */}
+      <div className="flex flex-col flex-1 p-3.5 sm:p-5 justify-between min-w-0 gap-2">
+        {/* Top Line: Category & Star Rating */}
+        <div className="flex items-center justify-between gap-2 min-h-[22px]">
+          {product.category ? (
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold tracking-wide uppercase bg-[var(--color-primary)]/10 text-[var(--color-primary)] border border-[var(--color-primary)]/15 truncate max-w-[140px]">
               {product.category}
             </span>
+          ) : (
+            <span />
           )}
 
-          {/* Right: Price and Rating */}
-          <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-end">
-            {/* Rating Badge */}
-            <div className="flex items-center gap-1 bg-[var(--color-primary-50)] px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full
-              transition-all duration-300 group-hover:shadow-[0_0_12px_rgba(22,131,199,0.15)]">
-              <Star size={12} className="sm:w-3.5 sm:h-3.5 text-[var(--color-warning)] fill-[var(--color-warning)]" strokeWidth={0} />
-              <span className="text-xs sm:text-sm font-bold text-[var(--color-text-primary)] leading-none">
-                {product.rating}
-              </span>
+          {hasRating && (
+            <div
+              className="inline-flex items-center gap-1 text-[11px] sm:text-xs font-semibold text-[var(--color-text-secondary)]"
+              aria-label={t('productCard.ratingOutOfFive', { rating: product.rating })}
+            >
+              <Star size={13} className="text-amber-400 fill-amber-400 flex-shrink-0" />
+              <span>{product.rating}</span>
               {reviewCount > 0 && (
-                <span className="text-[10px] sm:text-xs text-[var(--color-text-muted)] ml-0.5">
+                <span className="text-[10px] text-[var(--color-text-muted)] font-normal">
                   ({reviewCount})
                 </span>
               )}
             </div>
-            
-            {/* Price */}
-            <span className="font-bold text-sm sm:text-base md:text-lg text-[var(--color-primary)] whitespace-nowrap">
+          )}
+        </div>
+
+        {/* Product Title */}
+        <Link href={href} prefetch={false} className="group/title block">
+          <h3
+            className="font-bold text-sm sm:text-base md:text-lg leading-snug text-[var(--color-text-primary)] group-hover/title:text-[var(--color-primary)] transition-colors line-clamp-2"
+            style={{ fontFamily: 'var(--font-display)' }}
+          >
+            {product.name}
+          </h3>
+        </Link>
+
+        {/* Description */}
+        {product.description && (
+          <p className="text-xs sm:text-sm text-[var(--color-text-secondary)] line-clamp-2 leading-relaxed">
+            {product.description}
+          </p>
+        )}
+
+        {/* ── 3. Footer Bar: Price & 44px Action Button ── */}
+        <div className="mt-auto pt-2.5 flex items-center justify-between gap-2 border-t border-[var(--color-border)]/60">
+          <div className="flex flex-col min-w-0">
+            <span className="text-[10px] sm:text-[11px] font-medium uppercase tracking-wider text-[var(--color-text-muted)]">
+              {t('productCard.price')}
+            </span>
+            <span className="font-extrabold text-sm sm:text-base md:text-lg text-[var(--color-text-primary)] truncate">
               {product.price}
             </span>
           </div>
+
+          {/* Action Button */}
+          {hasOptions ? (
+            <Link
+              href={href}
+              prefetch={false}
+              className="min-w-[44px] min-h-[44px] w-11 h-11 rounded-full
+                flex items-center justify-center
+                bg-[var(--color-primary)]/10 text-[var(--color-primary)]
+                border border-[var(--color-primary)]/20
+                hover:bg-[var(--color-primary)] hover:text-[var(--color-text-on-primary)]
+                hover:border-[var(--color-primary)]
+                active:scale-95 transition-all duration-200 ease-out
+                cursor-pointer"
+              aria-label={t('productCard.customizeSpecific', { name: product.name })}
+              title={t('productCard.customize')}
+            >
+              <SlidersHorizontal size={17} />
+            </Link>
+          ) : (
+            <button
+              onClick={handleQuickAdd}
+              type="button"
+              className={`min-w-[44px] min-h-[44px] w-11 h-11 rounded-full
+                flex items-center justify-center
+                transition-all duration-200 ease-out cursor-pointer active:scale-90
+                ${
+                  justAdded
+                    ? 'bg-emerald-500 text-white border border-emerald-500 shadow-sm scale-105'
+                    : 'bg-[var(--color-primary)]/10 text-[var(--color-primary)] border border-[var(--color-primary)]/20 hover:bg-[var(--color-primary)] hover:text-[var(--color-text-on-primary)] hover:border-[var(--color-primary)]'
+                }`}
+              aria-label={t('productCard.addToCartSpecific', { name: product.name })}
+              title={t('productCard.addToCart')}
+            >
+              {justAdded ? (
+                <Check size={18} className="animate-scale-in" strokeWidth={2.5} />
+              ) : (
+                <ShoppingBag size={17} />
+              )}
+            </button>
+          )}
         </div>
       </div>
-    </Link>
+    </article>
   );
 }

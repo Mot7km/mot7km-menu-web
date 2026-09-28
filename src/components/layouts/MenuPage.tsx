@@ -18,6 +18,7 @@ export function MenuPage() {
     promoCards,
     loading,
     storeNotFound,
+    sliderHeader
   } = useStore();
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
@@ -74,14 +75,18 @@ export function MenuPage() {
       <div className="flex flex-col items-center justify-center">
         {hasPromos && (
           <>
-            <section className="section-glow relative w-full px-4 pt-10 pb-8 sm:px-6 sm:pt-12 sm:pb-10 lg:px-8">
-              <div className="mx-auto max-w-5xl md:max-w-6xl">
-                <h2
-                  className="accent-line mb-6 text-2xl font-bold text-[var(--color-text-primary)] sm:text-3xl"
-                  style={{ fontFamily: 'var(--font-display)' }}
-                >
-                  {t('home.specialOffers')}
-                </h2>
+            <section className="section-glow relative w-full pt-6 pb-4 sm:pt-8 sm:pb-6">
+              {sliderHeader && (
+                <div className="mx-auto max-w-5xl md:max-w-6xl px-4 sm:px-6 lg:px-8">
+                  <h2
+                    className="accent-line mb-4 text-2xl font-bold text-[var(--color-text-primary)] sm:text-3xl"
+                    style={{ fontFamily: 'var(--font-display)' }}
+                  >
+                    {sliderHeader}
+                  </h2>
+                </div>
+              )}
+              <div className="w-full">
                 <PromotionalCarousel />
               </div>
             </section>
