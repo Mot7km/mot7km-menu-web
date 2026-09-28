@@ -50,7 +50,7 @@ export function HorizontalProductCard({ product }: HorizontalProductCardProps) {
   return (
     <article
       className="group relative flex flex-row w-full min-h-[150px] sm:min-h-[170px] md:min-h-[185px]
-        bg-[var(--color-surface)] rounded-2xl
+        bg-[var(--color-surface)] rounded-lg
         border border-[var(--color-border)]
         hover:border-[var(--color-primary)]/40
         shadow-[0_4px_20px_-4px_rgba(0,0,0,0.04)]

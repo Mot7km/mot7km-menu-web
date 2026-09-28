@@ -423,12 +423,12 @@ export function Header() {
   );
 
   const iconButton = (icon: React.ReactNode) => (
-    <div className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[var(--color-surface)]/20 border border-[var(--color-border-strong)]/30 text-[var(--color-on-secondary)] hover:bg-[var(--color-surface)]/30 transition-colors group">
+    <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 text-white/90 hover:text-white transition-all group">
       {icon}
     </div>
   );
 
-  const statusIndicator = (
+  const desktopStatusIndicator = (
     <div
       className={`flex items-center gap-2 px-2.5 py-1 rounded-full border backdrop-blur-md transition-all
         ${open
@@ -484,6 +484,72 @@ export function Header() {
         ))}
       </div>
     </>
+  );
+
+  const actionButtons = (
+    <>
+      {storeInfo.phone && (
+        <Popover
+          open={popoverOpen === 'phone'}
+          onToggle={() => togglePopover('phone')}
+          trigger={iconButton(<Phone size={14} className="group-hover:scale-110 transition-transform" />)}
+        >
+          {simpleContent(
+            <Phone className="h-3.5 w-3.5 text-[var(--color-text-muted)]" />,
+            t('storeInfo.phone'),
+            storeInfo.phone,
+            `tel:${storeInfo.phone}`
+          )}
+        </Popover>
+      )}
+
+      {storeInfo.email && (
+        <Popover
+          open={popoverOpen === 'email'}
+          onToggle={() => togglePopover('email')}
+          trigger={iconButton(<Mail size={14} className="group-hover:scale-110 transition-transform" />)}
+        >
+          {simpleContent(
+            <Mail className="h-3.5 w-3.5 text-[var(--color-text-muted)]" />,
+            t('storeInfo.email'),
+            storeInfo.email,
+            `mailto:${storeInfo.email}`
+          )}
+        </Popover>
+      )}
+
+      {displayAddress && (
+        <Popover
+          open={popoverOpen === 'address'}
+          onToggle={() => togglePopover('address')}
+          trigger={iconButton(<MapPin size={14} className="group-hover:scale-110 transition-transform" />)}
+        >
+          {simpleContent(
+            <MapPin className="h-3.5 w-3.5 text-[var(--color-text-muted)]" />,
+            t('storeInfo.address'),
+            displayAddress,
+            storeInfo.mapUrl || null
+          )}
+        </Popover>
+      )}
+
+      {storeInfo.socials && storeInfo.socials.length > 0 && (
+        <Popover
+          open={popoverOpen === 'socials'}
+          onToggle={() => togglePopover('socials')}
+          trigger={iconButton(<Users size={14} className="group-hover:scale-110 transition-transform" />)}
+        >
+          {socialsContent}
+        </Popover>
+      )}
+    </>
+  );
+
+  const hasActions = Boolean(
+    storeInfo.phone ||
+    storeInfo.email ||
+    displayAddress ||
+    (storeInfo.socials && storeInfo.socials.length > 0)
   );
 
   return (
@@ -603,7 +669,7 @@ export function Header() {
             >
               {brandName}
             </h1>
-            <div className="hidden lg:inline-flex">{statusIndicator}</div>
+            <div className="hidden lg:inline-flex">{desktopStatusIndicator}</div>
           </div>
 
           {/* Tagline */}
@@ -625,74 +691,70 @@ export function Header() {
           {/* Decorative accent line */}
           <div className="mt-2 h-[3px] w-14 sm:w-20 rounded-full bg-gradient-to-r from-[var(--color-accent)] to-transparent shadow-sm" />
 
-          {/* Bottom row: mobile status + icon bar */}
+          {/* Bottom row: Unified Capsule on Mobile (<lg) / Action Bar on Desktop (lg+) */}
           <div className="flex flex-wrap items-center gap-2 mt-2.5">
-            <div className="lg:hidden">{statusIndicator}</div>
-
+            {/* Mobile Unified Capsule (<lg) */}
             <div
               className="
-                flex items-center gap-1 sm:gap-1.5 flex-wrap
+                lg:hidden
+                inline-flex items-center gap-2
                 rounded-full
-                bg-black/20 backdrop-blur-sm
-                px-1.5 py-1
-                border border-white/10
+                bg-black/25 backdrop-blur-md
+                border border-white/15
+                px-3 py-1.5
+                shadow-[0_4px_16px_rgba(0,0,0,0.2)]
               "
             >
-              {storeInfo.phone && (
-                <Popover
-                  open={popoverOpen === 'phone'}
-                  onToggle={() => togglePopover('phone')}
-                  trigger={iconButton(<Phone size={15} className="group-hover:scale-110 transition-transform" />)}
+              {/* Status Section */}
+              <div className="flex items-center gap-1.5">
+                <span className="relative flex h-2 w-2 flex-shrink-0">
+                  <span
+                    className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
+                      open ? 'bg-emerald-400' : 'bg-rose-400'
+                    }`}
+                  />
+                  <span
+                    className={`relative inline-flex rounded-full h-2 w-2 ${
+                      open ? 'bg-emerald-500' : 'bg-rose-500'
+                    }`}
+                  />
+                </span>
+                <span
+                  className={`text-xs font-semibold tracking-wide whitespace-nowrap ${
+                    open ? 'text-emerald-300' : 'text-rose-300'
+                  }`}
                 >
-                  {simpleContent(
-                    <Phone className="h-3.5 w-3.5 text-[var(--color-text-muted)]" />,
-                    t('storeInfo.phone'),
-                    storeInfo.phone,
-                    `tel:${storeInfo.phone}`
-                  )}
-                </Popover>
-              )}
+                  {open ? t('storeInfo.open') : t('storeInfo.closed')}
+                </span>
+              </div>
 
-              {storeInfo.email && (
-                <Popover
-                  open={popoverOpen === 'email'}
-                  onToggle={() => togglePopover('email')}
-                  trigger={iconButton(<Mail size={15} className="group-hover:scale-110 transition-transform" />)}
-                >
-                  {simpleContent(
-                    <Mail className="h-3.5 w-3.5 text-[var(--color-text-muted)]" />,
-                    t('storeInfo.email'),
-                    storeInfo.email,
-                    `mailto:${storeInfo.email}`
-                  )}
-                </Popover>
-              )}
-
-              {displayAddress && (
-                <Popover
-                  open={popoverOpen === 'address'}
-                  onToggle={() => togglePopover('address')}
-                  trigger={iconButton(<MapPin size={15} className="group-hover:scale-110 transition-transform" />)}
-                >
-                  {simpleContent(
-                    <MapPin className="h-3.5 w-3.5 text-[var(--color-text-muted)]" />,
-                    t('storeInfo.address'),
-                    displayAddress,
-                    storeInfo.mapUrl || null
-                  )}
-                </Popover>
-              )}
-
-              {storeInfo.socials && storeInfo.socials.length > 0 && (
-                <Popover
-                  open={popoverOpen === 'socials'}
-                  onToggle={() => togglePopover('socials')}
-                  trigger={iconButton(<Users size={15} className="group-hover:scale-110 transition-transform" />)}
-                >
-                  {socialsContent}
-                </Popover>
+              {/* Vertical Divider */}
+              {hasActions && (
+                <>
+                  <div className="h-3.5 w-[1px] bg-white/20 mx-0.5" />
+                  <div className="flex items-center gap-1">
+                    {actionButtons}
+                  </div>
+                </>
               )}
             </div>
+
+            {/* Desktop Actions Bar (lg+) */}
+            {hasActions && (
+              <div
+                className="
+                  hidden lg:flex
+                  items-center gap-1.5
+                  rounded-full
+                  bg-black/25 backdrop-blur-md
+                  border border-white/15
+                  px-2 py-1.5
+                  shadow-[0_4px_16px_rgba(0,0,0,0.2)]
+                "
+              >
+                {actionButtons}
+              </div>
+            )}
           </div>
         </div>
       </div>
