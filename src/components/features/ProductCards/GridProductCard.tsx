@@ -50,7 +50,7 @@ export function GridProductCard({ product }: ProductCardProps) {
   return (
     <article
       className="group relative flex flex-col w-full h-full
-        bg-[var(--color-surface)] rounded-2xl sm:rounded-3xl
+        bg-[var(--color-surface)] rounded-lg sm:rounded-lg
         border border-[var(--color-border)]
         hover:border-[var(--color-primary)]/40
         shadow-[0_4px_20px_-4px_rgba(0,0,0,0.04)]

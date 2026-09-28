@@ -207,7 +207,7 @@ function PromoCard({
 
   return (
     <div
-      className="group relative h-[200px] sm:h-[240px] md:h-[260px] w-full overflow-hidden rounded-2xl
+      className="group relative h-[200px] sm:h-[240px] md:h-[260px] w-full overflow-hidden rounded-lg
         border border-[var(--color-border)]
         shadow-[0_4px_20px_-4px_rgba(0,0,0,0.3)]
         hover:shadow-[0_12px_32px_-6px_rgba(0,0,0,0.45)]
