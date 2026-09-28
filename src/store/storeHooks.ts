@@ -159,8 +159,9 @@ export function useStore(): StoreState {
       mapUrl: address ? `https://maps.google.com/?q=${encodeURIComponent(address)}` : undefined,
       workingHours: header?.workingHours?.map(({ day, open, close }) => ({ day, open, close })) || [],
       socials,
+      businessDescription: infoData?.businessDescription || identity?.businessDescription || undefined,
     };
-  }, [header, identity, businessName, displayBusinessName]);
+  }, [header, identity, businessName, displayBusinessName, infoData]);
 
   const promoCards = useMemo<PromoCardData[]>(() => sliders.map((slider, index) => ({
     id: slider.id || index + 1,
