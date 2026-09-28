@@ -35,11 +35,10 @@
   --gradient-brand: linear-gradient(135deg, #2B9FD9, #0B529E, #10B981);
   --gradient-accent: linear-gradient(135deg, #10B981, #2B9FD9);
   --gradient-hero: linear-gradient(135deg, rgba(43, 159, 217, 0.92), rgba(11, 82, 158, 0.88), rgba(16, 185, 129, 0.8));
-  --gradient-subtle: linear-gradient(135deg, rgba(43, 159, 217, 0.08), transparent, rgba(16, 185, 129, 0.08));
-  --shadow-card: 0 4px 20px rgba(43, 159, 217, 0.08);
-  --shadow-card-hover: 0 12px 32px rgba(43, 159, 217, 0.16);
-  --shadow-glow: 0 0 20px rgba(16, 185, 129, 0.2);
-  --shadow-glow-strong: 0 0 30px rgba(16, 185, 129, 0.35);
+  --shadow-card: 0 4px 20px -4px rgba(0, 0, 0, 0.08);
+  --shadow-card-hover: 0 12px 32px -8px rgba(0, 0, 0, 0.14);
+  --shadow-glow: 0 4px 20px -4px rgba(0, 0, 0, 0.1);
+  --shadow-glow-strong: 0 8px 30px -4px rgba(0, 0, 0, 0.15);
   --font-english: var(--font-roboto), "Roboto", sans-serif;
   --font-arabic: var(--font-cairo), "Cairo", sans-serif;
   --font-display: var(--font-english);
@@ -492,23 +491,6 @@ body {
 
 .section-glow {
   position: relative;
-}
-
-.section-glow::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 200px;
-  height: 200px;
-  background: radial-gradient(circle, color-mix(in srgb, var(--color-primary) 6%, transparent) 0%, transparent 70%);
-  pointer-events: none;
-  z-index: 0;
-}
-
-.dark .section-glow::before {
-  background: radial-gradient(circle, color-mix(in srgb, var(--color-primary) 10%, transparent) 0%, transparent 70%);
 }
 
 /* =================================================================

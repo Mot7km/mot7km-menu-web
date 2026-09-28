@@ -209,18 +209,12 @@ function PromoCard({
     <div
       className="group relative h-[200px] sm:h-[240px] md:h-[260px] w-full overflow-hidden rounded-2xl
         border border-[var(--color-border)]
-        transition-all duration-400 ease-out
+        shadow-[0_4px_20px_-4px_rgba(0,0,0,0.3)]
+        hover:shadow-[0_12px_32px_-6px_rgba(0,0,0,0.45)]
         hover:border-[var(--color-primary)]/50
+        transition-all duration-300 ease-out
+        hover:scale-[1.01]
         cursor-pointer"
-      style={{ boxShadow: 'var(--shadow-card)' }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.boxShadow = 'var(--shadow-card-hover)';
-        e.currentTarget.style.transform = 'scale(1.02)';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.boxShadow = 'var(--shadow-card)';
-        e.currentTarget.style.transform = 'scale(1)';
-      }}
     >
       {/* Image */}
       {hasImage && (

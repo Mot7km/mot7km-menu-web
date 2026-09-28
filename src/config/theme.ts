@@ -459,10 +459,10 @@ export function generateThemeVariables(input?: ThemePaletteInput) {
     "--gradient-subtle": `linear-gradient(135deg, ${withAlpha(light.primary, 0.08)}, transparent, ${withAlpha(light.accent, 0.08)})`,
 
     // Shadows
-    "--shadow-card": `0 4px 20px ${withAlpha(light.primary, 0.08)}`,
-    "--shadow-card-hover": `0 12px 32px ${withAlpha(light.primary, 0.16)}`,
-    "--shadow-glow": `0 0 20px ${withAlpha(light.accent, 0.2)}`,
-    "--shadow-glow-strong": `0 0 30px ${withAlpha(light.accent, 0.35)}`,
+    "--shadow-card": "0 4px 20px -4px rgba(0, 0, 0, 0.08)",
+    "--shadow-card-hover": "0 12px 32px -8px rgba(0, 0, 0, 0.14)",
+    "--shadow-glow": "0 4px 20px -4px rgba(0, 0, 0, 0.1)",
+    "--shadow-glow-strong": "0 8px 30px -4px rgba(0, 0, 0, 0.15)",
   };
 
   const darkVars: Record<string, string> = {
@@ -525,10 +525,10 @@ export function generateThemeVariables(input?: ThemePaletteInput) {
     "--gradient-subtle": `linear-gradient(135deg, ${withAlpha(dark.primary, 0.12)}, transparent, ${withAlpha(dark.accent, 0.1)})`,
 
     // Shadows
-    "--shadow-card": `0 8px 24px ${withAlpha(dark.primary, 0.22)}`,
-    "--shadow-card-hover": `0 16px 40px ${withAlpha(dark.accent, 0.26)}`,
-    "--shadow-glow": `0 0 30px ${withAlpha(dark.accent, 0.24)}`,
-    "--shadow-glow-strong": `0 0 45px ${withAlpha(dark.accent, 0.4)}`,
+    "--shadow-card": "0 8px 24px -4px rgba(0, 0, 0, 0.4)",
+    "--shadow-card-hover": "0 16px 40px -8px rgba(0, 0, 0, 0.55)",
+    "--shadow-glow": "0 8px 24px -4px rgba(0, 0, 0, 0.4)",
+    "--shadow-glow-strong": "0 12px 36px -4px rgba(0, 0, 0, 0.55)",
   };
 
   return { light: lightVars, dark: darkVars };

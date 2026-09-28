@@ -26,11 +26,12 @@ export default function Categories({
         {/* Scrollable container */}
         <div
           className="
-            flex flex-nowrap gap-2 sm:gap-3 md:gap-4
+            flex flex-nowrap gap-5 sm:gap-6 md:gap-7
             overflow-x-auto
             justify-start
-            py-2 sm:py-3
-            px-4 sm:px-6 md:px-8
+            pt-4 sm:pt-4
+            pb-1
+            px-20 sm:px-20 md:px-20
             max-w-full
             scrollbar-hide
             snap-x snap-mandatory
@@ -55,6 +56,7 @@ export default function Categories({
                   transition-all duration-300 ease-out
                   cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60
                   active:scale-95
+                  pt-2
                 "
                 aria-pressed={isActive}
                 aria-current={isActive ? 'page' : undefined}
@@ -97,6 +99,8 @@ export default function Categories({
                       className="absolute inset-0 rounded-full pointer-events-none"
                       style={{
                         boxShadow: 'var(--shadow-glow)',
+                        scale: '100%',
+                        opacity: '0.8',
                       }}
                     />
                   )}
