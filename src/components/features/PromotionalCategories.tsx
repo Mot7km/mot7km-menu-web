@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import { LayoutGrid } from 'lucide-react';
 
 interface Category {
   id: string;
@@ -46,6 +47,8 @@ export default function Categories({
         >
           {categories.map((category) => {
             const isActive = category.id === activeCategory;
+            const imageSrc = category.image || (category.id === 'All' ? 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=500&q=80' : '');
+
             return (
               <button
                 key={category.id}
@@ -74,7 +77,7 @@ export default function Categories({
                     ${
                       isActive
                         ? 'scale-110'
-                        : 'ring-1 ring-border/50 group-hover:ring-primary/40 group-hover:scale-105 shadow-sm'
+                        : 'group-hover:scale-105'
                     }
                   `}
                 >
@@ -105,21 +108,30 @@ export default function Categories({
                     />
                   )}
 
-                  {category.image ? (
-                    <Image
-                      src={category.image}
-                      alt=""
-                      fill
-                      sizes="(max-width: 640px) 48px, (max-width: 768px) 56px, (max-width: 1024px) 64px, 80px"
-                      className="object-cover rounded-full transition-transform duration-500 group-hover:scale-110"
-                      priority={isActive}
-                    />
-                  ) : (
-                    <div
-                      aria-hidden="true"
-                      className="absolute inset-0 rounded-full bg-[var(--color-primary-50)] transition-transform duration-500 group-hover:scale-110"
-                    />
-                  )}
+                  {/* Inner image container (overflow-hidden to guarantee perfect circular clipping) */}
+                  <div className="relative w-full h-full rounded-full overflow-hidden">
+                    {imageSrc ? (
+                      <Image
+                        src={imageSrc}
+                        alt={category.label}
+                        fill
+                        sizes="(max-width: 640px) 48px, (max-width: 768px) 56px, (max-width: 1024px) 64px, 80px"
+                        className="object-cover transition-transform duration-500 group-hover:scale-110"
+                        priority={isActive}
+                      />
+                    ) : (
+                      <div
+                        aria-hidden="true"
+                        className={`absolute inset-0 rounded-full flex items-center justify-center transition-all duration-500 group-hover:scale-110 ${
+                          isActive
+                            ? 'bg-[var(--color-primary)] text-white shadow-sm'
+                            : 'bg-[var(--color-primary)]/10 text-[var(--color-primary)]'
+                        }`}
+                      >
+                        <LayoutGrid className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 transition-transform group-hover:scale-110" />
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {/* Label with gradient text for active */}

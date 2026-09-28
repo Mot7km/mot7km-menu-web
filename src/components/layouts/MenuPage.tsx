@@ -29,7 +29,11 @@ export function MenuPage() {
     if (!apiCategories?.length) return [];
 
     return [
-      { id: 'All', label: t('common.all'), image: '' },
+      {
+        id: 'All',
+        label: t('common.all'),
+        image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=500&q=80',
+      },
       ...apiCategories.map((category) => ({
         id: category.categoryName || category.category_Name || category.name || String(category.id),
         label: category.categoryName || category.category_Name || category.name || String(category.id),

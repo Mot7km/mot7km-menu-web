@@ -184,7 +184,11 @@ export function useStore(): StoreState {
     price: product.price === undefined || product.price === null || product.price === '' ? '' : String(product.price),
     rating: (product.rating ?? product.averageRating) == null ? '' : Number(product.rating ?? product.averageRating).toFixed(1),
     image: product.productImageUrl || product.product_ImageUrl || product.image || '',
-    featured: true,
+    featured: Boolean(
+      (product as { featured?: boolean; isFeatured?: boolean; is_Featured?: boolean }).featured ||
+      (product as { featured?: boolean; isFeatured?: boolean; is_Featured?: boolean }).isFeatured ||
+      (product as { featured?: boolean; isFeatured?: boolean; is_Featured?: boolean }).is_Featured
+    ),
     category: product.categoryName || product.category || categories.find((category) => String(category.id) === String(product.categoryId))?.categoryName || '',
     ingredients: product.ingredients || [],
     customizationOptions: product.customizationOptions || [],
