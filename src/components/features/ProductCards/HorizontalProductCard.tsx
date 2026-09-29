@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, memo } from 'react';
 import Image from 'next/image';
 import { Link } from 'next-view-transitions';
 import { Star, ShoppingBag, Check, SlidersHorizontal } from 'lucide-react';
@@ -15,7 +15,7 @@ interface HorizontalProductCardProps {
   priority?: boolean;
 }
 
-export function HorizontalProductCard({ product, priority = false }: HorizontalProductCardProps) {
+export const HorizontalProductCard = memo(function HorizontalProductCard({ product, priority = false }: HorizontalProductCardProps) {
   const t = useTranslations();
   const { getPath } = useBusinessRoute();
   const href = getPath(product.id);
@@ -196,4 +196,4 @@ export function HorizontalProductCard({ product, priority = false }: HorizontalP
       </div>
     </article>
   );
-}
+});

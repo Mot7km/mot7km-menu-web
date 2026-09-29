@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, memo } from 'react';
 import Image from 'next/image';
 import { createPortal } from 'react-dom';
 import { useTranslations, useLocale } from 'next-intl';
@@ -375,7 +375,7 @@ export function SettingsMenu() {
 
 // ─── Header ────────────────────────────────────────────────
 
-export function Header() {
+export const Header = memo(function Header() {
   const t = useTranslations();
   const locale = useLocale();
   const isRTL = locale === 'ar';
@@ -634,4 +634,4 @@ export function Header() {
       </div>
     </header>
   );
-}
+});

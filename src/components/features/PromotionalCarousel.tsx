@@ -1,10 +1,10 @@
 'use client';
 
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { Coffee, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 import useEmblaCarousel from 'embla-carousel-react';
 import Autoplay from 'embla-carousel-autoplay';
-import { useCallback, useEffect, useRef, useState } from 'react';
 import { PromoCardData } from '@/data/menupromo';
 import { useStore } from '@/store/storeHooks';
 import { useLocale, useTranslations } from 'next-intl';
@@ -12,7 +12,7 @@ import { useLocale, useTranslations } from 'next-intl';
 // -------------------------------------------------------------------
 // Main Carousel – full‑width on mobile, container‑width on larger screens
 // -------------------------------------------------------------------
-export function PromotionalCarousel() {
+export const PromotionalCarousel = memo(function PromotionalCarousel() {
   const t = useTranslations();
   const locale = useLocale();
   const isRTL = locale === 'ar';
@@ -189,12 +189,12 @@ export function PromotionalCarousel() {
       </div>
     </section>
   );
-}
+});
 
 // -------------------------------------------------------------------
 // Individual Promo Card – fully responsive
 // -------------------------------------------------------------------
-function PromoCard({
+const PromoCard = memo(function PromoCard({
   title,
   description,
   badge,
@@ -292,4 +292,4 @@ function PromoCard({
       </div>
     </div>
   );
-}
+});

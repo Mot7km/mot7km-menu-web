@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, memo } from 'react';
 import Image from 'next/image';
 import { Link } from 'next-view-transitions';
 import { Star, ShoppingBag, Check, SlidersHorizontal, Sparkles, UtensilsCrossed } from 'lucide-react';
@@ -15,7 +15,7 @@ interface ProductCardProps {
   priority?: boolean;
 }
 
-export function GridProductCard({ product, priority = false }: ProductCardProps) {
+export const GridProductCard = memo(function GridProductCard({ product, priority = false }: ProductCardProps) {
   const t = useTranslations();
   const { getPath } = useBusinessRoute();
   const href = getPath(product.id);
@@ -240,4 +240,4 @@ export function GridProductCard({ product, priority = false }: ProductCardProps)
       </div>
     </article>
   );
-}
+});

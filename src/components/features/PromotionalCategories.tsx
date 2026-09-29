@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import Image from 'next/image';
 import { LayoutGrid } from 'lucide-react';
 
@@ -15,7 +16,7 @@ interface CategoriesProps {
   onSelectCategory: (id: string) => void;
 }
 
-export default function Categories({
+function Categories({
   categories,
   activeCategory,
   onSelectCategory,
@@ -170,3 +171,5 @@ export default function Categories({
     </div>
   );
 }
+
+export default memo(Categories);

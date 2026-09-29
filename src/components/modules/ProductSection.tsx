@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import { useTranslations } from 'next-intl';
 import { LayoutGrid, LayoutList, PackageOpen } from 'lucide-react';
 import { Product } from '@/data/menu';
@@ -18,7 +18,7 @@ interface ProductSectionProps {
   loading?: boolean;
 }
 
-export default function ProductSection({
+function ProductSection({
   title,
   products,
   initialCount = 4,
@@ -175,3 +175,5 @@ export default function ProductSection({
     </section>
   );
 }
+
+export default memo(ProductSection);

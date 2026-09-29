@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useCallback, useDeferredValue, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
 import Categories from '@/components/features/PromotionalCategories';
@@ -25,6 +25,15 @@ export function MenuPage() {
   } = useStore();
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
+  const deferredSearchQuery = useDeferredValue(searchQuery);
+
+  const handleSearchChange = useCallback((val: string) => {
+    setSearchQuery(val);
+  }, []);
+
+  const handleSelectCategory = useCallback((id: string) => {
+    setActiveCategory(id);
+  }, []);
 
   const hasPromos = Boolean(promoCards?.length);
 
@@ -45,7 +54,7 @@ export function MenuPage() {
     ];
   }, [apiCategories, t]);
 
-  const normalizedQuery = searchQuery.trim().toLowerCase();
+  const normalizedQuery = deferredSearchQuery.trim().toLowerCase();
 
   const filteredProducts = useMemo(() => {
     return storeProducts.filter((product) => {
@@ -108,12 +117,12 @@ export function MenuPage() {
                   className="sticky top-0 z-30 bg-[var(--color-background)]/90 backdrop-blur-xl border-b border-[var(--color-border)]/50 pb-1 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 mb-6"
                   style={{ minHeight: '142px' }}
                 >
-                  <SearchBar value={searchQuery} onChange={setSearchQuery} />
+                  <SearchBar value={searchQuery} onChange={handleSearchChange} />
                   <div className="flex w-full justify-center pb-2 min-h-[82px] items-center">
                     <Categories
                       categories={categories}
                       activeCategory={activeCategory}
-                      onSelectCategory={setActiveCategory}
+                      onSelectCategory={handleSelectCategory}
                     />
                   </div>
                 </div>

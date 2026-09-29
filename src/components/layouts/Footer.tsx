@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import Image from 'next/image';
 import { Phone, MapPin, Mail, Clock } from 'lucide-react';
 import { useTranslations, useLocale } from 'next-intl';
@@ -53,7 +54,7 @@ function formatTime(time24: string): string {
   return `${hour12}:${m.toString().padStart(2, '0')} ${suffix}`;
 }
 
-export function Footer() {
+export const Footer = memo(function Footer() {
   const t = useTranslations();
   const locale = useLocale();
   const isRTL = locale === 'ar';
@@ -220,4 +221,4 @@ export function Footer() {
       </div>
     </footer>
   );
-}
+});

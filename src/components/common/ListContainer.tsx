@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import { Product, Review } from '@/data/menu';
 import ProductSection from '../modules/ProductSection';
 import ReviewSection from '../modules/ReviewSection';
@@ -22,7 +23,7 @@ interface ListContainerProps {
   loading?: boolean;
 }
 
-export default function ListContainer({ sections = [], loading = false }: ListContainerProps) {
+function ListContainer({ sections = [], loading = false }: ListContainerProps) {
   if (!sections.length) return null;
 
   return (
@@ -60,3 +61,5 @@ export default function ListContainer({ sections = [], loading = false }: ListCo
     </div>
   );
 }
+
+export default memo(ListContainer);

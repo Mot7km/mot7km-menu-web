@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import { Search } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
@@ -8,7 +9,7 @@ interface SearchBarProps {
   onChange: (value: string) => void;
 }
 
-export default function SearchBar({ value, onChange }: SearchBarProps) {
+function SearchBar({ value, onChange }: SearchBarProps) {
   const t = useTranslations();
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,3 +60,5 @@ export default function SearchBar({ value, onChange }: SearchBarProps) {
     </div>
   );
 }
+
+export default memo(SearchBar);

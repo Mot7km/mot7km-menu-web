@@ -1,4 +1,5 @@
 // src/lib/api/menuApi.ts
+import { cache } from 'react';
 import { API_BASE_URL } from '../constants';
 import type {
   ApiBusinessInfo,
@@ -170,7 +171,7 @@ export const webMenuApi = {
    * - GET /api/menu/{businessName}/categories for category taxonomy
    * - GET /api/menu/{businessName}/products for products list
    */
-  async getCompleteStoreData(customBusinessName?: string): Promise<{
+  getCompleteStoreData: cache(async (customBusinessName?: string): Promise<{
     businessName: string;
     displayBusinessName: string;
     menuId: number;
@@ -180,7 +181,7 @@ export const webMenuApi = {
     sliderHeader: string | null;
     categories: ApiCategory[] | null;
     products: ApiProduct[] | null;
-  }> {
+  }> => {
     const businessName = customBusinessName;
 
     if (!businessName) {
@@ -198,10 +199,10 @@ export const webMenuApi = {
     }
 
     const [infoRes, slidersRes, categoriesRes, productsRes] = await Promise.all([
-      this.getBusinessInfo(businessName),
-      this.getBusinessSliders(businessName),
-      this.getBusinessCategories(businessName),
-      this.getBusinessProducts(businessName),
+      webMenuApi.getBusinessInfo(businessName),
+      webMenuApi.getBusinessSliders(businessName),
+      webMenuApi.getBusinessCategories(businessName),
+      webMenuApi.getBusinessProducts(businessName),
     ]);
 
     const identity = infoRes?.businessIdentity || null;
@@ -213,12 +214,12 @@ export const webMenuApi = {
     const sliders = slidersRes?.sliderItems || null;
     const sliderHeader = slidersRes?.sliderHeader || null;
 
-    const rawCategories = categoriesRes || [];
-    const rawProducts = productsRes || [];
+    const rawCategories: ApiCategory[] = categoriesRes || [];
+    const rawProducts: ApiProduct[] = productsRes || [];
 
     // Map categories with accurate productCount and product links
-    const categories: ApiCategory[] = rawCategories.map((c) => {
-      const catProducts = rawProducts.filter((p) => Number(p.categoryId) === Number(c.id));
+    const categories: ApiCategory[] = rawCategories.map((c: ApiCategory) => {
+      const catProducts = rawProducts.filter((p: ApiProduct) => Number(p.categoryId) === Number(c.id));
       return {
         id: c.id,
         categoryName: c.categoryName || c.category_Name || c.name || `Category ${c.id}`,
@@ -230,8 +231,8 @@ export const webMenuApi = {
     });
 
     // Ensure all products have categoryName populated
-    const products: ApiProduct[] = rawProducts.map((p) => {
-      const matchedCat = categories.find((c) => Number(c.id) === Number(p.categoryId));
+    const products: ApiProduct[] = rawProducts.map((p: ApiProduct) => {
+      const matchedCat = categories.find((c: ApiCategory) => Number(c.id) === Number(p.categoryId));
       return {
         ...p,
         categoryName: p.categoryName || matchedCat?.categoryName,
@@ -249,5 +250,5 @@ export const webMenuApi = {
       categories: categories.length > 0 ? categories : null,
       products: products.length > 0 ? products : null,
     };
-  },
+  }),
 };

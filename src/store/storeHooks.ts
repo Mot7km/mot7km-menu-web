@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
 import { skipToken } from '@reduxjs/toolkit/query';
 import {
@@ -56,14 +56,20 @@ export function useStore(): StoreState {
   const initialData = useInitialStoreContext();
   const hasInitialData = Boolean(initialData && (initialData.categories?.length || initialData.products?.length || initialData.header));
 
+  const [forceFetch, setForceFetch] = useState(false);
+  const shouldSkip = hasInitialData && !forceFetch;
+
   const queryArg = requestedBusinessName || skipToken;
-  const infoQuery = useGetBusinessInfoQuery(queryArg);
-  const slidersQuery = useGetSlidersQuery(queryArg);
-  const categoriesQuery = useGetCategoriesQuery(queryArg);
-  const productsQuery = useGetProductsQuery(requestedBusinessName ? { businessName: requestedBusinessName } : skipToken);
+  const infoQuery = useGetBusinessInfoQuery(queryArg, { skip: shouldSkip });
+  const slidersQuery = useGetSlidersQuery(queryArg, { skip: shouldSkip });
+  const categoriesQuery = useGetCategoriesQuery(queryArg, { skip: shouldSkip });
+  const productsQuery = useGetProductsQuery(
+    requestedBusinessName ? { businessName: requestedBusinessName } : skipToken,
+    { skip: shouldSkip }
+  );
 
   const loading = !hasInitialData && (infoQuery.isLoading || slidersQuery.isLoading || categoriesQuery.isLoading || productsQuery.isLoading);
-  const isFetching = infoQuery.isFetching || slidersQuery.isFetching || categoriesQuery.isFetching || productsQuery.isFetching;
+  const isFetching = !shouldSkip && (infoQuery.isFetching || slidersQuery.isFetching || categoriesQuery.isFetching || productsQuery.isFetching);
 
   const infoData = infoQuery.data;
   const slidersData = slidersQuery.data;
@@ -105,6 +111,7 @@ export function useStore(): StoreState {
 
   const storeNotFound = Boolean(
     requestedBusinessName &&
+    !hasInitialData &&
     !loading &&
     !isFetching &&
     (infoQuery.isError || (!infoData && !categoriesData && !productsData))
@@ -217,7 +224,17 @@ export function useStore(): StoreState {
     })),
   })), [apiProducts, categories]);
 
-  return {
+  const refresh = useCallback(async () => {
+    setForceFetch(true);
+    await Promise.all([
+      infoQuery.refetch(),
+      slidersQuery.refetch(),
+      categoriesQuery.refetch(),
+      productsQuery.refetch(),
+    ]);
+  }, [infoQuery, slidersQuery, categoriesQuery, productsQuery]);
+
+  return useMemo<StoreState>(() => ({
     loading,
     storeNotFound,
     businessName,
@@ -231,13 +248,20 @@ export function useStore(): StoreState {
     products,
     storeInfo,
     promoCards,
-    refresh: async () => {
-      await Promise.all([
-        infoQuery.refetch(),
-        slidersQuery.refetch(),
-        categoriesQuery.refetch(),
-        productsQuery.refetch(),
-      ]);
-    },
-  };
+    refresh,
+  }), [
+    loading,
+    storeNotFound,
+    businessName,
+    displayBusinessName,
+    identity,
+    header,
+    sliders,
+    sliderHeader,
+    categories,
+    products,
+    storeInfo,
+    promoCards,
+    refresh,
+  ]);
 }
