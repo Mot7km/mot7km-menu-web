@@ -176,6 +176,7 @@ function SettingsContent() {
   const pathname = usePathname();
   const router = useRouter();
   const { startLocaleTransition } = useLocaleTransition();
+  const { storeInfo } = useStore();
   const currentTheme = theme || 'system';
 
   const applyTheme = (name: 'light' | 'dark' | 'system') => {
@@ -304,8 +305,37 @@ function SettingsContent() {
             );
           })}
         </div>
-
       </div>
+
+      {/* Socials if available */}
+      {storeInfo.socials && storeInfo.socials.length > 0 && (
+        <>
+          <div className="section-divider mx-3 my-2" />
+          <div className="px-3 pt-1 pb-3">
+            <div className="flex items-center gap-2 px-1 pb-2">
+              <Users className="h-3.5 w-3.5 text-[var(--color-text-muted)]" />
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
+                {t('storeInfo.socials')}
+              </span>
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {storeInfo.socials.map((social) => (
+                <a
+                  key={social.platform}
+                  href={social.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 rounded-xl bg-[var(--color-primary-50)] px-2.5 py-1.5 text-xs font-medium text-[var(--color-text-secondary)] hover:bg-[var(--color-primary-100)] transition-colors"
+                  style={{ color: socialColorMap[social.platform] || 'currentColor' }}
+                >
+                  <SocialIcon platform={social.platform} className="w-3.5 h-3.5" />
+                  <span className="capitalize">{social.platform}</span>
+                </a>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
     </>
   );
 }
@@ -352,7 +382,6 @@ export function Header() {
   const { storeInfo, header, identity, displayBusinessName } = useStore();
 
   const [open, setOpen] = useState(true);
-  const [popoverOpen, setPopoverOpen] = useState<string | null>(null);
   const [todayHours, setTodayHours] = useState<{ open: string; close: string } | null>(null);
 
   useEffect(() => {
@@ -385,173 +414,6 @@ export function Header() {
     (header as Record<string, unknown>)?.cover;
   const backgroundImage = typeof rawBg === 'string' && rawBg.trim() ? rawBg.trim() : null;
 
-  const togglePopover = (id: string) => {
-    setPopoverOpen((prev) => (prev === id ? null : id));
-  };
-
-  const simpleContent = (
-    icon: React.ReactNode,
-    label: string,
-    value?: string | null,
-    href?: string | null
-  ) => (
-    <>
-      <div className="flex items-center gap-2 px-1 pb-2">
-        {icon}
-        <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
-          {label}
-        </span>
-      </div>
-      {value ? (
-        href ? (
-          <a
-            href={href}
-            target={href.startsWith('http') ? '_blank' : undefined}
-            rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
-            className="flex items-center gap-1 text-sm font-medium text-[var(--color-text-primary)] hover:text-[var(--color-primary)] transition-colors"
-          >
-            {value}
-            {href.startsWith('http') && <ExternalLink size={12} />}
-          </a>
-        ) : (
-          <span className="text-sm font-medium text-[var(--color-text-primary)]">{value}</span>
-        )
-      ) : (
-        <span className="text-sm text-[var(--color-text-muted)]">Not available</span>
-      )}
-    </>
-  );
-
-  const iconButton = (icon: React.ReactNode) => (
-    <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 text-white/90 hover:text-white transition-all group">
-      {icon}
-    </div>
-  );
-
-  const desktopStatusIndicator = (
-    <div
-      className={`flex items-center gap-2 px-2.5 py-1 rounded-full border backdrop-blur-md transition-all
-        ${open
-          ? 'border-[var(--color-success)]/40 bg-[var(--color-success)]/20 text-[var(--color-success)]'
-          : 'border-[var(--color-danger)]/40 bg-[var(--color-danger)]/20 text-[var(--color-danger)]'
-        }`}
-    >
-      <span
-        className={`inline-block w-2 h-2 rounded-full animate-pulse ${
-          open ? 'bg-[var(--color-success)]' : 'bg-[var(--color-danger)]'
-        }`}
-      />
-      <span className="text-xs font-medium whitespace-nowrap">
-        {open ? t('storeInfo.open') : t('storeInfo.closed')}
-        {todayHours && open && (
-          <span className="ml-1 opacity-80">
-            {t('storeInfo.todayFromTo', {
-              from: formatTimeLocalized(todayHours.open, locale),
-              to: formatTimeLocalized(todayHours.close, locale),
-            })}
-          </span>
-        )}
-        {todayHours && !open && (
-          <span className="ml-1 opacity-80">
-            {t('storeInfo.todayClosed')}
-          </span>
-        )}
-      </span>
-    </div>
-  );
-
-  const socialsContent = (
-    <>
-      <div className="flex items-center gap-2 px-1 pb-2">
-        <Users className="h-3.5 w-3.5 text-[var(--color-text-muted)]" />
-        <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
-          {t('storeInfo.socials')}
-        </span>
-      </div>
-      <div className="flex flex-wrap gap-2">
-        {storeInfo.socials.map((social) => (
-          <a
-            key={social.platform}
-            href={social.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 rounded-full bg-[var(--color-primary-50)] px-3 py-1.5 text-sm font-medium text-[var(--color-text-secondary)] hover:bg-[var(--color-primary-100)] transition-colors"
-            style={{ color: socialColorMap[social.platform] || 'currentColor' }}
-          >
-            <SocialIcon platform={social.platform} className="w-4 h-4" />
-            <span className="capitalize">{social.platform}</span>
-          </a>
-        ))}
-      </div>
-    </>
-  );
-
-  const actionButtons = (
-    <>
-      {storeInfo.phone && (
-        <Popover
-          open={popoverOpen === 'phone'}
-          onToggle={() => togglePopover('phone')}
-          trigger={iconButton(<Phone size={14} className="group-hover:scale-110 transition-transform" />)}
-        >
-          {simpleContent(
-            <Phone className="h-3.5 w-3.5 text-[var(--color-text-muted)]" />,
-            t('storeInfo.phone'),
-            storeInfo.phone,
-            `tel:${storeInfo.phone}`
-          )}
-        </Popover>
-      )}
-
-      {storeInfo.email && (
-        <Popover
-          open={popoverOpen === 'email'}
-          onToggle={() => togglePopover('email')}
-          trigger={iconButton(<Mail size={14} className="group-hover:scale-110 transition-transform" />)}
-        >
-          {simpleContent(
-            <Mail className="h-3.5 w-3.5 text-[var(--color-text-muted)]" />,
-            t('storeInfo.email'),
-            storeInfo.email,
-            `mailto:${storeInfo.email}`
-          )}
-        </Popover>
-      )}
-
-      {displayAddress && (
-        <Popover
-          open={popoverOpen === 'address'}
-          onToggle={() => togglePopover('address')}
-          trigger={iconButton(<MapPin size={14} className="group-hover:scale-110 transition-transform" />)}
-        >
-          {simpleContent(
-            <MapPin className="h-3.5 w-3.5 text-[var(--color-text-muted)]" />,
-            t('storeInfo.address'),
-            displayAddress,
-            storeInfo.mapUrl || null
-          )}
-        </Popover>
-      )}
-
-      {storeInfo.socials && storeInfo.socials.length > 0 && (
-        <Popover
-          open={popoverOpen === 'socials'}
-          onToggle={() => togglePopover('socials')}
-          trigger={iconButton(<Users size={14} className="group-hover:scale-110 transition-transform" />)}
-        >
-          {socialsContent}
-        </Popover>
-      )}
-    </>
-  );
-
-  const hasActions = Boolean(
-    storeInfo.phone ||
-    storeInfo.email ||
-    displayAddress ||
-    (storeInfo.socials && storeInfo.socials.length > 0)
-  );
-
   return (
     <header
       className="
@@ -559,12 +421,12 @@ export function Header() {
         flex items-center justify-center
         rounded-b-[1.75rem] sm:rounded-b-[2.25rem]
         px-4 sm:px-6 lg:px-8
-        py-5 sm:py-6
+        pt-7 pb-5 sm:pt-9 sm:pb-6 lg:pt-10 lg:pb-7
         transition-colors duration-300
       "
       style={{
         backgroundColor: 'var(--color-secondary)',
-        minHeight: 'clamp(170px, 22vw, 240px)',
+        minHeight: 'clamp(145px, 18vw, 195px)',
       }}
     >
       {/* ─── Background ─────────────────────────────────── */}
@@ -615,52 +477,81 @@ export function Header() {
       <div
         className="
           relative z-10 w-full max-w-7xl mx-auto
-          flex flex-row items-center
-          gap-4 sm:gap-6 lg:gap-8
+          flex items-center
         "
       >
-        {/* Logo */}
-        <div className="flex-shrink-0">
-          <div
-            className="
-              flex items-center justify-center
-              h-16 w-16 sm:h-20 sm:w-20 lg:h-24 lg:w-24
-              rounded-2xl
-              border border-white/25
-              bg-white/10 backdrop-blur-md
-              shadow-[0_8px_24px_rgba(0,0,0,0.25)]
-              transition-all duration-300
-              hover:scale-105 hover:border-[var(--color-accent)]/70
-              hover:shadow-[var(--shadow-glow-strong)]
-              overflow-hidden relative
-            "
-          >
-            {logoUrl ? (
-              <Image
-                src={logoUrl}
-                alt={brandName}
-                width={137}
-                height={137}
-                priority
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <UtensilsCrossed
-                strokeWidth={2.2}
-                className="h-8 w-8 sm:h-10 sm:w-10 lg:h-12 lg:w-12 drop-shadow-lg text-[var(--color-on-secondary)]"
-              />
-            )}
-          </div>
-        </div>
+        {/* Brand identity row: Logo + Name, Slogan & Essential Info */}
+        <div className="flex items-center gap-3.5 sm:gap-5 min-w-0 flex-1">
+          {/* Logo with minimal live presence status dot */}
+          <div className="relative flex-shrink-0">
+            <div
+              className="
+                flex items-center justify-center
+                h-16 w-16 sm:h-20 sm:w-20 lg:h-22 lg:w-22
+                rounded-2xl
+                border border-white/25
+                bg-white/10 backdrop-blur-md
+                shadow-[0_8px_24px_rgba(0,0,0,0.25)]
+                transition-all duration-300
+                hover:scale-105 hover:border-[var(--color-accent)]/70
+                hover:shadow-[var(--shadow-glow-strong)]
+                overflow-hidden relative
+              "
+            >
+              {logoUrl ? (
+                <Image
+                  src={logoUrl}
+                  alt={brandName}
+                  width={137}
+                  height={137}
+                  priority
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <UtensilsCrossed
+                  strokeWidth={2.2}
+                  className="h-8 w-8 sm:h-10 sm:w-10 lg:h-12 lg:w-12 drop-shadow-lg text-[var(--color-on-secondary)]"
+                />
+              )}
+            </div>
 
-        {/* Text + controls column */}
-        <div className="flex-1 flex flex-col min-w-0">
-          {/* Brand name + desktop status */}
-          <div className="flex items-center gap-3 flex-wrap">
+            {/* Smart presence indicator dot (no text, ultra-clean) */}
+            <div
+              className="absolute -bottom-1 -end-1 z-10 pointer-events-auto"
+              title={
+                todayHours
+                  ? open
+                    ? `${t('storeInfo.open')} - ${t('storeInfo.todayFromTo', {
+                        from: formatTimeLocalized(todayHours.open, locale),
+                        to: formatTimeLocalized(todayHours.close, locale),
+                      })}`
+                    : `${t('storeInfo.closed')} - ${t('storeInfo.todayClosed')}`
+                  : open
+                  ? t('storeInfo.open')
+                  : t('storeInfo.closed')
+              }
+            >
+              <span className="relative flex h-3.5 w-3.5 sm:h-4 sm:w-4 items-center justify-center rounded-full bg-black/60 backdrop-blur-md ring-2 ring-white/30 shadow-md">
+                <span
+                  className={`animate-ping absolute inline-flex h-2 w-2 rounded-full opacity-75 ${
+                    open ? 'bg-emerald-400' : 'bg-rose-400'
+                  }`}
+                />
+                <span
+                  className={`relative inline-flex rounded-full h-2 w-2 ${
+                    open ? 'bg-emerald-500' : 'bg-rose-500'
+                  }`}
+                />
+              </span>
+            </div>
+          </div>
+
+          {/* Name & Slogan Column with Address & Phone */}
+          <div className="flex flex-col justify-center min-w-0 flex-1">
             <h1
               className="
-                text-2xl sm:text-3xl lg:text-4xl
-                font-extrabold tracking-tight leading-none
+                text-xl sm:text-2xl lg:text-3xl
+                font-extrabold tracking-tight leading-tight
                 text-white
                 drop-shadow-[0_2px_8px_rgba(0,0,0,0.55)]
                 truncate
@@ -669,92 +560,65 @@ export function Header() {
             >
               {brandName}
             </h1>
-            <div className="hidden lg:inline-flex">{desktopStatusIndicator}</div>
-          </div>
 
-          {/* Tagline */}
-          {slogan && (
-            <p
-              className="
-                mt-1.5
-                text-sm sm:text-base
-                font-medium
-                text-white/90
-                drop-shadow-[0_1px_4px_rgba(0,0,0,0.55)]
-                line-clamp-1
-              "
-            >
-              {slogan}
-            </p>
-          )}
-
-          {/* Decorative accent line */}
-          <div className="mt-2 h-[3px] w-14 sm:w-20 rounded-full bg-gradient-to-r from-[var(--color-accent)] to-transparent shadow-sm" />
-
-          {/* Bottom row: Unified Capsule on Mobile (<lg) / Action Bar on Desktop (lg+) */}
-          <div className="flex flex-wrap items-center gap-2 mt-2.5">
-            {/* Mobile Unified Capsule (<lg) */}
-            <div
-              className="
-                lg:hidden
-                inline-flex items-center gap-2
-                rounded-full
-                bg-black/25 backdrop-blur-md
-                border border-white/15
-                px-3 py-1.5
-                shadow-[0_4px_16px_rgba(0,0,0,0.2)]
-              "
-            >
-              {/* Status Section */}
-              <div className="flex items-center gap-1.5">
-                <span className="relative flex h-2 w-2 flex-shrink-0">
-                  <span
-                    className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
-                      open ? 'bg-emerald-400' : 'bg-rose-400'
-                    }`}
-                  />
-                  <span
-                    className={`relative inline-flex rounded-full h-2 w-2 ${
-                      open ? 'bg-emerald-500' : 'bg-rose-500'
-                    }`}
-                  />
-                </span>
-                <span
-                  className={`text-xs font-semibold tracking-wide whitespace-nowrap ${
-                    open ? 'text-emerald-300' : 'text-rose-300'
-                  }`}
-                >
-                  {open ? t('storeInfo.open') : t('storeInfo.closed')}
-                </span>
-              </div>
-
-              {/* Vertical Divider */}
-              {hasActions && (
-                <>
-                  <div className="h-3.5 w-[1px] bg-white/20 mx-0.5" />
-                  <div className="flex items-center gap-1">
-                    {actionButtons}
-                  </div>
-                </>
-              )}
-            </div>
-
-            {/* Desktop Actions Bar (lg+) */}
-            {hasActions && (
-              <div
+            {slogan && (
+              <p
                 className="
-                  hidden lg:flex
-                  items-center gap-1.5
-                  rounded-full
-                  bg-black/25 backdrop-blur-md
-                  border border-white/15
-                  px-2 py-1.5
-                  shadow-[0_4px_16px_rgba(0,0,0,0.2)]
+                  mt-0.5
+                  text-xs sm:text-sm
+                  font-medium
+                  text-white/85
+                  drop-shadow-[0_1px_4px_rgba(0,0,0,0.55)]
+                  line-clamp-1
                 "
               >
-                {actionButtons}
+                {slogan}
+              </p>
+            )}
+
+            {/* Essential Contact Meta: Address & Phone */}
+            {(displayAddress || storeInfo.phone) && (
+              <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] sm:text-xs text-white/85 drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
+                {displayAddress && (
+                  storeInfo.mapUrl ? (
+                    <a
+                      href={storeInfo.mapUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 hover:text-white transition-colors cursor-pointer"
+                      title={displayAddress}
+                    >
+                      <MapPin size={12} className="text-[var(--color-accent)] flex-shrink-0" />
+                      <span className="truncate max-w-[170px] sm:max-w-xs">{displayAddress}</span>
+                    </a>
+                  ) : (
+                    <div className="inline-flex items-center gap-1" title={displayAddress}>
+                      <MapPin size={12} className="text-[var(--color-accent)] flex-shrink-0" />
+                      <span className="truncate max-w-[170px] sm:max-w-xs">{displayAddress}</span>
+                    </div>
+                  )
+                )}
+
+                {displayAddress && storeInfo.phone && (
+                  <span className="inline-block w-1 h-1 rounded-full bg-white/40 flex-shrink-0" />
+                )}
+
+                {storeInfo.phone && (
+                  <a
+                    href={`tel:${storeInfo.phone}`}
+                    className="inline-flex items-center gap-1 hover:text-white transition-colors cursor-pointer"
+                    dir="ltr"
+                    title={storeInfo.phone}
+                  >
+                    <Phone size={12} className="text-[var(--color-accent)] flex-shrink-0" />
+                    <span className="font-semibold tracking-wide">{storeInfo.phone}</span>
+                  </a>
+                )}
               </div>
             )}
+
+            {/* Decorative accent line */}
+            <div className="mt-1.5 h-[2px] w-12 sm:w-16 rounded-full bg-gradient-to-r from-[var(--color-accent)] to-transparent shadow-sm" />
           </div>
         </div>
       </div>
