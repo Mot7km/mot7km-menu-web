@@ -10,13 +10,13 @@ import { PageShell } from '@/components/layouts/PageShell';
 import { useStore } from '@/store/storeHooks';
 import { MenuNotFound } from '@/components/common/MenuNotFound';
 
+import { CarouselSkeleton, CategoriesSkeleton } from '@/components/skeletons';
+
 const PromotionalCarousel = dynamic(
   () => import('@/components/features/PromotionalCarousel').then((m) => m.PromotionalCarousel),
   {
     ssr: false,
-    loading: () => (
-      <div className="w-full h-44 sm:h-52 md:h-64 rounded-2xl bg-[var(--color-surface-subtle)] animate-pulse mx-auto max-w-5xl md:max-w-6xl" />
-    ),
+    loading: () => <CarouselSkeleton />,
   }
 );
 
@@ -110,32 +110,23 @@ export function MenuPage() {
         <section className="relative w-full px-4 pb-8 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-5xl md:max-w-6xl">
             <div className="relative">
-              {(categories.length > 0 || loading) && (
+              {categories.length > 0 ? (
                 <div
                   className="sticky top-0 z-30 bg-[var(--color-background)]/90 backdrop-blur-xl border-b border-[var(--color-border)]/50 pb-1 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 mb-6"
                   style={{ minHeight: '142px' }}
                 >
                   <SearchBar value={searchQuery} onChange={setSearchQuery} />
                   <div className="flex w-full justify-center pb-2 min-h-[82px] items-center">
-                    {categories.length > 0 ? (
-                      <Categories
-                        categories={categories}
-                        activeCategory={activeCategory}
-                        onSelectCategory={setActiveCategory}
-                      />
-                    ) : (
-                      <div className="flex justify-center items-center gap-5 sm:gap-6 md:gap-7 py-3 overflow-hidden w-full">
-                        {Array.from({ length: 7 }).map((_, i) => (
-                          <div key={i} className="flex flex-col items-center gap-2 shrink-0">
-                            <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 rounded-full bg-[var(--color-surface-subtle)] border border-[var(--color-border)]/60 animate-pulse shadow-sm" />
-                            <div className="w-12 sm:w-14 h-3 bg-[var(--color-surface-subtle)] rounded-full animate-pulse" />
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                    <Categories
+                      categories={categories}
+                      activeCategory={activeCategory}
+                      onSelectCategory={setActiveCategory}
+                    />
                   </div>
                 </div>
-              )}
+              ) : loading ? (
+                <CategoriesSkeleton />
+              ) : null}
 
               <ListContainer sections={sections} loading={loading} />
             </div>

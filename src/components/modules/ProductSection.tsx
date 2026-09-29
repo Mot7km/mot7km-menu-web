@@ -7,7 +7,7 @@ import { Product } from '@/data/menu';
 import { GridProductCard } from '@/components/features/ProductCards/GridProductCard';
 import { HorizontalProductCard } from '@/components/features/ProductCards/HorizontalProductCard';
 import { ViewMoreButton, ThatsIt } from '@/components/ui/ViewMore';
-import { Loader } from '@/components/ui/Loader';
+import { ProductSectionSkeleton } from '@/components/skeletons';
 
 interface ProductSectionProps {
   title?: string;
@@ -16,43 +16,6 @@ interface ProductSectionProps {
   loadMoreCount?: number;
   showCount?: boolean;
   loading?: boolean;
-}
-
-function ProductCardSkeleton() {
-  return (
-    <div className="group relative flex flex-col w-full h-full bg-[var(--color-surface)] rounded-2xl sm:rounded-3xl border border-[var(--color-border)]/80 overflow-hidden shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)]">
-      {/* 1. Hero Image Skeleton */}
-      <div
-        className="relative w-full overflow-hidden bg-[var(--color-surface-subtle)] flex-shrink-0 animate-pulse"
-        style={{ aspectRatio: '4 / 3.4' }}
-      >
-        {/* Badge skeletons */}
-        <div className="absolute top-2.5 start-2.5 flex items-center gap-1.5">
-          <div className="h-4.5 w-16 rounded-full bg-[var(--color-border)]/40" />
-        </div>
-        <div className="absolute top-2.5 end-2.5">
-          <div className="h-4.5 w-10 rounded-full bg-[var(--color-border)]/40" />
-        </div>
-      </div>
-
-      {/* 2. Content Zone */}
-      <div className="flex flex-col flex-1 p-3.5 sm:p-4.5 justify-between gap-3">
-        <div className="flex flex-col gap-2">
-          {/* Title */}
-          <div className="h-4.5 bg-[var(--color-surface-subtle)] rounded-md w-4/5 animate-pulse" />
-          {/* Description */}
-          <div className="h-3 bg-[var(--color-surface-subtle)] rounded-md w-full animate-pulse" />
-          <div className="h-3 bg-[var(--color-surface-subtle)] rounded-md w-2/3 animate-pulse" />
-        </div>
-
-        {/* Price & Action Row */}
-        <div className="flex items-center justify-between pt-1 border-t border-[var(--color-border)]/30">
-          <div className="h-5.5 w-16 bg-[var(--color-surface-subtle)] rounded-lg animate-pulse" />
-          <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-xl bg-[var(--color-surface-subtle)] animate-pulse" />
-        </div>
-      </div>
-    </div>
-  );
 }
 
 export default function ProductSection({
@@ -76,19 +39,7 @@ export default function ProductSection({
   const sectionTitle = title || t('productList.menu');
 
   if (loading) {
-    return (
-      <section className="flex flex-col gap-6 w-full max-w-7xl mx-auto px-4 sm:px-6" aria-busy="true">
-        <div className="flex items-center justify-between">
-          <div className="h-7 w-36 bg-[var(--color-surface-subtle)] rounded-lg animate-pulse" />
-          <div className="h-6 w-20 bg-[var(--color-surface-subtle)] rounded-full animate-pulse" />
-        </div>
-        <div className="grid gap-4 justify-items-center grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <ProductCardSkeleton key={i} />
-          ))}
-        </div>
-      </section>
-    );
+    return <ProductSectionSkeleton count={initialCount || 8} layout={layout} />;
   }
 
   const handleLoadMore = () => {
