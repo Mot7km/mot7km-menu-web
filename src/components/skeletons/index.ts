@@ -6,3 +6,4 @@ export * from './ProductCardSkeleton';
 export * from './ProductSectionSkeleton';
 export * from './FooterSkeleton';
 export * from './MenuPageSkeleton';
+export * from './ProductDetailsSkeleton';

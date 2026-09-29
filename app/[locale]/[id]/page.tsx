@@ -11,6 +11,7 @@ import { ArrowLeft, Sparkles, Star } from 'lucide-react';
 import { useCart } from '@/store/hooks';
 import { AddToCartBar } from '@/components/cart/AddToCartBar';
 import { useStore } from '@/store/storeHooks';
+import { ProductDetailsSkeleton } from '@/components/skeletons';
 import { useBusinessRoute } from '@/hooks/useLocale';
 import { skipToken } from '@reduxjs/toolkit/query';
 import {
@@ -156,11 +157,7 @@ export default function ProductPage({
   }, [allReviews, product?.rating]);
 
   if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center text-[var(--color-text-muted)]">
-        {t('loading.product')}
-      </div>
-    );
+    return <ProductDetailsSkeleton />;
   }
 
   if (!product) {
