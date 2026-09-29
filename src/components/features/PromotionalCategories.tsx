@@ -36,10 +36,10 @@ export default function Categories({
             max-w-full
             scrollbar-hide
             snap-x snap-mandatory
-            touch-pan-x
           "
           style={{
             flex: '0 0 auto',
+            touchAction: 'pan-x pan-y',
             scrollSnapType: 'x mandatory',
             scrollPaddingLeft: '1rem',
             scrollPaddingRight: '1rem',
@@ -56,7 +56,7 @@ export default function Categories({
                 className="
                   group flex flex-col items-center gap-1.5 sm:gap-2
                   snap-center shrink-0
-                  transition-all duration-300 ease-out
+                  transition-transform duration-300 ease-out
                   cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60
                   active:scale-95
                   pt-2
@@ -73,7 +73,7 @@ export default function Categories({
                     md:w-16 md:h-16
                     lg:w-20 lg:h-20
                     rounded-full
-                    transition-all duration-400 ease-out
+                    transition-transform duration-300 ease-out
                     ${
                       isActive
                         ? 'scale-110'
@@ -138,7 +138,6 @@ export default function Categories({
                 <span
                   className={`
                     text-[10px] xs:text-xs sm:text-sm font-semibold leading-tight
-                    transition-all duration-300
                     max-w-[72px] truncate text-center
                     ${
                       isActive

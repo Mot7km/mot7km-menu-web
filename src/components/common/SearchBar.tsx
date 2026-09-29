@@ -30,14 +30,14 @@ export default function SearchBar({ value, onChange }: SearchBarProps) {
 
           <div
             className="relative rounded-full bg-[var(--color-surface-subtle)] border border-[var(--color-border)] overflow-hidden
-              transition-all duration-400
+              transition-shadow duration-300
               group-focus-within:border-[var(--color-primary)] group-focus-within:shadow-[var(--shadow-card)]"
           >
             {/* Search Icon */}
             <div className="absolute left-1 top-1 bottom-1 flex items-center pl-4 pointer-events-none">
               <Search
                 className="w-5 h-5 text-[var(--color-primary)]
-                  transition-all duration-300
+                  transition-transform duration-200
                   group-focus-within:scale-110"
               />
             </div>
@@ -50,7 +50,6 @@ export default function SearchBar({ value, onChange }: SearchBarProps) {
               onChange={(e) => onChange(e.target.value)}
               className="w-full pl-12 pr-4 py-3.5 bg-transparent rounded-full
                 focus:outline-none
-                transition-all duration-300
                 text-base text-[var(--color-text-primary)]
                 placeholder:text-[var(--color-text-muted)]"
             />

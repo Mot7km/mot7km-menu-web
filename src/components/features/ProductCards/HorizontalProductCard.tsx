@@ -58,7 +58,7 @@ export function HorizontalProductCard({ product, priority = false }: HorizontalP
         shadow-[0_2px_12px_-2px_rgba(0,0,0,0.04)]
         hover:shadow-[0_12px_28px_-6px_rgba(0,0,0,0.08)]
         hover:-translate-y-0.5
-        transition-all duration-300 ease-out
+        transition-[transform,box-shadow] duration-300 ease-out
         overflow-hidden"
     >
       {/* ── Full Card Clickable Overlay ── */}

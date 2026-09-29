@@ -145,7 +145,7 @@ export default function ProductSection({
           <div className="flex items-center rounded-full p-0.5 border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm">
             <button
               onClick={() => setLayout('grid')}
-              className={`p-1.5 rounded-full transition-all duration-200 cursor-pointer ${
+              className={`p-1.5 rounded-full transition-transform duration-200 cursor-pointer ${
                 layout === 'grid'
                   ? 'bg-[var(--color-primary)] text-[var(--color-text-on-primary)] shadow-[var(--shadow-glow)]'
                   : 'text-[var(--color-text-muted)] hover:text-[var(--color-primary)] hover:bg-[var(--color-primary)]/10'
@@ -157,7 +157,7 @@ export default function ProductSection({
             </button>
             <button
               onClick={() => setLayout('horizontal')}
-              className={`p-1.5 rounded-full transition-all duration-200 cursor-pointer ${
+              className={`p-1.5 rounded-full transition-transform duration-200 cursor-pointer ${
                 layout === 'horizontal'
                   ? 'bg-[var(--color-primary)] text-[var(--color-text-on-primary)] shadow-[var(--shadow-glow)]'
                   : 'text-[var(--color-text-muted)] hover:text-[var(--color-primary)] hover:bg-[var(--color-primary)]/10'

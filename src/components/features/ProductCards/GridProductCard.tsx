@@ -66,7 +66,7 @@ export function GridProductCard({ product, priority = false }: ProductCardProps)
         dark:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.35)]
         dark:hover:shadow-[0_20px_40px_-12px_rgba(0,0,0,0.6),0_0_0_1px_rgba(var(--color-primary),0.2)]
         hover:-translate-y-1.5
-        transition-all duration-300 ease-out
+        transition-[transform,box-shadow] duration-300 ease-out
         overflow-hidden cursor-pointer"
     >
       {/* ── Top edge ambient glow line on hover ── */}

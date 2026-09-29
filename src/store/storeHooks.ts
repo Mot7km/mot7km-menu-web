@@ -11,6 +11,7 @@ import {
 } from './menuApi';
 import { applyThemePalette } from '@/config/theme';
 import { loadGoogleFont } from '@/helpers/fontLoader';
+import { useInitialStoreContext } from '@/context/InitialStoreContext';
 import { i18n, type Locale } from '@/config/i18n';
 import type { ApiBusinessIdentity, ApiCategory, ApiProduct, ApiSliderItem, ApiStoreHeader } from '@/lib/types/menuApi';
 import type { StoreInfo } from '@/data/storeInfo';
@@ -52,13 +53,16 @@ export function useStore(): StoreState {
     return businessName ? decodeURIComponent(businessName) : undefined;
   }, [pathname]);
 
+  const initialData = useInitialStoreContext();
+  const hasInitialData = Boolean(initialData && (initialData.categories?.length || initialData.products?.length || initialData.header));
+
   const queryArg = requestedBusinessName || skipToken;
   const infoQuery = useGetBusinessInfoQuery(queryArg);
   const slidersQuery = useGetSlidersQuery(queryArg);
   const categoriesQuery = useGetCategoriesQuery(queryArg);
   const productsQuery = useGetProductsQuery(requestedBusinessName ? { businessName: requestedBusinessName } : skipToken);
 
-  const loading = infoQuery.isLoading || slidersQuery.isLoading || categoriesQuery.isLoading || productsQuery.isLoading;
+  const loading = !hasInitialData && (infoQuery.isLoading || slidersQuery.isLoading || categoriesQuery.isLoading || productsQuery.isLoading);
   const isFetching = infoQuery.isFetching || slidersQuery.isFetching || categoriesQuery.isFetching || productsQuery.isFetching;
 
   const infoData = infoQuery.data;
@@ -66,22 +70,24 @@ export function useStore(): StoreState {
   const categoriesData = categoriesQuery.data;
   const productsData = productsQuery.data;
 
-  const businessName = infoData?.businessName || requestedBusinessName || '';
-  const displayBusinessName = infoData?.displayBusinessName || businessName;
-  const identity = infoData?.businessIdentity || null;
+  const businessName = infoData?.businessName || initialData?.businessName || requestedBusinessName || '';
+  const displayBusinessName = infoData?.displayBusinessName || initialData?.displayBusinessName || businessName;
+  const identity = infoData?.businessIdentity || initialData?.identity || null;
   const header = useMemo<ApiStoreHeader | null>(() => {
-    if (!infoData?.header && !infoData?.businessDescription) return null;
+    const rawHeader = infoData?.header || initialData?.header;
+    const rawDesc = infoData?.businessDescription || (initialData as any)?.businessDescription;
+    if (!rawHeader && !rawDesc) return null;
 
     return {
-      ...infoData?.header,
-      slogan: infoData?.header?.slogan || infoData?.businessDescription || null,
+      ...rawHeader,
+      slogan: rawHeader?.slogan || rawDesc || null,
     };
-  }, [infoData]);
-  const sliders = slidersData?.sliderItems ?? EMPTY_SLIDERS;
-  const sliderHeader = slidersData?.sliderHeader || null;
+  }, [infoData, initialData]);
+  const sliders = slidersData?.sliderItems ?? initialData?.sliders ?? EMPTY_SLIDERS;
+  const sliderHeader = slidersData?.sliderHeader || initialData?.sliderHeader || null;
 
-  const rawCategories = categoriesData ?? EMPTY_CATEGORIES;
-  const apiProducts = productsData ?? EMPTY_PRODUCTS;
+  const rawCategories = categoriesData ?? initialData?.categories ?? EMPTY_CATEGORIES;
+  const apiProducts = productsData ?? initialData?.products ?? EMPTY_PRODUCTS;
 
   // Build categories with productCount matching products from the dedicated products endpoint
   const categories = useMemo<ApiCategory[]>(() => {

@@ -169,11 +169,11 @@ export function PromotionalCarousel() {
                 className="group flex items-center justify-center min-w-[16px] min-h-[36px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] rounded-full"
               >
                 <span
-                  className={`h-2 rounded-full transition-all duration-400 ease-out block
+                  className={`h-2 rounded-full transition-[width,opacity] duration-300 ease-out block
                     ${
                       index === selectedIndex
                         ? 'w-7'
-                        : 'w-2 bg-[var(--color-border-strong)] group-hover:bg-[var(--color-primary)]/40'
+                        : 'w-2 bg-[var(--color-border-strong)]'
                     }
                   `}
                   style={

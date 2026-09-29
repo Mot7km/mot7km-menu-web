@@ -104,7 +104,7 @@ export function Footer() {
                 {brandName}
               </span>
             </div>
-            <p className="text-sm text-[var(--color-text-muted)] leading-relaxed max-w-[250px]">
+            <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed max-w-[250px]">
               {slogan}
             </p>
           </div>
@@ -119,15 +119,15 @@ export function Footer() {
                 {storeInfo.phone && (
                   <a
                     href={`tel:${storeInfo.phone}`}
-                    className="inline-flex items-center gap-2 text-sm text-[var(--color-text-muted)]
-                      hover:text-[var(--color-primary)] transition-colors"
+                    className="inline-flex items-center gap-2 text-sm text-[var(--color-text-secondary)]
+                      hover:text-[var(--color-primary)]"
                   >
                     <Phone size={14} className="text-[var(--color-primary)] flex-shrink-0" />
                     <span dir="ltr">{storeInfo.phone}</span>
                   </a>
                 )}
                 {displayAddress && (
-                  <div className="inline-flex items-start gap-2 text-sm text-[var(--color-text-muted)]">
+                  <div className="inline-flex items-start gap-2 text-sm text-[var(--color-text-secondary)]">
                     <MapPin size={14} className="text-[var(--color-secondary)] flex-shrink-0 mt-0.5" />
                     <span>{displayAddress}</span>
                   </div>
@@ -135,15 +135,15 @@ export function Footer() {
                 {storeInfo.email && (
                   <a
                     href={`mailto:${storeInfo.email}`}
-                    className="inline-flex items-center gap-2 text-sm text-[var(--color-text-muted)]
-                      hover:text-[var(--color-primary)] transition-colors"
+                    className="inline-flex items-center gap-2 text-sm text-[var(--color-text-secondary)]
+                      hover:text-[var(--color-primary)]"
                   >
                     <Mail size={14} className="text-[var(--color-accent)] flex-shrink-0" />
                     <span>{storeInfo.email}</span>
                   </a>
                 )}
                 {todayHours && (
-                  <div className="inline-flex items-center gap-2 text-sm text-[var(--color-text-muted)]">
+                  <div className="inline-flex items-center gap-2 text-sm text-[var(--color-text-secondary)]">
                     <Clock size={14} className="text-[var(--color-warning)] flex-shrink-0" />
                     <span>{formatTime(todayHours.open)} – {formatTime(todayHours.close)}</span>
                   </div>
@@ -169,14 +169,13 @@ export function Footer() {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center justify-center w-10 h-10 rounded-xl
-              
                         border border-[var(--color-border)]
                         hover:border-[var(--color-primary)]/50
                         hover:scale-110 active:scale-95
-                        transition-all duration-300 group"
+                        transition-transform duration-200 group"
                       aria-label={social.platform}
                     >
-                      <IconComponent className="w-4 h-4 text-[var(--color-text-muted)] group-hover:text-[var(--color-primary)] transition-colors" />
+                      <IconComponent className="w-4 h-4 text-[var(--color-text-secondary)] group-hover:text-[var(--color-primary)]" />
                     </a>
                   );
                 })}
@@ -188,7 +187,7 @@ export function Footer() {
         {/* Bottom divider + copyright */}
         <div className="section-divider-premium w-full mb-6" />
         <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
-          <p className="text-xs text-[var(--color-text-muted)]">
+          <p className="text-xs text-[var(--color-text-secondary)]">
             {t('footer.copyrightText', {
               year: currentYear,
               brand: brandName,
@@ -199,9 +198,9 @@ export function Footer() {
             href="https://mot7km.store"
             target="_blank"
             rel="noopener noreferrer"
-            className="group inline-flex items-center gap-1.5 text-xs text-[var(--color-text-muted)] px-2.5 py-1 rounded-full border border-transparent hover:border-[var(--color-border)] hover:bg-[var(--color-surface)]/40 transition-all duration-300 opacity-70 hover:opacity-100 cursor-pointer"
+            className="group inline-flex items-center gap-1.5 text-xs text-[var(--color-text-secondary)] px-2.5 py-1 rounded-full border border-transparent hover:border-[var(--color-border)] hover:bg-[var(--color-surface)]/40 transition-opacity duration-200 cursor-pointer"
           >
-            <span className="transition-colors group-hover:text-[var(--color-text)]">Powered by</span>
+            <span>Powered by</span>
             <span className="gradient-text font-bold">Mot7km</span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -211,7 +210,7 @@ export function Footer() {
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="w-3 h-3 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300"
+              className="w-3 h-3 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-[transform,opacity] duration-200"
             >
               <path d="M7 17L17 7" />
               <path d="M7 7h10v10" />

@@ -353,7 +353,7 @@ export function SettingsMenu() {
         w-8 h-8 sm:w-9 sm:h-9 rounded-full
         bg-[var(--color-surface)]/20 border border-[var(--color-border-strong)]/30
         text-[var(--color-on-secondary)] hover:bg-[var(--color-surface)]/30
-        transition-all duration-250 ease-out
+        transition-transform duration-200 ease-out
         cursor-pointer hover:scale-105 active:scale-95
         ${open ? 'bg-[var(--color-surface)]/30' : ''}
       `}
@@ -436,6 +436,7 @@ export function Header() {
             alt=""
             fill
             priority
+            fetchPriority="high"
             sizes="100vw"
             className="object-cover object-center"
           />

@@ -90,8 +90,18 @@ export default async function BusinessMenuPage({ params }: BusinessMenuPageProps
     );
   }
 
+  const rawCover = storeData?.header?.coverUrl || storeData?.header?.backGroundImage;
+  const coverImage = typeof rawCover === 'string' && rawCover.trim() ? rawCover.trim() : null;
+
   return (
     <InitialStoreProvider data={storeData}>
+      {coverImage && (
+        <link
+          rel="preload"
+          as="image"
+          href={coverImage}
+        />
+      )}
       {themeStyles}
       <MenuPage />
     </InitialStoreProvider>
