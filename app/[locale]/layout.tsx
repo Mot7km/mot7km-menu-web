@@ -68,8 +68,7 @@ export default async function LocaleLayout({
       <html
         lang={locale}
         dir={isRTL ? "rtl" : "ltr"}
-        className={`h-full antialiased ${roboto.variable} ${cairo.variable} ${montserrat.variable}`}
-        data-scroll-behavior="smooth"
+        className={`min-h-full antialiased ${roboto.variable} ${cairo.variable} ${montserrat.variable}`}
         suppressHydrationWarning
       >
         <head>
