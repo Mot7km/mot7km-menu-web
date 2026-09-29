@@ -125,10 +125,10 @@ export function MenuPage() {
                       />
                     ) : (
                       <div className="flex justify-center items-center gap-5 sm:gap-6 md:gap-7 py-3 overflow-hidden w-full">
-                        {Array.from({ length: 6 }).map((_, i) => (
+                        {Array.from({ length: 7 }).map((_, i) => (
                           <div key={i} className="flex flex-col items-center gap-2 shrink-0">
-                            <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full bg-[var(--color-surface-subtle)] animate-pulse" />
-                            <div className="w-12 h-2.5 bg-[var(--color-surface-subtle)] rounded-full animate-pulse" />
+                            <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 rounded-full bg-[var(--color-surface-subtle)] border border-[var(--color-border)]/60 animate-pulse shadow-sm" />
+                            <div className="w-12 sm:w-14 h-3 bg-[var(--color-surface-subtle)] rounded-full animate-pulse" />
                           </div>
                         ))}
                       </div>
