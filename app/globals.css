@@ -674,13 +674,20 @@ body {
   animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
-/* 1. Hero Image: Seamless GPU morph without distortion */
-::view-transition-old(product_hero_*),
-::view-transition-new(product_hero_*) {
+/* 1. Hero Image: Seamless GPU morph without distortion across Level 1 & Level 2 */
+::view-transition-group(.product-hero-image) {
+  animation-duration: 0.42s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  overflow: clip;
+}
+
+::view-transition-old(.product-hero-image),
+::view-transition-new(.product-hero-image) {
   height: 100%;
   width: 100%;
   object-fit: cover;
   overflow: clip;
+  mix-blend-mode: normal;
 }
 
 /* 2. Product Sheet: Independent native-feel slide up */

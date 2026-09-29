@@ -100,6 +100,7 @@ export const GridProductCard = memo(function GridProductCard({ product, priority
             className="object-cover transition-transform duration-700 ease-out group-hover:scale-108"
             style={{
               viewTransitionName: getHeroTransitionName(product.id),
+              viewTransitionClass: 'product-hero-image',
             } as React.CSSProperties}
           />
         ) : (

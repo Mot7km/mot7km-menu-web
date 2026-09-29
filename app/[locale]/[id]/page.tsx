@@ -189,6 +189,7 @@ export default function ProductPage({
           className="object-cover"
           style={{
             viewTransitionName: getHeroTransitionName(id),
+            viewTransitionClass: 'product-hero-image',
           } as React.CSSProperties}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/30" />

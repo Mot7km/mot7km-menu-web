@@ -86,6 +86,7 @@ export const HorizontalProductCard = memo(function HorizontalProductCard({ produ
           className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
           style={{
             viewTransitionName: getHeroTransitionName(product.id),
+            viewTransitionClass: 'product-hero-image',
           } as React.CSSProperties}
         />
       </div>
