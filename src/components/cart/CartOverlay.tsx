@@ -1,9 +1,14 @@
 'use client';
 
 import React, { useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { useCart } from '@/store/hooks';
 import { FloatingCartButton } from './CartButton';
-import { CartDrawer } from './CartDrawer';
+
+const CartDrawer = dynamic(
+  () => import('./CartDrawer').then((m) => m.CartDrawer),
+  { ssr: false }
+);
 
 export function CartOverlay() {
   const { 

@@ -68,7 +68,10 @@ export function Footer() {
   const logoUrl = header?.logo || header?.logoUrl || identity?.logo;
 
   return (
-    <footer className="relative overflow-hidden border-t border-[var(--color-border)] bg-[var(--color-surface)] transition-colors">
+    <footer
+      className="relative overflow-hidden border-t border-[var(--color-border)] bg-[var(--color-surface)]"
+      style={{ minHeight: '320px' }}
+    >
       {/* Gradient top accent line with shimmer */}
       <div className="absolute top-0 inset-x-0 h-[2px] overflow-hidden" style={{ background: 'var(--gradient-primary)' }}>
         <div

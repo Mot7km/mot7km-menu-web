@@ -11,9 +11,10 @@ import { useCart } from '@/store/hooks';
 
 interface HorizontalProductCardProps {
   product: Product;
+  priority?: boolean;
 }
 
-export function HorizontalProductCard({ product }: HorizontalProductCardProps) {
+export function HorizontalProductCard({ product, priority = false }: HorizontalProductCardProps) {
   const t = useTranslations();
   const { getPath } = useBusinessRoute();
   const href = getPath(product.id);
@@ -70,11 +71,16 @@ export function HorizontalProductCard({ product }: HorizontalProductCardProps) {
       />
 
       {/* ── 1. Hero Left Image Frame ── */}
-      <div className="relative w-28 h-28 sm:w-36 sm:h-36 md:w-40 md:h-40 flex-shrink-0 rounded-xl overflow-hidden bg-[var(--color-surface-subtle)] z-10 pointer-events-none">
+      <div
+        className="relative w-28 h-28 sm:w-36 sm:h-36 md:w-40 md:h-40 flex-shrink-0 rounded-xl overflow-hidden bg-[var(--color-surface-subtle)] z-10 pointer-events-none"
+        style={{ aspectRatio: '1 / 1' }}
+      >
         <Image
           src={product.image}
           alt={product.name}
           fill
+          priority={priority}
+          fetchPriority={priority ? 'high' : undefined}
           sizes="(max-width: 640px) 112px, (max-width: 768px) 144px, 160px"
           className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
         />

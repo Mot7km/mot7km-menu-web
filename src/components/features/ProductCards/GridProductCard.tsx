@@ -11,9 +11,10 @@ import { useCart } from '@/store/hooks';
 
 interface ProductCardProps {
   product: Product;
+  priority?: boolean;
 }
 
-export function GridProductCard({ product }: ProductCardProps) {
+export function GridProductCard({ product, priority = false }: ProductCardProps) {
   const t = useTranslations();
   const { getPath } = useBusinessRoute();
   const href = getPath(product.id);
@@ -83,12 +84,17 @@ export function GridProductCard({ product }: ProductCardProps) {
       />
 
       {/* ── 1. Hero Image Container with Floating Badges ── */}
-      <div className="relative w-full aspect-[4/3.4] sm:aspect-square overflow-hidden bg-[var(--color-surface-subtle)] flex-shrink-0 pointer-events-none">
+      <div
+        className="relative w-full aspect-[4/3.4] sm:aspect-square overflow-hidden bg-[var(--color-surface-subtle)] flex-shrink-0 pointer-events-none"
+        style={{ aspectRatio: '4 / 3.4' }}
+      >
         {product.image ? (
           <Image
             src={product.image}
             alt={product.name}
             fill
+            priority={priority}
+            fetchPriority={priority ? 'high' : undefined}
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             className="object-cover transition-transform duration-700 ease-out group-hover:scale-108"
           />
@@ -108,7 +114,7 @@ export function GridProductCard({ product }: ProductCardProps) {
               className="inline-flex items-center gap-1 px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-[11px] font-bold tracking-wide uppercase text-white shadow-md backdrop-blur-md"
               style={{ background: 'var(--gradient-primary)' }}
             >
-              <Sparkles size={11} className="fill-white flex-shrink-0 animate-pulse" />
+              <Sparkles size={11} className="fill-white flex-shrink-0" />
               <span className="truncate">{t('home.bestSeller') || 'Special'}</span>
             </span>
           ) : product.category ? (

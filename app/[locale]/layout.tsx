@@ -71,7 +71,7 @@ export default async function LocaleLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
       <body
-        className="flex min-h-full flex-col bg-[var(--color-background)] text-[var(--color-text-primary)] transition-colors duration-300"
+        className="flex min-h-full flex-col bg-[var(--color-background)] text-[var(--color-text-primary)]"
         style={{ fontFamily: isRTL ? "var(--font-arabic)" : "var(--font-english)" }}
       >
         <NextIntlClientProvider messages={messages}>

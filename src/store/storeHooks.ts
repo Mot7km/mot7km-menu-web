@@ -106,8 +106,14 @@ export function useStore(): StoreState {
 
   useEffect(() => {
     const root = document.documentElement;
-    const isCustomArabic = Boolean(identity?.typography?.arabicFont && identity.typography.arabicFont !== 'Cairo');
-    const isCustomEnglish = Boolean(identity?.typography?.englishFont && identity.typography.englishFont !== 'Roboto');
+    const isCustomArabic = Boolean(
+      identity?.typography?.arabicFont &&
+      identity.typography.arabicFont.trim().toLowerCase() !== 'cairo'
+    );
+    const isCustomEnglish = Boolean(
+      identity?.typography?.englishFont &&
+      identity.typography.englishFont.trim().toLowerCase() !== 'roboto'
+    );
     const arabicFont = isCustomArabic ? (loadGoogleFont(identity?.typography?.arabicFont) || 'Cairo') : 'Cairo';
     const englishFont = isCustomEnglish ? (loadGoogleFont(identity?.typography?.englishFont) || 'Roboto') : 'Roboto';
     const arabicStack = `"${arabicFont}", "Cairo", sans-serif`;

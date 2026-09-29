@@ -1,10 +1,12 @@
 const GOOGLE_FONT_LINK_PREFIX = 'tenant-font-';
+const BUNDLED_FONTS = new Set(['cairo', 'roboto', 'sans-serif', 'system-ui', 'arial']);
 
 function normalizeFontName(fontName: string | null | undefined) {
   if (typeof fontName !== 'string') return null;
 
   const name = fontName.trim();
   if (!name || name.toLowerCase() === 'string') return null;
+  if (BUNDLED_FONTS.has(name.toLowerCase())) return null;
   return name;
 }
 

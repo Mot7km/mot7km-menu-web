@@ -2,6 +2,10 @@ import type { NextConfig } from 'next';
 import createNextIntlPlugin from 'next-intl/plugin';
 
 const nextConfig: NextConfig = {
+  compress: true,
+  experimental: {
+    optimizePackageImports: ['lucide-react', '@use-gesture/react'],
+  },
   images: {
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [

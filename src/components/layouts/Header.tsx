@@ -422,7 +422,6 @@ export function Header() {
         rounded-b-[1.75rem] sm:rounded-b-[2.25rem]
         px-4 sm:px-6 lg:px-8
         pt-7 pb-5 sm:pt-9 sm:pb-6 lg:pt-10 lg:pb-7
-        transition-colors duration-300
       "
       style={{
         backgroundColor: 'var(--color-secondary)',

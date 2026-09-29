@@ -18,6 +18,25 @@ interface ProductSectionProps {
   loading?: boolean;
 }
 
+function ProductCardSkeleton() {
+  return (
+    <div className="w-full flex flex-col bg-[var(--color-surface)] rounded-2xl sm:rounded-3xl border border-[var(--color-border)]/60 overflow-hidden shadow-sm">
+      <div
+        className="w-full bg-[var(--color-surface-subtle)] animate-pulse"
+        style={{ aspectRatio: '4 / 3.4' }}
+      />
+      <div className="p-3.5 sm:p-4.5 flex flex-col gap-2.5">
+        <div className="h-4 bg-[var(--color-surface-subtle)] rounded-md w-3/4 animate-pulse" />
+        <div className="h-3 bg-[var(--color-surface-subtle)] rounded-md w-1/2 animate-pulse" />
+        <div className="flex justify-between items-center pt-2">
+          <div className="h-5 bg-[var(--color-surface-subtle)] rounded-md w-1/4 animate-pulse" />
+          <div className="h-8 w-8 rounded-full bg-[var(--color-surface-subtle)] animate-pulse" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ProductSection({
   title,
   products,
@@ -40,9 +59,17 @@ export default function ProductSection({
 
   if (loading) {
     return (
-      <div className="flex min-h-56 items-center justify-center" aria-live="polite">
-        <Loader size="md" text="Loading products..." />
-      </div>
+      <section className="flex flex-col gap-6 w-full max-w-7xl mx-auto px-4 sm:px-6" aria-busy="true">
+        <div className="flex items-center justify-between">
+          <div className="h-7 w-36 bg-[var(--color-surface-subtle)] rounded-lg animate-pulse" />
+          <div className="h-6 w-20 bg-[var(--color-surface-subtle)] rounded-full animate-pulse" />
+        </div>
+        <div className="grid gap-4 justify-items-center grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <ProductCardSkeleton key={i} />
+          ))}
+        </div>
+      </section>
     );
   }
 
@@ -155,13 +182,12 @@ export default function ProductSection({
         {visibleItems.map((product, index) => (
           <div
             key={product.id}
-            className="w-full animate-fade-in-up"
-            style={{ animationDelay: `${index * 0.05}s` }}
+            className="w-full animate-fade-in"
           >
             {layout === 'grid' ? (
-              <GridProductCard product={product} />
+              <GridProductCard product={product} priority={index < 2} />
             ) : (
-              <HorizontalProductCard product={product} />
+              <HorizontalProductCard product={product} priority={index < 2} />
             )}
           </div>
         ))}
