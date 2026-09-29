@@ -10,15 +10,8 @@ import { PageShell } from '@/components/layouts/PageShell';
 import { useStore } from '@/store/storeHooks';
 import { MenuNotFound } from '@/components/common/MenuNotFound';
 
+import { PromotionalCarousel } from '@/components/features/PromotionalCarousel';
 import { CarouselSkeleton, CategoriesSkeleton } from '@/components/skeletons';
-
-const PromotionalCarousel = dynamic(
-  () => import('@/components/features/PromotionalCarousel').then((m) => m.PromotionalCarousel),
-  {
-    ssr: false,
-    loading: () => <CarouselSkeleton />,
-  }
-);
 
 export function MenuPage() {
   const t = useTranslations();
@@ -87,25 +80,25 @@ export function MenuPage() {
   return (
     <PageShell showHeader showFooter>
       <div className="flex flex-col items-center justify-center">
-        {hasPromos && (
-          <>
-            <section className="relative w-full pt-6 pb-4 sm:pt-8 sm:pb-6">
-              {sliderHeader && (
-                <div className="mx-auto max-w-5xl md:max-w-6xl px-4 sm:px-6 lg:px-8">
-                  <h2
-                    className="accent-line mb-4 text-2xl font-bold text-[var(--color-text-primary)] sm:text-3xl"
-                    style={{ fontFamily: 'var(--font-display)' }}
-                  >
-                    {sliderHeader}
-                  </h2>
-                </div>
-              )}
-              <div className="w-full">
-                <PromotionalCarousel />
+        {loading && !hasPromos ? (
+          <CarouselSkeleton />
+        ) : hasPromos ? (
+          <section className="relative w-full pt-6 pb-4 sm:pt-8 sm:pb-6">
+            {sliderHeader && (
+              <div className="mx-auto max-w-5xl md:max-w-6xl px-4 sm:px-6 lg:px-8">
+                <h2
+                  className="accent-line mb-4 text-2xl font-bold text-[var(--color-text-primary)] sm:text-3xl"
+                  style={{ fontFamily: 'var(--font-display)' }}
+                >
+                  {sliderHeader}
+                </h2>
               </div>
-            </section>
-          </>
-        )}
+            )}
+            <div className="w-full">
+              <PromotionalCarousel />
+            </div>
+          </section>
+        ) : null}
 
         <section className="relative w-full px-4 pb-8 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-5xl md:max-w-6xl">

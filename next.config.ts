@@ -4,10 +4,16 @@ import createNextIntlPlugin from 'next-intl/plugin';
 const nextConfig: NextConfig = {
   compress: true,
   experimental: {
-    optimizePackageImports: ['lucide-react', '@use-gesture/react'],
+    optimizePackageImports: [
+      'lucide-react',
+      '@use-gesture/react',
+      'embla-carousel-react',
+      'embla-carousel-autoplay',
+    ],
   },
   images: {
     formats: ['image/avif', 'image/webp'],
+    minimumCacheTTL: 31536000,
     remotePatterns: [
       {
         protocol: 'https',

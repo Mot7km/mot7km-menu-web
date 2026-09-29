@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getMessages } from "next-intl/server";
 import { NextIntlClientProvider } from "next-intl";
-import { Roboto, Cairo } from "next/font/google";
+import { Roboto, Cairo, Montserrat } from "next/font/google";
 import { Providers } from "@/components/providers";
 import { FaviconController } from "@/components/common/FaviconController";
 import { i18n } from "@/config/i18n";
@@ -19,6 +19,13 @@ const cairo = Cairo({
   weight: ["400", "600", "700"],
   display: "swap",
   variable: "--font-cairo",
+});
+
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+  variable: "--font-montserrat",
 });
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://menu.mot7km.store";
@@ -59,7 +66,7 @@ export default async function LocaleLayout({
     <html
       lang={locale}
       dir={isRTL ? "rtl" : "ltr"}
-      className={`h-full antialiased ${roboto.variable} ${cairo.variable}`}
+      className={`h-full antialiased ${roboto.variable} ${cairo.variable} ${montserrat.variable}`}
       suppressHydrationWarning
     >
       <head>
@@ -67,8 +74,6 @@ export default async function LocaleLayout({
         <link rel="dns-prefetch" href="https://mjrnltqsxgqyhfjqbain.supabase.co" />
         <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="" />
         <link rel="dns-prefetch" href="https://images.unsplash.com" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
       <body
         className="flex min-h-full flex-col bg-[var(--color-background)] text-[var(--color-text-primary)]"

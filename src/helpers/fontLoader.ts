@@ -1,5 +1,5 @@
 const GOOGLE_FONT_LINK_PREFIX = 'tenant-font-';
-const BUNDLED_FONTS = new Set(['cairo', 'roboto', 'sans-serif', 'system-ui', 'arial']);
+const BUNDLED_FONTS = new Set(['cairo', 'roboto', 'montserrat', 'sans-serif', 'system-ui', 'arial']);
 
 function normalizeFontName(fontName: string | null | undefined) {
   if (typeof fontName !== 'string') return null;

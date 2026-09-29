@@ -112,16 +112,21 @@ export function useStore(): StoreState {
 
   useEffect(() => {
     const root = document.documentElement;
-    const isCustomArabic = Boolean(
-      identity?.typography?.arabicFont &&
-      identity.typography.arabicFont.trim().toLowerCase() !== 'cairo'
-    );
-    const isCustomEnglish = Boolean(
-      identity?.typography?.englishFont &&
-      identity.typography.englishFont.trim().toLowerCase() !== 'roboto'
-    );
-    const arabicFont = isCustomArabic ? (loadGoogleFont(identity?.typography?.arabicFont) || 'Cairo') : 'Cairo';
-    const englishFont = isCustomEnglish ? (loadGoogleFont(identity?.typography?.englishFont) || 'Roboto') : 'Roboto';
+    const requestedArabic = identity?.typography?.arabicFont?.trim();
+    const requestedEnglish = identity?.typography?.englishFont?.trim();
+
+    let arabicFont = 'Cairo';
+    if (requestedArabic && requestedArabic.toLowerCase() !== 'cairo' && requestedArabic.toLowerCase() !== 'string') {
+      loadGoogleFont(requestedArabic);
+      arabicFont = requestedArabic;
+    }
+
+    let englishFont = 'Roboto';
+    if (requestedEnglish && requestedEnglish.toLowerCase() !== 'roboto' && requestedEnglish.toLowerCase() !== 'string') {
+      loadGoogleFont(requestedEnglish);
+      englishFont = requestedEnglish;
+    }
+
     const arabicStack = `"${arabicFont}", "Cairo", sans-serif`;
     const englishStack = `"${englishFont}", "Roboto", sans-serif`;
 

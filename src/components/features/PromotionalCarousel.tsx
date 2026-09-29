@@ -106,12 +106,12 @@ export function PromotionalCarousel() {
           dir={isRTL ? 'rtl' : 'ltr'}
         >
           <div className="flex">
-            {promoCards.map((card) => (
+            {promoCards.map((card, index) => (
               <div
                 key={card.id}
                 className="min-w-0 shrink-0 grow-0 basis-[85%] sm:basis-[72%] md:basis-[58%] lg:basis-[48%] px-1.5 sm:px-2 py-1"
               >
-                <PromoCard {...card} />
+                <PromoCard {...card} isFirst={index === 0} />
               </div>
             ))}
           </div>
@@ -202,8 +202,10 @@ function PromoCard({
   gradient,
   backgroundColor,
   hasIcon,
-}: PromoCardData) {
+  isFirst = false,
+}: PromoCardData & { isFirst?: boolean }) {
   const hasImage = Boolean(image);
+  const cleanAlt = title && title.trim() !== '.' ? title : 'Promotional Banner';
 
   return (
     <div
@@ -221,10 +223,12 @@ function PromoCard({
         <>
           <Image
             src={image}
-            alt={title}
+            alt={cleanAlt}
             fill
             className="object-cover transition-transform duration-700 group-hover:scale-105"
-            priority
+            priority={isFirst}
+            fetchPriority={isFirst ? 'high' : 'auto'}
+            loading={isFirst ? undefined : 'lazy'}
             sizes="(max-width: 640px) 85vw, (max-width: 768px) 75vw, (max-width: 1024px) 60vw, 50vw"
           />
           {/* Gradient overlay */}
