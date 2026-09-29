@@ -1,7 +1,8 @@
 import { ArrowLeft, Sparkles, UtensilsCrossed, Star } from 'lucide-react';
 import { Skeleton } from './SkeletonBase';
+import { getHeroTransitionName } from '@/helpers/transitionHelper';
 
-export function ProductDetailsSkeleton() {
+export function ProductDetailsSkeleton({ id }: { id?: string | number } = {}) {
   const heroHeight = 45; // Matches product page hero height (45vh)
 
   return (
@@ -11,7 +12,10 @@ export function ProductDetailsSkeleton() {
       <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-[var(--color-accent)]/10 blur-[80px] rounded-full pointer-events-none -z-10" />
 
       {/* 2. Hero Image Placeholder Skeleton */}
-      <div className="fixed inset-x-0 top-0 h-[45vh] sm:h-[50vh] md:h-[55vh] xl:h-[60vh] z-0 overflow-hidden bg-[var(--color-surface-subtle)]">
+      <div
+        className="fixed inset-x-0 top-0 h-[45vh] sm:h-[50vh] md:h-[55vh] xl:h-[60vh] z-0 overflow-hidden bg-[var(--color-surface-subtle)]"
+        style={id ? ({ viewTransitionName: getHeroTransitionName(id) } as React.CSSProperties) : undefined}
+      >
         <div className="absolute inset-0 skeleton-shimmer opacity-40" />
         {/* Subtle decorative icon placeholder */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">

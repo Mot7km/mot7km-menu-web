@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect, useRef, useState } from 'react';
 import { ShoppingBag, X, Trash2, Minus, Plus } from 'lucide-react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
@@ -91,21 +91,46 @@ export function CartDrawer({
     }
   };
 
+  const CLOSE_DURATION = 380; // ms — must match the CSS transition duration
+
+  // `isVisible` tracks if the sheet is physically rendered (for animation).
+  // We keep it true for CLOSE_DURATION after isOpen becomes false so the
+  // slide-out animation can finish before we stop rendering.
+  const [isVisible, setIsVisible] = useState(isOpen);
+  const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      // Immediately show when opening
+      if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
+      setIsVisible(true);
+    } else {
+      // Delay hiding until animation completes
+      closeTimeoutRef.current = setTimeout(() => setIsVisible(false), CLOSE_DURATION);
+    }
+    return () => {
+      if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
+    };
+  }, [isOpen]);
+
   return (
     <>
-      {isOpen && (
+      {/* Backdrop — stays visible until close animation finishes */}
+      {isVisible && (
         <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 transition-opacity animate-fade-in"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 transition-opacity duration-300"
+          style={{ opacity: isOpen ? 1 : 0, pointerEvents: isOpen ? 'auto' : 'none' }}
           onClick={onClose}
         />
       )}
 
+      {isVisible && (
       <div
         className={`fixed bottom-0 left-1/2 -translate-x-1/2 z-50 
           w-full max-w-4xl
           bg-[var(--color-background)] rounded-t-[2rem] 
           shadow-[0_-20px_60px_rgba(0,0,0,0.15)] flex flex-col
-          transition-transform duration-500 cubic-bezier(0.32, 0.72, 0, 1)
+          transition-transform duration-[380ms] ease-[cubic-bezier(0.32,0.72,0,1)]
           ${isOpen ? 'translate-y-0' : 'translate-y-full'}`}
         style={{ maxHeight: '85vh' }}
       >
@@ -253,6 +278,7 @@ export function CartDrawer({
           </div>
         </div>
       </div>
+      )}
     </>
   );
 }

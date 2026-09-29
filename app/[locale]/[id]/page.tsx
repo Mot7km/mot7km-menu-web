@@ -39,7 +39,7 @@ export default function ProductPage({
   const [quantity, setQuantity] = useState(1);
 
   const baseProduct = useMemo(
-    () => storeProducts.find((p) => p.id === id),
+    () => storeProducts.find((p) => String(p.id) === String(id)),
     [storeProducts, id]
   );
 
@@ -157,8 +157,8 @@ export default function ProductPage({
     return product?.rating || '';
   }, [allReviews, product?.rating]);
 
-  if (loading) {
-    return <ProductDetailsSkeleton />;
+  if (loading && !baseProduct) {
+    return <ProductDetailsSkeleton id={id} />;
   }
 
   if (!product) {

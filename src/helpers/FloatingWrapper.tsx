@@ -98,6 +98,8 @@ export function FloatingWrapper({
   const startPosRef = useRef({ x: 0, y: 0 });
   const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isOverDropTargetRef = useRef(false);
+  // Prevent synthetic click (fired ~300ms after touchend on iOS) from double-firing onClick
+  const touchTappedRef = useRef(false);
 
   const updateDropTarget = useCallback(
     (clientX: number, clientY: number) => {
@@ -276,15 +278,29 @@ export function FloatingWrapper({
     [dragOffset, margin, updateDropTarget]
   );
 
-  const handleTouchEnd = useCallback(() => {
-    setIsDragging(false);
-    isDraggingRef.current = false;
-    snapToEdge();
-    onDragEnd?.(isOverDropTargetRef.current);
-    isOverDropTargetRef.current = false;
-    setIsOverDropTarget(false);
-    onDropTargetChange?.(false);
-  }, [snapToEdge, onDragEnd, onDropTargetChange]);
+  const handleTouchEnd = useCallback(
+    (e: TouchEvent) => {
+      const wasDragging = dragHasMoved;
+      setIsDragging(false);
+      isDraggingRef.current = false;
+      snapToEdge();
+      onDragEnd?.(isOverDropTargetRef.current);
+      isOverDropTargetRef.current = false;
+      setIsOverDropTarget(false);
+      onDropTargetChange?.(false);
+
+      // If it was a tap (no drag), fire onClick here directly and suppress
+      // the 300ms-delayed synthetic click that iOS/Android send afterward.
+      if (!wasDragging && onClick) {
+        e.preventDefault(); // stops the ghost click
+        touchTappedRef.current = true;
+        onClick(e as unknown as React.MouseEvent);
+        // Reset the flag after the ghost click window has passed
+        setTimeout(() => { touchTappedRef.current = false; }, 600);
+      }
+    },
+    [snapToEdge, onDragEnd, onDropTargetChange, dragHasMoved, onClick]
+  );
 
   useEffect(() => {
     if (isDragging) {
@@ -319,6 +335,11 @@ export function FloatingWrapper({
 
   const handleContainerClick = useCallback(
     (e: React.MouseEvent) => {
+      // If the tap was already handled in touchEnd, swallow this synthetic click
+      if (touchTappedRef.current) {
+        touchTappedRef.current = false;
+        return;
+      }
       if (!dragHasMoved && onClick) {
         onClick(e);
       }

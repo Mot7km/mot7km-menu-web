@@ -674,22 +674,14 @@ body {
   animation-duration: 0.38s;
   animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
   pointer-events: none;
-}
-
-/* 1. Hero Image: Seamless GPU morph without distortion across Level 1 & Level 2 */
-::view-transition-group(.product-hero-image) {
-  animation-duration: 0.42s;
-  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
   overflow: clip;
 }
 
-::view-transition-old(.product-hero-image),
-::view-transition-new(.product-hero-image) {
-  height: 100%;
-  width: 100%;
-  object-fit: cover;
-  overflow: clip;
+/* 1. Fix universal defaults: prevent white flash (mix-blend-mode) and image stretch (object-fit) on ALL browsers including Safari/iOS */
+::view-transition-old(*),
+::view-transition-new(*) {
   mix-blend-mode: normal;
+  object-fit: cover;
 }
 
 /* 2. Product Sheet: Independent native-feel slide up */
