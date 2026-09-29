@@ -6,7 +6,6 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: [
       'lucide-react',
-      '@use-gesture/react',
       'embla-carousel-react',
       'embla-carousel-autoplay',
     ],
