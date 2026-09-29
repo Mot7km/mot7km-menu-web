@@ -151,7 +151,7 @@ function ProductSection({
         {visibleItems.map((product, index) => (
           <div
             key={product.id}
-            className="w-full animate-fade-in"
+            className="w-full"
           >
             {layout === 'grid' ? (
               <GridProductCard product={product} priority={index < 2} />

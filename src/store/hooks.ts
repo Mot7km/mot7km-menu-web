@@ -34,6 +34,12 @@ export function useCart() {
     dispatch(setBusinessName(businessName));
   }, [businessName, dispatch]);
 
+  // Close the drawer immediately on any navigation so it never appears
+  // during a View Transition (hero animation) or browser back swipe.
+  useEffect(() => {
+    dispatch(setDrawerOpen(false));
+  }, [pathname, dispatch]);
+
   const addToCart = useCallback(
     (product: Product, selections: Record<string, string>, quantity = 1) => {
       dispatch(addItem({ product, selections, quantity }));

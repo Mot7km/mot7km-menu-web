@@ -4,6 +4,7 @@ import React, { useMemo, useEffect, useRef, useState } from 'react';
 import { ShoppingBag, X, Trash2, Minus, Plus } from 'lucide-react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
+import { usePathname } from 'next/navigation';
 
 interface CartItem {
   id: string;
@@ -96,8 +97,12 @@ export function CartDrawer({
   // `isVisible` tracks if the sheet is physically rendered (for animation).
   // We keep it true for CLOSE_DURATION after isOpen becomes false so the
   // slide-out animation can finish before we stop rendering.
+  // EXCEPTION: on navigation (pathname changes), we hide instantly so the
+  // drawer never appears during a View Transition or browser back animation.
   const [isVisible, setIsVisible] = useState(isOpen);
   const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pathname = usePathname();
+  const prevPathnameRef = useRef(pathname);
 
   useEffect(() => {
     if (isOpen) {
@@ -105,13 +110,23 @@ export function CartDrawer({
       if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
       setIsVisible(true);
     } else {
-      // Delay hiding until animation completes
-      closeTimeoutRef.current = setTimeout(() => setIsVisible(false), CLOSE_DURATION);
+      const isNavigation = prevPathnameRef.current !== pathname;
+      prevPathnameRef.current = pathname;
+
+      if (isNavigation) {
+        // Hide immediately — no animation during page transitions
+        if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
+        setIsVisible(false);
+      } else {
+        // Normal close: delay hiding until slide-out animation completes
+        closeTimeoutRef.current = setTimeout(() => setIsVisible(false), CLOSE_DURATION);
+      }
     }
     return () => {
       if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
     };
-  }, [isOpen]);
+  // pathname in deps ensures we re-evaluate when route changes
+  }, [isOpen, pathname]);
 
   return (
     <>

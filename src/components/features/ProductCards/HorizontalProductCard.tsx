@@ -83,7 +83,7 @@ export const HorizontalProductCard = memo(function HorizontalProductCard({ produ
           priority={priority}
           fetchPriority={priority ? 'high' : undefined}
           sizes="(max-width: 640px) 112px, (max-width: 768px) 144px, 160px"
-          className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+          className="object-cover md:group-hover:scale-105 transition-transform duration-300 ease-out"
           style={{
             viewTransitionName: getHeroTransitionName(product.id),
             viewTransitionClass: 'product-hero-image',

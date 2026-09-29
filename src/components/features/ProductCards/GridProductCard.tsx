@@ -97,7 +97,7 @@ export const GridProductCard = memo(function GridProductCard({ product, priority
             priority={priority}
             fetchPriority={priority ? 'high' : undefined}
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            className="object-cover transition-transform duration-700 ease-out group-hover:scale-108"
+            className="object-cover md:group-hover:scale-105 transition-transform duration-300 ease-out"
             style={{
               viewTransitionName: getHeroTransitionName(product.id),
               viewTransitionClass: 'product-hero-image',

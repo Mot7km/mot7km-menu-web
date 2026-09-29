@@ -86,17 +86,14 @@
    ================================================================= */
 html {
   min-height: 100%;
-  touch-action: pan-y;
 }
 
 body {
   min-height: 100vh;
-  touch-action: pan-y;
   margin: 0;
   background-color: var(--color-background);
   color: var(--color-text-primary);
   font-family: var(--font-english);
-  transition: background-color 0.3s ease, color 0.3s ease;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -237,6 +234,7 @@ body {
 /* =================================================================
    ANIMATION UTILITIES
    ================================================================= */
+
 .animate-fade-in-up {
   animation: fadeInUp 0.5s ease-out both;
   will-change: transform, opacity;
@@ -669,31 +667,51 @@ body {
   pointer-events: none;
 }
 
-/* Master timing: Apple's fluid spring deceleration curve */
+/* Master timing: Apple fluid deceleration curve */
 ::view-transition-group(*) {
-  animation-duration: 0.38s;
+  animation-duration: 0.35s;
   animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
   pointer-events: none;
   overflow: clip;
 }
 
-/* 1. Fix universal defaults: prevent white flash (mix-blend-mode) and image stretch (object-fit) on ALL browsers including Safari/iOS */
+/* 1. Universal snapshot rules:
+   Force width: 100% and height: 100% with object-fit: cover.
+   This completely resolves the aspect ratio mismatch: without 100% width and height,
+   the browser's user-agent defaults to block-size: auto, causing the snapshot
+   to balloon in height/zoom out mid-transition and then snap back. */
 ::view-transition-old(*),
 ::view-transition-new(*) {
+  width: 100%;
+  height: 100%;
   mix-blend-mode: normal;
   object-fit: cover;
 }
 
-/* 2. Product Sheet: Independent native-feel slide up */
+/* Dedicated hero image morph rules */
+::view-transition-group(.product-hero-image) {
+  animation-duration: 0.35s;
+  animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+  overflow: clip;
+}
+
+::view-transition-old(.product-hero-image),
+::view-transition-new(.product-hero-image) {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 2. Product Sheet: Smooth slide up on entrance, clean fade out on exit */
 ::view-transition-group(product_sheet) {
-  animation-duration: 0.4s;
+  animation-duration: 0.32s;
   animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @keyframes sheetSlideUp {
   from {
-    transform: translateY(120px);
-    opacity: 0.85;
+    transform: translateY(60px);
+    opacity: 0;
   }
   to {
     transform: translateY(0);
@@ -701,29 +719,28 @@ body {
   }
 }
 
-@keyframes sheetSlideDown {
+@keyframes sheetFadeOut {
   from {
-    transform: translateY(0);
     opacity: 1;
   }
   to {
-    transform: translateY(90px);
     opacity: 0;
   }
 }
 
 ::view-transition-new(product_sheet) {
-  animation: sheetSlideUp 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+  animation: sheetSlideUp 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+/* Sheet exit: pure fade out with fill-mode 'both' so it stays transparent and never flashes back */
 ::view-transition-old(product_sheet) {
-  animation: sheetSlideDown 0.28s cubic-bezier(0.25, 1, 0.5, 1);
+  animation: sheetFadeOut 0.22s ease-out both;
 }
 
 /* 3. Page Background Cross-fade */
 ::view-transition-old(root),
 ::view-transition-new(root) {
-  animation-duration: 0.25s;
+  animation-duration: 0.2s;
   mix-blend-mode: normal;
 }
 
