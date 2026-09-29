@@ -49,5 +49,11 @@
       "last 1 Edge version",
       "last 1 Safari version"
     ]
+  },
+  "allowScripts": {
+    "@parcel/watcher@2.6.0": true,
+    "@swc/core@1.16.2": true,
+    "sharp@0.34.5": true,
+    "unrs-resolver@1.12.2": true
   }
 }
