@@ -7,20 +7,26 @@ export async function proxyToBackend(
   const backendUrl = new URL(path, API_BASE_URL);
   backendUrl.search = new URL(request.url).search;
 
+  const isGetOrHead = request.method === 'GET' || request.method === 'HEAD';
+
   try {
     const response = await fetch(backendUrl, {
       method: request.method,
       headers: request.headers,
-      body: request.method === 'GET' || request.method === 'HEAD'
-        ? undefined
-        : await request.arrayBuffer(),
-      cache: 'no-store',
+      body: isGetOrHead ? undefined : await request.arrayBuffer(),
+      cache: isGetOrHead ? undefined : 'no-store',
+      next: isGetOrHead ? { revalidate: 60 } : undefined,
     });
+
+    const headers = new Headers(response.headers);
+    if (isGetOrHead && response.ok) {
+      headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
+    }
 
     return new Response(response.body, {
       status: response.status,
       statusText: response.statusText,
-      headers: response.headers,
+      headers,
     });
   } catch {
     return Response.json(

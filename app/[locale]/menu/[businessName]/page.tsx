@@ -4,6 +4,8 @@ import { InitialStoreProvider } from '@/context/InitialStoreContext';
 import { webMenuApi } from '@/lib/api/menuApi';
 import { generateThemeVariables } from '@/config/theme';
 
+export const revalidate = 60;
+
 interface BusinessMenuPageProps {
   params: Promise<{ locale: string; businessName: string }>;
 }

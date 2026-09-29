@@ -58,6 +58,7 @@ function normalizeMenu(rawMenu: ApiBusinessMenu, requestedBusinessName: string):
 export const menuApi = createApi({
   reducerPath: 'menuApi',
   baseQuery: fetchBaseQuery({ baseUrl: '/' }),
+  keepUnusedDataFor: 300,
   tagTypes: ['Menu', 'BusinessInfo', 'Sliders', 'Categories', 'Products', 'Reviews'],
   endpoints: (builder) => ({
     getMenu: builder.query<CompleteStoreData, string>({
