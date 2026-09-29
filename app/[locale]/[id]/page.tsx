@@ -3,7 +3,7 @@
 import { use, useCallback, useMemo, useState } from 'react';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
-import Link from 'next/link';
+import { Link } from 'next-view-transitions';
 import { useTranslations } from 'next-intl';
 import { CustomizationOptions } from '@/components/features/CustomizationOptions';
 import ListContainer from '@/components/common/ListContainer';
@@ -13,6 +13,7 @@ import { AddToCartBar } from '@/components/cart/AddToCartBar';
 import { useStore } from '@/store/storeHooks';
 import { ProductDetailsSkeleton } from '@/components/skeletons';
 import { useBusinessRoute } from '@/hooks/useLocale';
+import { getHeroTransitionName } from '@/helpers/transitionHelper';
 import { skipToken } from '@reduxjs/toolkit/query';
 import {
   useGetProductDetailsQuery,
@@ -186,6 +187,9 @@ export default function ProductPage({
           fill
           priority
           className="object-cover"
+          style={{
+            viewTransitionName: getHeroTransitionName(id),
+          } as React.CSSProperties}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/30" />
       </div>
@@ -198,6 +202,7 @@ export default function ProductPage({
           rounded-full glass-strong shadow-lg
           text-[var(--color-text-primary)] hover:text-[var(--color-primary)]
           transition-all duration-300 hover:scale-105 active:scale-95 group cursor-pointer"
+        style={{ viewTransitionName: 'product_back_btn' } as React.CSSProperties}
       >
         <ArrowLeft
           size={20}
@@ -214,25 +219,26 @@ export default function ProductPage({
         style={{
           marginTop: `calc(${heroHeight}vh - 2rem)`,
           minHeight: `calc(100vh - ${heroHeight}vh + 2rem)`,
-        }}
+          viewTransitionName: 'product_sheet',
+        } as React.CSSProperties}
       >
         <div className="max-w-4xl mx-auto">
-          <div className="card-premium p-6 sm:p-8 md:p-10 space-y-8 animate-slide-up bg-[var(--color-surface)]">
+          <div className="card-premium p-6 sm:p-8 md:p-10 space-y-8 bg-[var(--color-surface)]">
             {/* Header */}
             <div className="flex flex-col gap-4">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div className="flex-1 min-w-[200px]">
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 mb-3 rounded-full bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/20 animate-fade-in stagger-1">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 mb-3 rounded-full bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/20">
                     <Sparkles size={12} className="text-[var(--color-primary)]" />
                     <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-primary)]">
                       {product.category || t('productPage.noCategory')}
                     </span>
                   </div>
-                  <h1 className="font-api text-3xl sm:text-4xl md:text-5xl font-extrabold text-[var(--color-text-primary)] leading-tight tracking-tight animate-fade-in stagger-2">
+                  <h1 className="font-api text-3xl sm:text-4xl md:text-5xl font-extrabold text-[var(--color-text-primary)] leading-tight tracking-tight">
                     {product.name}
                   </h1>
-                  <div className="flex items-center gap-2 mt-3 animate-fade-in stagger-3">
-                    <div className="flex items-center bg-[var(--color-warning)]/10 px-2 py-1 rounded-full">
+                  <div className="flex items-center gap-2 mt-3">
+                    <div className="flex items-center bg-[var(--color-warning)]/10 px-2.5 py-1 rounded-full border border-[var(--color-warning)]/20">
                       <Star
                         size={14}
                         className="text-[var(--color-warning)] fill-[var(--color-warning)] mr-1"
@@ -247,9 +253,9 @@ export default function ProductPage({
                 </div>
 
                 {/* Price Tag */}
-                <div className="flex-shrink-0 animate-fade-in-up stagger-3">
+                <div className="flex-shrink-0">
                   <div className="relative group cursor-default">
-                    <div className="absolute -inset-1 rounded-2xl opacity-75 blur-md bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-accent)] group-hover:opacity-100 transition-opacity duration-500 animate-pulse-glow" />
+                    <div className="absolute -inset-1 rounded-2xl opacity-75 blur-md bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-accent)] group-hover:opacity-100 transition-opacity duration-500" />
                     <div className="relative px-6 py-3 bg-[var(--color-surface)] rounded-xl border border-[var(--color-border)] shadow-xl flex items-center justify-center">
                       <span className="gradient-text font-api font-black text-3xl md:text-4xl tracking-tight">
                         {product.price || t('productPage.noPrice')}
@@ -259,15 +265,15 @@ export default function ProductPage({
                 </div>
               </div>
 
-              <p className="text-[var(--color-text-secondary)] text-base md:text-lg leading-relaxed max-w-3xl animate-fade-in stagger-4">
+              <p className="text-[var(--color-text-secondary)] text-base md:text-lg leading-relaxed max-w-3xl">
                 {product.description || t('productPage.noDescription')}
               </p>
             </div>
 
-            <div className="section-divider-premium animate-fade-in stagger-5" />
+            <div className="section-divider-premium" />
 
             {/* Ingredients */}
-            <div className="space-y-4 animate-fade-in-up stagger-6">
+            <div className="space-y-4">
               <h3 className="font-api font-bold text-lg sm:text-xl text-[var(--color-text-primary)] flex items-center gap-2">
                 <div className="w-1.5 h-6 rounded-full bg-[var(--color-primary)]" />
                 {t('productPage.ingredients')}
@@ -291,7 +297,7 @@ export default function ProductPage({
             </div>
 
             {/* Customization */}
-            <div className="pt-2 animate-fade-in-up stagger-7">
+            <div className="pt-2">
               <CustomizationOptions
                 product={product}
                 onSelectionsChange={setSelections}
@@ -300,7 +306,7 @@ export default function ProductPage({
             </div>
 
             {/* Reviews */}
-            <div className="pt-6 animate-fade-in-up stagger-8">
+            <div className="pt-6">
               <ListContainer sections={reviewSections} />
             </div>
           </div>

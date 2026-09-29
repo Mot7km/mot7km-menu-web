@@ -2,12 +2,13 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
+import { Link } from 'next-view-transitions';
 import { Star, ShoppingBag, Check, SlidersHorizontal } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Product } from '@/data/menu';
 import { useBusinessRoute } from '@/hooks/useLocale';
 import { useCart } from '@/store/hooks';
+import { getHeroTransitionName } from '@/helpers/transitionHelper';
 
 interface HorizontalProductCardProps {
   product: Product;
@@ -64,8 +65,8 @@ export function HorizontalProductCard({ product, priority = false }: HorizontalP
       {/* ── Full Card Clickable Overlay ── */}
       <Link
         href={href}
-        prefetch={false}
         className="absolute inset-0 z-0"
+        style={{ touchAction: 'manipulation' }}
         aria-label={product.name}
         tabIndex={-1}
       />
@@ -83,6 +84,9 @@ export function HorizontalProductCard({ product, priority = false }: HorizontalP
           fetchPriority={priority ? 'high' : undefined}
           sizes="(max-width: 640px) 112px, (max-width: 768px) 144px, 160px"
           className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+          style={{
+            viewTransitionName: getHeroTransitionName(product.id),
+          } as React.CSSProperties}
         />
       </div>
 

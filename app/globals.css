@@ -662,6 +662,75 @@ body {
 }
 
 /* =================================================================
+   VIEW TRANSITIONS (Hero Shared Element Animations)
+   ================================================================= */
+@view-transition {
+  navigation: auto;
+}
+
+/* Master timing: Apple's fluid spring deceleration curve */
+::view-transition-group(*) {
+  animation-duration: 0.38s;
+  animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* 1. Hero Image: Seamless GPU morph without distortion */
+::view-transition-old(product_hero_*),
+::view-transition-new(product_hero_*) {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  overflow: clip;
+}
+
+/* 2. Product Sheet: Independent native-feel slide up */
+::view-transition-group(product_sheet) {
+  animation-duration: 0.4s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes sheetSlideUp {
+  from {
+    transform: translateY(120px);
+    opacity: 0.85;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes sheetSlideDown {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(90px);
+    opacity: 0;
+  }
+}
+
+::view-transition-new(product_sheet) {
+  animation: sheetSlideUp 0.38s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+::view-transition-old(product_sheet) {
+  animation: sheetSlideDown 0.28s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+/* 3. Page Background Cross-fade */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.25s;
+  mix-blend-mode: normal;
+}
+
+::view-transition-image-pair(*) {
+  isolation: isolate;
+}
+
+/* =================================================================
    ACCESSIBILITY & PERFORMANCE
    ================================================================= */
 @media (prefers-reduced-motion: reduce) {
@@ -674,5 +743,6 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
 
 

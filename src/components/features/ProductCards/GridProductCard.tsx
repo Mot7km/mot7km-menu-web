@@ -2,12 +2,13 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
+import { Link } from 'next-view-transitions';
 import { Star, ShoppingBag, Check, SlidersHorizontal, Sparkles, UtensilsCrossed } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Product } from '@/data/menu';
 import { useBusinessRoute } from '@/hooks/useLocale';
 import { useCart } from '@/store/hooks';
+import { getHeroTransitionName } from '@/helpers/transitionHelper';
 
 interface ProductCardProps {
   product: Product;
@@ -78,8 +79,8 @@ export function GridProductCard({ product, priority = false }: ProductCardProps)
       {/* ── Stretched Link covering the entire card ── */}
       <Link
         href={href}
-        prefetch={false}
         className="absolute inset-0 z-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] rounded-2xl sm:rounded-3xl"
+        style={{ touchAction: 'manipulation' }}
         aria-label={product.name}
       />
 
@@ -97,6 +98,9 @@ export function GridProductCard({ product, priority = false }: ProductCardProps)
             fetchPriority={priority ? 'high' : undefined}
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             className="object-cover transition-transform duration-700 ease-out group-hover:scale-108"
+            style={{
+              viewTransitionName: getHeroTransitionName(product.id),
+            } as React.CSSProperties}
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[var(--color-surface-subtle)] to-[var(--color-border)]/20">

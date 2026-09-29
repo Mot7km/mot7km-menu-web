@@ -6,6 +6,7 @@ import { Roboto, Cairo, Montserrat } from "next/font/google";
 import { Providers } from "@/components/providers";
 import { FaviconController } from "@/components/common/FaviconController";
 import { i18n } from "@/config/i18n";
+import { ViewTransitions } from "next-view-transitions";
 
 const roboto = Roboto({
   subsets: ["latin"],
@@ -63,29 +64,31 @@ export default async function LocaleLayout({
   const messages = await getMessages({ locale });
 
   return (
-    <html
-      lang={locale}
-      dir={isRTL ? "rtl" : "ltr"}
-      className={`h-full antialiased ${roboto.variable} ${cairo.variable} ${montserrat.variable}`}
-      suppressHydrationWarning
-    >
-      <head>
-        <link rel="preconnect" href="https://mjrnltqsxgqyhfjqbain.supabase.co" crossOrigin="" />
-        <link rel="dns-prefetch" href="https://mjrnltqsxgqyhfjqbain.supabase.co" />
-        <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="" />
-        <link rel="dns-prefetch" href="https://images.unsplash.com" />
-      </head>
-      <body
-        className="flex min-h-full flex-col bg-[var(--color-background)] text-[var(--color-text-primary)]"
-        style={{ fontFamily: isRTL ? "var(--font-arabic)" : "var(--font-english)" }}
+    <ViewTransitions>
+      <html
+        lang={locale}
+        dir={isRTL ? "rtl" : "ltr"}
+        className={`h-full antialiased ${roboto.variable} ${cairo.variable} ${montserrat.variable}`}
+        suppressHydrationWarning
       >
-        <NextIntlClientProvider messages={messages}>
-          <Providers>
-            <FaviconController />
-            {children}
-          </Providers>
-        </NextIntlClientProvider>
-      </body>
-    </html>
+        <head>
+          <link rel="preconnect" href="https://mjrnltqsxgqyhfjqbain.supabase.co" crossOrigin="" />
+          <link rel="dns-prefetch" href="https://mjrnltqsxgqyhfjqbain.supabase.co" />
+          <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="" />
+          <link rel="dns-prefetch" href="https://images.unsplash.com" />
+        </head>
+        <body
+          className="flex min-h-full flex-col bg-[var(--color-background)] text-[var(--color-text-primary)]"
+          style={{ fontFamily: isRTL ? "var(--font-arabic)" : "var(--font-english)" }}
+        >
+          <NextIntlClientProvider messages={messages}>
+            <Providers>
+              <FaviconController />
+              {children}
+            </Providers>
+          </NextIntlClientProvider>
+        </body>
+      </html>
+    </ViewTransitions>
   );
 }
