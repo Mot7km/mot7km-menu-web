@@ -4,10 +4,22 @@ import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { Coffee, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 import useEmblaCarousel from 'embla-carousel-react';
+import type { EmblaCarouselType } from 'embla-carousel';
 import Autoplay from 'embla-carousel-autoplay';
 import { PromoCardData } from '@/data/menupromo';
 import { useStore } from '@/store/storeHooks';
 import { useLocale, useTranslations } from 'next-intl';
+
+// -------------------------------------------------------------------
+// Tween constants — tweak these to control the coverflow intensity
+// -------------------------------------------------------------------
+const TWEEN_SCALE_FACTOR = 0.9;   // smooth scaling transition
+const SCALE_MIN = 0.88;           // side slides scale (88% of center slide)
+const OPACITY_MIN = 0.65;         // side slides opacity (clear and legible)
+
+/** Clamp a value between min and max. */
+const clamp = (v: number, min: number, max: number) =>
+  Math.min(max, Math.max(min, v));
 
 // -------------------------------------------------------------------
 // Main Carousel – full‑width on mobile, container‑width on larger screens
@@ -51,6 +63,45 @@ export const PromotionalCarousel = memo(function PromotionalCarousel() {
   const [canPrev, setCanPrev] = useState(false);
   const [canNext, setCanNext] = useState(false);
 
+  // ---- Coverflow tween refs (direct DOM manipulation → 60 fps) ----
+  const tweenNodesRef = useRef<HTMLElement[]>([]);
+
+  /** Cache the inner wrapper of every slide so we don't query the DOM on every frame. */
+  const setTweenNodes = useCallback((api: EmblaCarouselType) => {
+    tweenNodesRef.current = api.slideNodes().map((node) => {
+      const inner = node.querySelector<HTMLElement>('[data-tween-target]');
+      return inner ?? node;
+    });
+  }, []);
+
+  /** Apply scale + opacity to every slide based on distance from center. */
+  const tweenSlides = useCallback((api: EmblaCarouselType) => {
+    const progress = api.scrollProgress();
+    const snaps = api.scrollSnapList();
+
+    snaps.forEach((snap, idx) => {
+      const node = tweenNodesRef.current[idx];
+      if (!node) return;
+
+      // Distance from center: 0 = perfectly centered, ±1 = one full page away
+      let diff = snap - progress;
+
+      // Handle looping: pick the shortest wrap-around distance
+      if (loop) {
+        if (diff > 0.5) diff -= 1;
+        else if (diff < -0.5) diff += 1;
+      }
+
+      const absDiff = Math.abs(diff);
+      const scale = clamp(1 - absDiff * TWEEN_SCALE_FACTOR, SCALE_MIN, 1);
+      const opacity = clamp(1 - absDiff * TWEEN_SCALE_FACTOR, OPACITY_MIN, 1);
+
+      node.style.transform = `scale(${scale})`;
+      node.style.opacity = `${opacity}`;
+    });
+  }, [loop]);
+
+  // ---- Standard sync (selected index, snap count, nav) ----
   useEffect(() => {
     if (!emblaApi) return;
 
@@ -61,15 +112,27 @@ export const PromotionalCarousel = memo(function PromotionalCarousel() {
       setCanNext(emblaApi.canScrollNext());
     };
 
+    // Init tween nodes & run first tween pass
+    setTweenNodes(emblaApi);
+    tweenSlides(emblaApi);
+
     sync();
     emblaApi.on('select', sync);
     emblaApi.on('reInit', sync);
+    emblaApi.on('reInit', setTweenNodes);
+    emblaApi.on('reInit', tweenSlides);
+    emblaApi.on('scroll', tweenSlides);
+    emblaApi.on('slideFocus', tweenSlides);
 
     return () => {
       emblaApi.off('select', sync);
       emblaApi.off('reInit', sync);
+      emblaApi.off('reInit', setTweenNodes);
+      emblaApi.off('reInit', tweenSlides);
+      emblaApi.off('scroll', tweenSlides);
+      emblaApi.off('slideFocus', tweenSlides);
     };
-  }, [emblaApi]);
+  }, [emblaApi, setTweenNodes, tweenSlides]);
 
   // Pause autoplay when there's nothing to rotate through.
   useEffect(() => {
@@ -97,7 +160,7 @@ export const PromotionalCarousel = memo(function PromotionalCarousel() {
   const showNav = snapCount > 1;
 
   return (
-    <section className="relative overflow-x-hidden w-full py-1">
+    <section className="relative overflow-x-hidden w-full py-1" style={{ perspective: '1200px' }}>
       <div className="relative w-full">
         {/* Carousel Viewport */}
         <div
@@ -111,7 +174,13 @@ export const PromotionalCarousel = memo(function PromotionalCarousel() {
                 key={card.id}
                 className="min-w-0 shrink-0 grow-0 basis-[85%] sm:basis-[72%] md:basis-[58%] lg:basis-[48%] px-1.5 sm:px-2 py-1"
               >
-                <PromoCard {...card} isFirst={index === 0} />
+                {/* Inner wrapper targeted by the tween effect — never conflict with Embla's own transforms */}
+                <div
+                  data-tween-target
+                  className="transition-[transform,opacity] duration-300 ease-out will-change-[transform,opacity] origin-center"
+                >
+                  <PromoCard {...card} isFirst={index === 0} />
+                </div>
               </div>
             ))}
           </div>
