@@ -16,8 +16,8 @@ export function useBusinessRoute() {
   const locale: Locale = i18n.locales.includes(segments[0] as Locale)
     ? segments[0] as Locale
     : i18n.defaultLocale;
-  const pathBusinessName = segments[1] === 'menu' && segments[2] ? decodeURIComponent(segments[2]) : undefined;
-  const businessName = pathBusinessName;
-  const getPath = (suffix = '') => `${businessName ? `/${locale}/menu/${encodeURIComponent(businessName)}` : `/${locale}`}${suffix ? `/${suffix.replace(/^\//, '')}` : ''}`;
+  // New URL structure: /[locale]/[businessName]/[id]
+  const businessName = segments[1] ? decodeURIComponent(segments[1]) : undefined;
+  const getPath = (suffix = '') => `${businessName ? `/${locale}/${encodeURIComponent(businessName)}` : `/${locale}`}${suffix ? `/${suffix.replace(/^\//, '')}` : ''}`;
   return { locale, businessName, getPath };
 }

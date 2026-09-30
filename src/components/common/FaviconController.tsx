@@ -8,12 +8,12 @@ const DEFAULT_ICON = '/default-icon.png';
 
 /**
  * Resolves the business name from a locale-prefixed pathname:
- * /{locale}/menu/{businessName}[/{...nested}] → businessName, else undefined.
+ * /{locale}/{businessName}[/{...nested}] → businessName, else undefined.
  */
 function getBusinessNameFromPathname(pathname: string): string | undefined {
   const segments = pathname.split('/').filter(Boolean);
-  if (segments[1] === 'menu' && segments[2] && i18n.locales.includes(segments[0] as never)) {
-    return decodeURIComponent(segments[2]);
+  if (i18n.locales.includes(segments[0] as never) && segments[1]) {
+    return decodeURIComponent(segments[1]);
   }
   return undefined;
 }
@@ -35,8 +35,8 @@ function setFavicon(href: string) {
 
 /**
  * Single owner of the dynamic favicon:
- * - Base URL (and any non-menu route) shows the default icon.
- * - /{locale}/menu/{businessName} and all of its nested pages show that
+ * - Base URL (and the root locale route) shows the default icon.
+ * - /{locale}/{businessName} and all of its nested pages show that
  *   business's logo (served via /api/tenant-icon), reverting on leave.
  */
 export function FaviconController() {

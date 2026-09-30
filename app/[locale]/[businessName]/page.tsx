@@ -40,11 +40,11 @@ export async function generateMetadata({ params }: BusinessMenuPageProps): Promi
         { url: iconUrl, rel: 'apple-touch-icon' },
       ],
       alternates: {
-        canonical: `${siteUrl}/${locale}/menu/${encodeURIComponent(decodedBusinessName)}`,
+        canonical: `${siteUrl}/${locale}/${encodeURIComponent(decodedBusinessName)}`,
         languages: {
-          en: `${siteUrl}/en/menu/${encodeURIComponent(decodedBusinessName)}`,
-          ar: `${siteUrl}/ar/menu/${encodeURIComponent(decodedBusinessName)}`,
-          'x-default': `${siteUrl}/en/menu/${encodeURIComponent(decodedBusinessName)}`,
+          en: `${siteUrl}/en/${encodeURIComponent(decodedBusinessName)}`,
+          ar: `${siteUrl}/ar/${encodeURIComponent(decodedBusinessName)}`,
+          'x-default': `${siteUrl}/en/${encodeURIComponent(decodedBusinessName)}`,
         },
       },
       openGraph: {

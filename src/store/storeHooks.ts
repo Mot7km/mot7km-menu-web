@@ -46,8 +46,9 @@ export function useStore(): StoreState {
     : i18n.defaultLocale;
   const requestedBusinessName = useMemo(() => {
     const segments = pathname.split('/').filter(Boolean);
-    const businessName = segments[0] && (segments[0] === 'en' || segments[0] === 'ar') && segments[1] === 'menu'
-      ? segments[2]
+    // New URL structure: /[locale]/[businessName]/[id]
+    const businessName = segments[0] && (segments[0] === 'en' || segments[0] === 'ar') && segments[1]
+      ? segments[1]
       : undefined;
 
     return businessName ? decodeURIComponent(businessName) : undefined;

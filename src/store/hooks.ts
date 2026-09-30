@@ -22,8 +22,9 @@ export function useCart() {
   const pathname = usePathname();
   const businessName = useMemo(() => {
     const segments = pathname.split('/').filter(Boolean);
-    const value = segments[0] && (segments[0] === 'en' || segments[0] === 'ar') && segments[1] === 'menu'
-      ? segments[2]
+    // New URL structure: /[locale]/[businessName]/[id]
+    const value = segments[0] && (segments[0] === 'en' || segments[0] === 'ar') && segments[1]
+      ? segments[1]
       : undefined;
     return value ? decodeURIComponent(value) : null;
   }, [pathname]);

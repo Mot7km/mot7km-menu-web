@@ -25,7 +25,7 @@ import type { Product, Review } from '@/data/menu';
 export default function ProductPage({
   params,
 }: {
-  params: Promise<{ locale: string; id: string }>;
+  params: Promise<{ locale: string; businessName: string; id: string }>;
 }) {
   const resolvedParams = use(params);
   const { id } = resolvedParams;
