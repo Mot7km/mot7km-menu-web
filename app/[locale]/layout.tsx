@@ -6,7 +6,7 @@ import { Roboto, Cairo, Montserrat } from "next/font/google";
 import { Providers } from "@/components/providers";
 import { FaviconController } from "@/components/common/FaviconController";
 import { i18n } from "@/config/i18n";
-import { ViewTransitions } from "next-view-transitions";
+
 
 const roboto = Roboto({
   subsets: ["latin"],
@@ -64,7 +64,7 @@ export default async function LocaleLayout({
   const messages = await getMessages({ locale });
 
   return (
-    <ViewTransitions>
+    <>
       <html
         lang={locale}
         dir={isRTL ? "rtl" : "ltr"}
@@ -89,6 +89,6 @@ export default async function LocaleLayout({
           </NextIntlClientProvider>
         </body>
       </html>
-    </ViewTransitions>
+    </>
   );
 }

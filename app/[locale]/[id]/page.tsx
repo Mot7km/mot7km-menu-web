@@ -3,7 +3,7 @@
 import { use, useCallback, useMemo, useState } from 'react';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
-import { Link } from 'next-view-transitions';
+import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { CustomizationOptions } from '@/components/features/CustomizationOptions';
 import ListContainer from '@/components/common/ListContainer';
@@ -13,7 +13,7 @@ import { AddToCartBar } from '@/components/cart/AddToCartBar';
 import { useStore } from '@/store/storeHooks';
 import { ProductDetailsSkeleton } from '@/components/skeletons';
 import { useBusinessRoute } from '@/hooks/useLocale';
-import { getHeroTransitionName } from '@/helpers/transitionHelper';
+
 import { skipToken } from '@reduxjs/toolkit/query';
 import {
   useGetProductDetailsQuery,
@@ -187,10 +187,6 @@ export default function ProductPage({
           fill
           priority
           className="object-cover"
-          style={{
-            viewTransitionName: getHeroTransitionName(id),
-            viewTransitionClass: 'product-hero-image',
-          } as React.CSSProperties}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/30" />
       </div>
@@ -203,7 +199,7 @@ export default function ProductPage({
           rounded-full glass-strong shadow-lg
           text-[var(--color-text-primary)] hover:text-[var(--color-primary)]
           transition-all duration-300 hover:scale-105 active:scale-95 group cursor-pointer"
-        style={{ viewTransitionName: 'product_back_btn' } as React.CSSProperties}
+        style={{ touchAction: 'manipulation' }}
       >
         <ArrowLeft
           size={20}
@@ -220,7 +216,6 @@ export default function ProductPage({
         style={{
           marginTop: `calc(${heroHeight}vh - 2rem)`,
           minHeight: `calc(100vh - ${heroHeight}vh + 2rem)`,
-          viewTransitionName: 'product_sheet',
         } as React.CSSProperties}
       >
         <div className="max-w-4xl mx-auto">

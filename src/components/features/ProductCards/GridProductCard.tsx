@@ -2,13 +2,13 @@
 
 import { useState, useRef, useEffect, memo } from 'react';
 import Image from 'next/image';
-import { Link } from 'next-view-transitions';
+import Link from 'next/link';
 import { Star, ShoppingBag, Check, SlidersHorizontal, Sparkles, UtensilsCrossed } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Product } from '@/data/menu';
 import { useBusinessRoute } from '@/hooks/useLocale';
 import { useCart } from '@/store/hooks';
-import { getHeroTransitionName } from '@/helpers/transitionHelper';
+
 
 interface ProductCardProps {
   product: Product;
@@ -98,10 +98,6 @@ export const GridProductCard = memo(function GridProductCard({ product, priority
             fetchPriority={priority ? 'high' : undefined}
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             className="object-cover md:group-hover:scale-105 transition-transform duration-300 ease-out"
-            style={{
-              viewTransitionName: getHeroTransitionName(product.id),
-              viewTransitionClass: 'product-hero-image',
-            } as React.CSSProperties}
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[var(--color-surface-subtle)] to-[var(--color-border)]/20">
