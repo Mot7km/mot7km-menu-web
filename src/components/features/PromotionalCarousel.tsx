@@ -95,8 +95,10 @@ export const PromotionalCarousel = memo(function PromotionalCarousel() {
       const absDiff = Math.abs(diff);
       const scale = clamp(1 - absDiff * TWEEN_SCALE_FACTOR, SCALE_MIN, 1);
       const opacity = clamp(1 - absDiff * TWEEN_SCALE_FACTOR, OPACITY_MIN, 1);
+      // Subtle 3D tilt (Apple Coverflow angle)
+      const rotate = clamp(diff * 6, -6, 6);
 
-      node.style.transform = `scale(${scale})`;
+      node.style.transform = `scale(${scale}) rotateY(${rotate}deg)`;
       node.style.opacity = `${opacity}`;
     });
   }, [loop]);
@@ -161,18 +163,26 @@ export const PromotionalCarousel = memo(function PromotionalCarousel() {
 
   return (
     <section className="relative overflow-x-hidden w-full py-1" style={{ perspective: '1200px' }}>
-      <div className="relative w-full">
+      {/* Adaptive Stage: Full-bleed on mobile (<md), centered container with padding on desktop (md+) */}
+      <div className="relative w-full md:max-w-6xl xl:max-w-7xl md:mx-auto md:px-6 lg:px-8">
         {/* Carousel Viewport */}
         <div
           className="overflow-hidden touch-pan-y"
           ref={emblaRef}
           dir={isRTL ? 'rtl' : 'ltr'}
+          onMouseEnter={() => autoplayRef.current?.stop()}
+          onMouseLeave={() => {
+            if (snapCount > 1) autoplayRef.current?.play();
+          }}
         >
           <div className="flex">
             {promoCards.map((card, index) => (
               <div
                 key={card.id}
-                className="min-w-0 shrink-0 grow-0 basis-[85%] sm:basis-[72%] md:basis-[58%] lg:basis-[48%] px-1.5 sm:px-2 py-1"
+                onClick={() => {
+                  if (index !== selectedIndex) scrollTo(index);
+                }}
+                className="min-w-0 shrink-0 grow-0 basis-[74%] sm:basis-[62%] md:basis-[50%] lg:basis-[45%] xl:basis-[42%] px-1 sm:px-1.5 py-1 cursor-pointer"
               >
                 {/* Inner wrapper targeted by the tween effect — never conflict with Embla's own transforms */}
                 <div
@@ -186,18 +196,18 @@ export const PromotionalCarousel = memo(function PromotionalCarousel() {
           </div>
         </div>
 
-        {/* Navigation Arrows — hidden on mobile, visible on sm+ */}
+        {/* Navigation Arrows — Framed within the stage on desktop */}
         {showNav && (
           <>
             <button
               onClick={scrollPrev}
               disabled={!loop && !canPrev}
               aria-label={isRTL ? 'التالي' : 'Previous'}
-              className="absolute top-1/2 left-3 sm:left-6 -translate-y-1/2 z-10
+              className="absolute top-1/2 left-2 sm:left-3 md:left-8 -translate-y-1/2 z-20
                 hidden sm:flex items-center justify-center
-                w-11 h-11 rounded-full
-                glass shadow-lg
-                text-[var(--color-text-secondary)] hover:text-[var(--color-primary)]
+                w-10 h-10 md:w-11 md:h-11 rounded-full
+                bg-black/40 hover:bg-black/60 text-white backdrop-blur-md border border-white/20
+                shadow-xl
                 transition-all duration-200
                 hover:scale-110 active:scale-95
                 focus:outline-none focus-ring
@@ -211,11 +221,11 @@ export const PromotionalCarousel = memo(function PromotionalCarousel() {
               onClick={scrollNext}
               disabled={!loop && !canNext}
               aria-label={isRTL ? 'السابق' : 'Next'}
-              className="absolute top-1/2 right-3 sm:right-6 -translate-y-1/2 z-10
+              className="absolute top-1/2 right-2 sm:right-3 md:right-8 -translate-y-1/2 z-20
                 hidden sm:flex items-center justify-center
-                w-11 h-11 rounded-full
-                glass shadow-lg
-                text-[var(--color-text-secondary)] hover:text-[var(--color-primary)]
+                w-10 h-10 md:w-11 md:h-11 rounded-full
+                bg-black/40 hover:bg-black/60 text-white backdrop-blur-md border border-white/20
+                shadow-xl
                 transition-all duration-200
                 hover:scale-110 active:scale-95
                 focus:outline-none focus-ring
@@ -278,7 +288,7 @@ const PromoCard = memo(function PromoCard({
 
   return (
     <div
-      className="group relative h-[200px] sm:h-[240px] md:h-[260px] w-full overflow-hidden rounded-lg
+      className="group relative h-[210px] sm:h-[250px] md:h-[280px] lg:h-[310px] xl:h-[330px] w-full overflow-hidden rounded-xl sm:rounded-2xl
         border border-[var(--color-border)]
         shadow-[0_4px_20px_-4px_rgba(0,0,0,0.3)]
         hover:shadow-[0_12px_32px_-6px_rgba(0,0,0,0.45)]
@@ -323,7 +333,7 @@ const PromoCard = memo(function PromoCard({
       )}
 
       {/* Content */}
-      <div className="relative z-10 flex h-full flex-col justify-center px-4 sm:px-6 py-4 sm:py-5">
+      <div className="relative z-10 flex h-full flex-col justify-center px-4 sm:px-6 md:px-8 py-4 sm:py-6">
         {badge && (
           <span
             className={`mb-2 sm:mb-3 inline-flex w-fit items-center rounded-full
@@ -339,7 +349,7 @@ const PromoCard = memo(function PromoCard({
         )}
 
         <h3
-          className={`text-xl sm:text-2xl md:text-[1.7rem] font-bold leading-tight tracking-tight
+          className={`text-xl sm:text-2xl md:text-3xl lg:text-[2rem] font-bold leading-tight tracking-tight
             ${hasImage || backgroundColor ? 'text-white' : 'text-[var(--color-text-primary)]'}
             line-clamp-2
           `}
@@ -350,7 +360,7 @@ const PromoCard = memo(function PromoCard({
 
         {description && (
           <p
-            className={`mt-1 text-xs sm:text-sm font-medium leading-5 max-w-sm
+            className={`mt-1.5 sm:mt-2 text-xs sm:text-sm md:text-base font-medium leading-relaxed max-w-sm sm:max-w-md lg:max-w-lg
               ${hasImage || backgroundColor ? 'text-white/95' : 'text-[var(--color-text-secondary)]'}
               line-clamp-2 sm:line-clamp-3
             `}
