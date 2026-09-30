@@ -99,6 +99,7 @@ export const menuApi = createApi({
       query: ({ businessName, productId }) =>
         `/api/menu/${encodeURIComponent(businessName)}/products/${encodeURIComponent(productId)}`,
       providesTags: (_result, _error, { productId }) => [{ type: 'Products', id: productId }],
+      keepUnusedDataFor: 600, // 10 min — product details rarely change mid-session
     }),
 
     /** GET /api/menu/{businessName}/products/{productId}/reviews — Reviews */
@@ -106,6 +107,7 @@ export const menuApi = createApi({
       query: ({ businessName, productId }) =>
         `/api/menu/${encodeURIComponent(businessName)}/products/${encodeURIComponent(productId)}/reviews`,
       providesTags: (_result, _error, { productId }) => [{ type: 'Reviews', id: productId }],
+      keepUnusedDataFor: 600, // 10 min
     }),
   }),
 });
