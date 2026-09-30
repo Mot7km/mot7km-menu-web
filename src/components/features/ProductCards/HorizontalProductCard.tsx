@@ -15,7 +15,10 @@ interface HorizontalProductCardProps {
   priority?: boolean;
 }
 
-export const HorizontalProductCard = memo(function HorizontalProductCard({ product, priority = false }: HorizontalProductCardProps) {
+export const HorizontalProductCard = memo(function HorizontalProductCard({
+  product,
+  priority = false,
+}: HorizontalProductCardProps) {
   const t = useTranslations();
   const { getPath } = useBusinessRoute();
   const href = getPath(product.id);
@@ -30,32 +33,33 @@ export const HorizontalProductCard = memo(function HorizontalProductCard({ produ
     };
   }, []);
 
-  const hasOptions = Boolean(product.customizationOptions && product.customizationOptions.length > 0);
+  const hasOptions = Boolean(
+    product.customizationOptions && product.customizationOptions.length > 0
+  );
   const reviewCount = product.reviews?.length || 0;
   const ratingNum = parseFloat(product.rating || '0');
   const hasRating = !isNaN(ratingNum) && ratingNum > 0;
 
   const handleQuickAdd = (e: React.MouseEvent) => {
     e.preventDefault();
-
     if (justAdded) return;
 
     addToCart(product, {}, 1);
     setJustAdded(true);
 
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    timeoutRef.current = setTimeout(() => {
-      setJustAdded(false);
-    }, 1200);
+    timeoutRef.current = setTimeout(() => setJustAdded(false), 1200);
   };
 
   return (
     <article
-      className="group relative flex flex-row items-stretch w-full min-h-[140px] sm:min-h-[160px] md:min-h-[175px]
+      className="group relative flex flex-row items-stretch w-full h-full
+        min-h-[128px] min-[400px]:min-h-[140px] sm:min-h-[160px] md:min-h-[175px]
         bg-[var(--color-surface)] rounded-2xl
         border border-[var(--color-border)]
         hover:border-[var(--color-primary)]/40
-        p-3 sm:p-4 gap-3.5 sm:gap-4.5
+        p-2.5 min-[400px]:p-3 sm:p-4
+        gap-2.5 min-[400px]:gap-3.5 sm:gap-4.5
         shadow-[0_2px_12px_-2px_rgba(0,0,0,0.04)]
         hover:shadow-[0_12px_28px_-6px_rgba(0,0,0,0.08)]
         hover:-translate-y-0.5
@@ -71,43 +75,57 @@ export const HorizontalProductCard = memo(function HorizontalProductCard({ produ
         tabIndex={-1}
       />
 
-      {/* ── 1. Hero Left Image Frame ── */}
+      {/* ── 1. Hero Left Image — stretches with card, image stays square & centered ── */}
       <div
-        className="relative w-28 h-28 sm:w-36 sm:h-36 md:w-40 md:h-40 flex-shrink-0 rounded-xl overflow-hidden bg-[var(--color-surface-subtle)] z-10 pointer-events-none"
-        style={{ aspectRatio: '1 / 1' }}
+        className="relative flex-shrink-0 self-stretch flex items-center justify-center z-10 pointer-events-none
+          w-24 min-[400px]:w-28 sm:w-36 md:w-40"
       >
-        <Image
-          src={product.image}
-          alt={product.name}
-          fill
-          priority={priority}
-          fetchPriority={priority ? 'high' : undefined}
-          sizes="(max-width: 640px) 112px, (max-width: 768px) 144px, 160px"
-          className="object-cover md:group-hover:scale-105 transition-transform duration-300 ease-out"
-        />
+        <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-[var(--color-surface-subtle)]">
+          <Image
+            src={product.image}
+            alt={product.name}
+            fill
+            priority={priority}
+            fetchPriority={priority ? 'high' : undefined}
+            sizes="(max-width: 400px) 96px, (max-width: 640px) 112px, (max-width: 768px) 144px, 160px"
+            className="object-cover md:group-hover:scale-105 transition-transform duration-300 ease-out"
+          />
+        </div>
       </div>
 
       {/* ── 2. Information Column ── */}
       <div className="flex flex-col justify-between flex-1 min-w-0 z-10 pointer-events-none">
-        {/* Top: Product Title, Description, and Tags */}
-        <div>
+        {/* Top: Title, Description, Meta */}
+        <div className="min-w-0">
           <h3
-            className="font-bold text-sm sm:text-base md:text-lg leading-snug text-[var(--color-text-primary)] group-hover:text-[var(--color-primary)] transition-colors line-clamp-2"
+            className="font-bold text-sm sm:text-base md:text-lg leading-snug
+              text-[var(--color-text-primary)] group-hover:text-[var(--color-primary)]
+              transition-colors line-clamp-2 break-words"
             style={{ fontFamily: 'var(--font-display)' }}
           >
             {product.name}
           </h3>
 
           {product.description && (
-            <p className="mt-1 text-xs sm:text-sm text-[var(--color-text-secondary)] line-clamp-2 leading-relaxed">
+            <p
+              className="mt-0.5 sm:mt-1 text-xs sm:text-sm
+                text-[var(--color-text-secondary)]
+                line-clamp-1 sm:line-clamp-2 leading-relaxed break-words"
+            >
               {product.description}
             </p>
           )}
 
           {/* Meta Line: Category & Star Rating */}
-          <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+          <div className="flex items-center gap-1.5 sm:gap-2 mt-1 sm:mt-1.5 flex-wrap">
             {product.category && (
-              <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] sm:text-[11px] font-semibold tracking-wide uppercase bg-[var(--color-primary)]/10 text-[var(--color-primary)] border border-[var(--color-primary)]/15 truncate max-w-[140px]">
+              <span
+                className="inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded-md
+                  text-[10px] sm:text-[11px] font-semibold tracking-wide uppercase
+                  bg-[var(--color-primary)]/10 text-[var(--color-primary)]
+                  border border-[var(--color-primary)]/15
+                  truncate max-w-[90px] min-[400px]:max-w-[120px] sm:max-w-[140px]"
+              >
                 {product.category}
               </span>
             )}
@@ -130,7 +148,11 @@ export const HorizontalProductCard = memo(function HorizontalProductCard({ produ
         </div>
 
         {/* ── 3. Footer Bar: Price & Action Pill Button ── */}
-        <div className="mt-2.5 pt-2 sm:pt-2.5 flex items-center justify-between gap-2 border-t border-[var(--color-border)]/50">
+        <div
+          className="mt-2 sm:mt-2.5 pt-1.5 sm:pt-2.5
+            flex items-center justify-between gap-1.5 sm:gap-2
+            border-t border-[var(--color-border)]/50"
+        >
           <div className="flex flex-col min-w-0">
             <span className="text-[10px] sm:text-[11px] font-medium uppercase tracking-wider text-[var(--color-text-muted)]">
               {t('productCard.price')}
@@ -140,12 +162,14 @@ export const HorizontalProductCard = memo(function HorizontalProductCard({ produ
             </span>
           </div>
 
-          {/* Action Button */}
+          {/* Action Button — icon-only below 400px, full label at ≥400px */}
           {hasOptions ? (
             <Link
               href={href}
               prefetch={false}
-              className="pointer-events-auto min-h-[36px] sm:min-h-[38px] px-3 sm:px-3.5 py-1.5 rounded-full
+              className="pointer-events-auto flex-shrink-0
+                min-h-[34px] min-[400px]:min-h-[36px] sm:min-h-[38px]
+                px-2.5 min-[400px]:px-3 sm:px-3.5 py-1.5 rounded-full
                 inline-flex items-center justify-center gap-1.5
                 text-xs sm:text-sm font-bold
                 bg-[var(--color-primary)]/10 text-[var(--color-primary)]
@@ -158,13 +182,17 @@ export const HorizontalProductCard = memo(function HorizontalProductCard({ produ
               title={t('productCard.customize')}
             >
               <SlidersHorizontal size={14} />
-              <span>{t('productCard.customize')}</span>
+              <span className="hidden min-[400px]:inline">
+                {t('productCard.customize')}
+              </span>
             </Link>
           ) : (
             <button
               onClick={handleQuickAdd}
               type="button"
-              className={`pointer-events-auto min-h-[36px] sm:min-h-[38px] px-3 sm:px-3.5 py-1.5 rounded-full
+              className={`pointer-events-auto flex-shrink-0
+                min-h-[34px] min-[400px]:min-h-[36px] sm:min-h-[38px]
+                px-2.5 min-[400px]:px-3 sm:px-3.5 py-1.5 rounded-full
                 inline-flex items-center justify-center gap-1.5
                 text-xs sm:text-sm font-bold
                 transition-all duration-200 ease-out cursor-pointer active:scale-95 shadow-sm
@@ -179,12 +207,16 @@ export const HorizontalProductCard = memo(function HorizontalProductCard({ produ
               {justAdded ? (
                 <>
                   <Check size={14} className="animate-scale-in" strokeWidth={2.5} />
-                  <span>{t('productCard.added')}</span>
+                  <span className="hidden min-[400px]:inline">
+                    {t('productCard.added')}
+                  </span>
                 </>
               ) : (
                 <>
                   <ShoppingBag size={14} />
-                  <span>{t('productCard.addToCart')}</span>
+                  <span className="hidden min-[400px]:inline">
+                    {t('productCard.addToCart')}
+                  </span>
                 </>
               )}
             </button>
