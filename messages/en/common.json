@@ -89,6 +89,7 @@
   "review": {
     "writeReview": "Write a Review",
     "name": "Your Name",
+    "anonymous": "Anonymous",
     "optional": "Optional",
     "namePlaceholder": "Enter your name...",
     "rating": "Rating",
@@ -111,6 +112,7 @@
   "newsletter": {
     "title": "Join Our Newsletter",
     "subtitle": "Get 10% off your first order!",
+    "discountBadge": "10% OFF",
     "placeholder": "Enter your email address",
     "button": "Subscribe"
   },
@@ -153,5 +155,219 @@
     "title": "Page Not Found",
     "description": "The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.",
     "goHome": "Back to Home"
+  },
+  "landing": {
+    "navbar": {
+      "home": "Home",
+      "about": "About",
+      "features": "Features",
+      "clients": "Featured Menus",
+      "plans": "Pricing",
+      "requestDemo": "Request Demo",
+      "toggleTheme": "Toggle theme",
+      "toggleLanguage": "Switch language",
+      "toggleMenu": "Toggle navigation menu"
+    },
+    "hero": {
+      "pillTag": "Next-Gen Cloud Digital Menus",
+      "titlePart1": "Your menu, ready to be",
+      "titleGradient": "discovered & loved",
+      "titlePart2": "",
+      "subtitle": "MOT7KM powers modern restaurants and cafes with ultra-fast, elegant digital menus. Instant QR scan, 3D interactive promotional banners, and live insights with zero app downloads.",
+      "exploreMenus": "Explore Partner Menus",
+      "viewPlans": "View Pricing Plans",
+      "metrics": {
+        "loadTime": "0.3s Instant Load Time",
+        "noApp": "No App Download Required",
+        "uptime": "99.9% Cloud Uptime"
+      },
+      "mockup": {
+        "storeName": "Elite Specialty Cafe",
+        "status": "Open Now • Table Service",
+        "specialOfferTag": "Special 25% Today",
+        "specialOfferTitle": "Morning Brew + Butter Croissant",
+        "specialOfferSubtitle": "Ethiopian Roast & Fresh Pastry",
+        "bestSellers": "Best Sellers",
+        "coldBrews": "Cold Brews",
+        "desserts": "Desserts",
+        "sampleProductTitle": "Salted Caramel Latte",
+        "sampleProductPrice": "22.00 SAR",
+        "salesMetric": "+35% Higher Sales",
+        "salesMetricSub": "Driven by smart promotional sliders",
+        "liveMenuBadge": "Live Interactive Menu"
+      }
+    },
+    "summary": {
+      "sectionTag": "About the Platform",
+      "title": "What is MOT7KM Platform?",
+      "description": "MOT7KM is an enterprise-grade cloud ecosystem built for restaurants, cafes, and hospitality businesses. It transforms static paper menus and clunky PDFs into interactive, high-performance web experiences that delight guests and accelerate revenue.",
+      "pillars": {
+        "speed": {
+          "title": "Lightning-Fast Agility",
+          "description": "Menus load in fractions of a second on any smartphone with zero app downloads or complicated sign-ups."
+        },
+        "control": {
+          "title": "Centralized Cloud Control",
+          "description": "Update prices instantly, upload rich food photography, and toggle out-of-stock items in real time with one click."
+        },
+        "growth": {
+          "title": "Higher Sales & Order Value",
+          "description": "Dynamic promotional sliders and featured highlights drive customer interest toward high-margin menu items, increasing ticket size by up to 35%."
+        }
+      },
+      "comparison": {
+        "title": "Why Choose MOT7KM Over Static PDF Menus?",
+        "subtitle": "A quick glance at traditional menus versus the modern MOT7KM experience",
+        "oldWayTitle": "Traditional Paper & PDF Menus",
+        "oldWayPoints": [
+          "Heavy file sizes take forever to download on mobile cellular data.",
+          "Awkward pinching and zooming on small screens disrupts dining flow.",
+          "Costly reprinting cycles every time a single ingredient or price changes.",
+          "Zero customer data or analytics on what guests actually view."
+        ],
+        "newWayTitle": "MOT7KM Smart Cloud Experience",
+        "newWayPoints": [
+          "Instant launch in under 0.3 seconds directly upon QR code scan.",
+          "100% responsive mobile-first UI with automatic dark & light theme support.",
+          "Instant live updates for prices, specials, and stock with zero reprint cost.",
+          "Cinematic interactive promotional sliders boosting high-margin dishes."
+        ]
+      }
+    },
+    "features": {
+      "sectionTag": "Core Features",
+      "title": "Everything You Need for an Elite Menu",
+      "description": "Engineered with modern tools to elevate customer ordering and give restaurant operators effortless control.",
+      "includedBadge": "Included in all plans",
+      "items": {
+        "qr": {
+          "tag": "Instant Access",
+          "title": "Instant Smart QR Code Scanning",
+          "description": "Custom branded QR codes for tables and packaging. Opens straight in the mobile browser without installing anything."
+        },
+        "cinematic": {
+          "tag": "Cinematic 3D",
+          "title": "3D Coverflow Promotional Sliders",
+          "description": "Highlight today's specials and high-margin dishes with a smooth, responsive 3D coverflow carousel inspired by Apple."
+        },
+        "customization": {
+          "tag": "Full Branding",
+          "title": "Custom Brand Palette & Typography",
+          "description": "Fine-tune your brand colors, custom logo, cinematic cover photography, and typography to reflect your restaurant identity."
+        },
+        "sync": {
+          "tag": "Live Sync",
+          "title": "Live Inventory & Price Updates",
+          "description": "Run out of an ingredient? Hide dishes instantly. Update pricing and seasonal items without any reprinting hassle."
+        },
+        "bilingual": {
+          "tag": "Bilingual Native",
+          "title": "Native Arabic & English Support",
+          "description": "Seamless RTL and LTR directionality paired with elegant typography (Cairo & Roboto) for locals and tourists alike."
+        },
+        "themes": {
+          "tag": "Adaptive Themes",
+          "title": "Dark & Light Mode Integration",
+          "description": "Adaptive theme support designed to blend seamlessly with dimly-lit dining atmospheres and daylight cafes."
+        }
+      }
+    },
+    "featuredMenus": {
+      "sectionTag": "Featured Menus",
+      "title": "Restaurants & Cafes Powered by MOT7KM",
+      "description": "Explore live showcase digital menus powered by our cloud system and experience real-time ordering.",
+      "categories": {
+        "all": "All",
+        "cafes": "Cafes & Roasteries",
+        "grill": "Burger & Grill",
+        "international": "International",
+        "sweets": "Bakery & Sweets",
+        "healthy": "Healthy Food"
+      },
+      "menuHandle": "Menu Handle",
+      "viewMenu": "View Menu",
+      "browseAll": "Browse All Menus on MOT7KM",
+      "featuredBadge": "Featured"
+    },
+    "pricing": {
+      "sectionTag": "Pricing & Plans",
+      "title": "Transparent, Scalable Plans for Every Stage",
+      "description": "Simple, predictable pricing with zero hidden fees. Upgrade, downgrade, or pause anytime.",
+      "monthly": "Monthly",
+      "annual": "Annual",
+      "savePercent": "Save 20%",
+      "perMonth": "SAR / mo",
+      "billedAnnually": "Billed annually",
+      "popularBadge": "Most Popular ⭐",
+      "plans": {
+        "starter": {
+          "name": "Starter Plan",
+          "tagline": "Ideal for food trucks & emerging cafes",
+          "cta": "Start Free Trial",
+          "features": [
+            "Digital menu for up to 60 items",
+            "Unlimited QR code table scans",
+            "Instant price & stock updates",
+            "Bilingual support (Arabic & English)",
+            "Adaptive Dark & Light mode",
+            "Standard email support"
+          ]
+        },
+        "pro": {
+          "name": "Pro Business Plan",
+          "tagline": "Most popular for thriving restaurants & cafes",
+          "cta": "Subscribe to Pro",
+          "features": [
+            "Unlimited products, menus & categories",
+            "3D Coverflow promotional slider",
+            "Custom branding, colors & logo",
+            "Analytics & customer dish trends",
+            "Custom branded vector QR codes",
+            "Nutritional & calorie details",
+            "Priority WhatsApp & phone support"
+          ]
+        },
+        "enterprise": {
+          "name": "Enterprise Chain",
+          "tagline": "Custom enterprise solutions for multi-branch chains",
+          "cta": "Talk to Sales",
+          "features": [
+            "Centralized multi-branch control",
+            "Custom domain setup (menu.yourbrand.com)",
+            "POS & ERP backend integrations",
+            "Role-based access & permissions",
+            "Dedicated account manager & onboarding",
+            "99.9% SLA & custom contracts"
+          ]
+        }
+      }
+    },
+    "cta": {
+      "tag": "Launch in Minutes",
+      "title": "Ready to Elevate Your Dining Experience?",
+      "subtitle": "Join top hospitality brands using MOT7KM for lightning-fast, high-converting digital menus.",
+      "getStarted": "Get Started Now",
+      "chatSales": "Chat with Sales",
+      "guarantees": {
+        "noCard": "No credit card required",
+        "sameDay": "Same-day setup assistance",
+        "support": "Free onboarding & support"
+      }
+    },
+    "footer": {
+      "brandDescription": "Next-generation cloud digital menu ecosystem for restaurants and cafes. Fast, intuitive, and conversion-focused.",
+      "navTitle": "Navigation",
+      "exploreMenus": "Explore Menus",
+      "features": "Features",
+      "pricingPlans": "Pricing Plans",
+      "aboutPlatform": "About Platform",
+      "supportTitle": "Support & Legal",
+      "helpCenter": "Help Center",
+      "termsOfService": "Terms of Service",
+      "privacyPolicy": "Privacy Policy",
+      "slaStatus": "SLA Status",
+      "copyright": "© {year} MOT7KM Cloud Systems. All rights reserved.",
+      "craftedWith": "Crafted with care for modern dining"
+    }
   }
 }

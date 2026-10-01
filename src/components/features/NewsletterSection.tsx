@@ -31,7 +31,7 @@ export function NewsletterSection() {
           bg-[var(--color-primary-50)] border border-[var(--color-primary-100)]
           text-[var(--color-primary)] text-xs font-semibold uppercase tracking-wider">
           <Sparkles size={12} />
-          <span>10% OFF</span>
+          <span>{t('discountBadge')}</span>
         </div>
 
         <h2

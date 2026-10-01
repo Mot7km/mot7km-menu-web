@@ -1,11 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
 export function LandingFooter() {
+  const t = useTranslations('landing.footer');
   const locale = useLocale();
-  const isRTL = locale === 'ar';
   const currentYear = new Date().getFullYear();
 
   return (
@@ -19,40 +19,38 @@ export function LandingFooter() {
                 M
               </div>
               <span className="text-xl font-black tracking-tight text-[var(--color-text-primary)]">
-                {isRTL ? 'مُتـحكّـم' : 'MOT7KM'}
+                Mot7km
               </span>
             </Link>
             <p className="mt-4 max-w-sm text-sm text-[var(--color-text-secondary)] leading-relaxed">
-              {isRTL
-                ? 'المنظومة السحابية المتكاملة لإدارة ونشر القوائم الرقمية للمطاعم والكافيهات. حلول ذكية سريعة تلهم عملاءك وتزيد مبيعاتك.'
-                : 'Next-generation cloud digital menu ecosystem for restaurants and cafes. Fast, intuitive, and conversion-focused.'}
+              {t('brandDescription')}
             </p>
           </div>
 
           {/* Quick Links */}
           <div>
             <h4 className="text-sm font-bold uppercase tracking-wider text-[var(--color-text-primary)]">
-              {isRTL ? 'روابط سريعة' : 'Navigation'}
+              {t('navTitle')}
             </h4>
             <ul className="mt-4 space-y-2.5 text-sm text-[var(--color-text-secondary)]">
               <li>
-                <Link href={`/${locale}/menu`} className="hover:text-[var(--color-primary)] transition-colors">
-                  {isRTL ? 'استكشف القوائم' : 'Explore Menus'}
+                <Link href={`/${locale}#clients`} className="hover:text-[var(--color-primary)] transition-colors">
+                  {t('exploreMenus')}
                 </Link>
               </li>
               <li>
                 <Link href={`/${locale}#features`} className="hover:text-[var(--color-primary)] transition-colors">
-                  {isRTL ? 'المميزات' : 'Features'}
+                  {t('features')}
                 </Link>
               </li>
               <li>
                 <Link href={`/${locale}#plans`} className="hover:text-[var(--color-primary)] transition-colors">
-                  {isRTL ? 'باقات الاشتراك' : 'Pricing Plans'}
+                  {t('pricingPlans')}
                 </Link>
               </li>
               <li>
-                <Link href={`/${locale}/info`} className="hover:text-[var(--color-primary)] transition-colors">
-                  {isRTL ? 'عن المنصة' : 'About Platform'}
+                <Link href={`/${locale}#summary`} className="hover:text-[var(--color-primary)] transition-colors">
+                  {t('aboutPlatform')}
                 </Link>
               </li>
             </ul>
@@ -61,27 +59,27 @@ export function LandingFooter() {
           {/* Legal & Support */}
           <div>
             <h4 className="text-sm font-bold uppercase tracking-wider text-[var(--color-text-primary)]">
-              {isRTL ? 'الدعم والمساعدة' : 'Support & Legal'}
+              {t('supportTitle')}
             </h4>
             <ul className="mt-4 space-y-2.5 text-sm text-[var(--color-text-secondary)]">
               <li>
                 <span className="cursor-pointer hover:text-[var(--color-primary)] transition-colors">
-                  {isRTL ? 'مركز المساعدة' : 'Help Center'}
+                  {t('helpCenter')}
                 </span>
               </li>
               <li>
                 <span className="cursor-pointer hover:text-[var(--color-primary)] transition-colors">
-                  {isRTL ? 'الشروط والأحكام' : 'Terms of Service'}
+                  {t('termsOfService')}
                 </span>
               </li>
               <li>
                 <span className="cursor-pointer hover:text-[var(--color-primary)] transition-colors">
-                  {isRTL ? 'سياسة الخصوصية' : 'Privacy Policy'}
+                  {t('privacyPolicy')}
                 </span>
               </li>
               <li>
                 <span className="cursor-pointer hover:text-[var(--color-primary)] transition-colors">
-                  {isRTL ? 'اتفاقية مستوى الخدمة' : 'SLA Status'}
+                  {t('slaStatus')}
                 </span>
               </li>
             </ul>
@@ -91,12 +89,10 @@ export function LandingFooter() {
         {/* Bottom Bar */}
         <div className="mt-12 flex flex-col sm:flex-row items-center justify-between border-t border-[var(--color-border)]/60 pt-6 text-xs text-[var(--color-text-muted)] gap-4">
           <p>
-            {isRTL
-              ? `© ${currentYear} مُتحكّم (MOT7KM). جميع الحقوق محفوظة.`
-              : `© ${currentYear} MOT7KM Cloud Systems. All rights reserved.`}
+            {t('copyright', { year: currentYear })}
           </p>
           <p className="flex items-center gap-1.5">
-            <span>{isRTL ? 'صُنع بعناية لقطاع الضيافة والمطاعم' : 'Crafted with care for modern dining'}</span>
+            <span>{t('craftedWith')}</span>
             <span>✨</span>
           </p>
         </div>

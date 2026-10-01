@@ -28,8 +28,14 @@ export function CustomizationOptions({ product, onPriceChange, onSelectionsChang
     return defaults;
   };
 
+  const [prevProduct, setPrevProduct] = useState(product);
   const [selections, setSelections] = useState<Record<string, string>>(getDefaultSelections);
   const [extraTotal, setExtraTotal] = useState<number>(0);
+
+  if (product !== prevProduct) {
+    setPrevProduct(product);
+    setSelections(getDefaultSelections());
+  }
 
   const updateTotals = (newSelections: Record<string, string>) => {
     let extras = 0;
@@ -56,8 +62,20 @@ export function CustomizationOptions({ product, onPriceChange, onSelectionsChang
 
   useEffect(() => {
     const defaults = getDefaultSelections();
-    setSelections(defaults);
-    updateTotals(defaults);
+    let extras = 0;
+    if (product.customizationOptions) {
+      for (const opt of product.customizationOptions) {
+        const chosen = defaults[opt.name];
+        if (chosen) {
+          const found = opt.choices.find((c) => c.label === chosen);
+          if (found) extras += found.extraPrice;
+        }
+      }
+    }
+    const total = computeTotalPrice(product, defaults);
+    onPriceChange?.(total, extras);
+    onSelectionsChange?.(defaults);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [product]);
 
   if (!product.customizationOptions || product.customizationOptions.length === 0) {
@@ -133,7 +151,7 @@ export function CustomizationOptions({ product, onPriceChange, onSelectionsChang
                   )}
                 </div>
 
-                <div className={`w-6 h-6 rounded-md border-2 transition-all duration-300 flex items-center justify-center ml-4
+                <div className={`w-6 h-6 rounded-md border-2 transition-all duration-300 flex items-center justify-center ms-4
                   ${isChecked 
                     ? 'bg-[var(--color-primary)] border-[var(--color-primary)] shadow-[var(--shadow-glow)]'
                     : 'bg-transparent border-[var(--color-border-strong)] group-hover:border-[var(--color-primary)]/50'

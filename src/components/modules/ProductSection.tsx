@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, memo } from 'react';
+import { useState, memo } from 'react';
 import { useTranslations } from 'next-intl';
 import { LayoutGrid, LayoutList, PackageOpen } from 'lucide-react';
 import { Product } from '@/data/menu';
@@ -27,14 +27,17 @@ function ProductSection({
   loading = false,
 }: ProductSectionProps) {
   const t = useTranslations();
+  const [prevProducts, setPrevProducts] = useState(products);
   const [visibleCount, setVisibleCount] = useState(initialCount);
   const [layout, setLayout] = useState<'grid' | 'horizontal'>('grid');
+
+  if (products !== prevProducts) {
+    setPrevProducts(products);
+    setVisibleCount(initialCount);
+  }
+
   const hasMore = visibleCount < products.length;
   const visibleItems = products.slice(0, visibleCount);
-
-  useEffect(() => {
-    setVisibleCount(initialCount);
-  }, [products, initialCount]);
 
   const sectionTitle = title || t('productList.menu');
 

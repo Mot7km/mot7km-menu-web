@@ -1,71 +1,46 @@
 'use client';
 
 import { useState } from 'react';
-import { useLocale } from 'next-intl';
-import { Check, Sparkles, ArrowRight, ArrowLeft, HelpCircle } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
+import { Check, ArrowRight, ArrowLeft } from 'lucide-react';
+
+interface PlanDefinition {
+  id: 'starter' | 'pro' | 'enterprise';
+  monthlyPrice: number;
+  annualPrice: number;
+  isPopular?: boolean;
+  featureCount: number;
+}
+
+const PLANS: PlanDefinition[] = [
+  {
+    id: 'starter',
+    monthlyPrice: 149,
+    annualPrice: 119,
+    featureCount: 6,
+  },
+  {
+    id: 'pro',
+    monthlyPrice: 299,
+    annualPrice: 239,
+    isPopular: true,
+    featureCount: 7,
+  },
+  {
+    id: 'enterprise',
+    monthlyPrice: 599,
+    annualPrice: 479,
+    featureCount: 6,
+  },
+];
 
 export function LandingPricing() {
+  const t = useTranslations('landing.pricing');
   const locale = useLocale();
   const isRTL = locale === 'ar';
   const [isAnnual, setIsAnnual] = useState(true);
 
   const ArrowIcon = isRTL ? ArrowLeft : ArrowRight;
-
-  const plans = [
-    {
-      id: 'starter',
-      name: isRTL ? 'باقة البداية' : 'Starter Plan',
-      tagline: isRTL ? 'مثالية لعربات الأطعمة والمقاهي الناشئة' : 'Ideal for food trucks & emerging cafes',
-      monthlyPrice: 149,
-      annualPrice: 119,
-      isPopular: false,
-      ctaText: isRTL ? 'ابدأ تجربة مجانية' : 'Start Free Trial',
-      features: [
-        isRTL ? 'منيو رقمي سريع حتى 60 صنفاً' : 'Digital menu for up to 60 items',
-        isRTL ? 'مسح QR Code غير محدود للطاولات' : 'Unlimited QR code scans',
-        isRTL ? 'تعديل فوري للأسعار والتوافر' : 'Instant price & stock updates',
-        isRTL ? 'دعم كامل للغتين (عربي / إنجليزي)' : 'Bilingual support (AR / EN)',
-        isRTL ? 'الوضع الليلي والنهاري التلقائي' : 'Adaptive Dark & Light mode',
-        isRTL ? 'دعم فني عبر البريد الإلكتروني' : 'Standard email support',
-      ],
-    },
-    {
-      id: 'pro',
-      name: isRTL ? 'باقة الأعمال الاحترافية' : 'Pro Business Plan',
-      tagline: isRTL ? 'الخيار الأكثر طلباً للمطاعم والكافيهات النشطة' : 'Most popular for thriving restaurants & cafes',
-      monthlyPrice: 299,
-      annualPrice: 239,
-      isPopular: true,
-      popularBadge: isRTL ? 'الأكثر طلباً ⭐' : 'Most Popular ⭐',
-      ctaText: isRTL ? 'اشترك في باقة برو' : 'Subscribe to Pro',
-      features: [
-        isRTL ? 'أصناف وقوائم وتصنيفات غير محدودة' : 'Unlimited products & categories',
-        isRTL ? 'سلايدر عروض ترويجية سينمائي 3D' : '3D Coverflow promotional slider',
-        isRTL ? 'تخصيص كامل للهوية والألوان والشعار' : 'Custom branding, colors & logo',
-        isRTL ? 'إحصائيات وتحليلات الأطباق الأكثر طلباً' : 'Analytics & customer dish trends',
-        isRTL ? 'QR كود مخصص بشعار هويتك قابل للطباعة' : 'Custom branded vector QR codes',
-        isRTL ? 'إمكانية إخفاء/إظهار المكونات والسعرات' : 'Nutritional & calorie details',
-        isRTL ? 'دعم فني ذو أولوية عبر الواتساب' : 'Priority WhatsApp & phone support',
-      ],
-    },
-    {
-      id: 'enterprise',
-      name: isRTL ? 'باقة السلاسل والشركات' : 'Enterprise Chain',
-      tagline: isRTL ? 'حلول متكاملة لسلاسل الفروع والامتيازات' : 'Custom enterprise solutions for multi-branch chains',
-      monthlyPrice: 599,
-      annualPrice: 479,
-      isPopular: false,
-      ctaText: isRTL ? 'تواصل مع فريق المبيعات' : 'Talk to Sales',
-      features: [
-        isRTL ? 'إدارة مركزية لجميع الفروع بحساب واحد' : 'Centralized multi-branch control',
-        isRTL ? 'ربط النطاق الخاص (menu.yourbrand.com)' : 'Custom domain setup support',
-        isRTL ? 'تكامل مع أنظمة الكاشير والـ POS / ERP' : 'POS & ERP backend integrations',
-        isRTL ? 'صلاحيات متعددة للمدراء والموظفين' : 'Role-based access & permissions',
-        isRTL ? 'مدير حساب مخصص وتدريب شامل للفريق' : 'Dedicated account manager & onboarding',
-        isRTL ? 'ضمان جاهزية سحابية 99.9% (SLA)' : '99.9% SLA & custom contracts',
-      ],
-    },
-  ];
 
   return (
     <section id="plans" className="relative py-16 sm:py-24 bg-[var(--color-surface)]/50 border-t border-[var(--color-border)]/60">
@@ -73,15 +48,13 @@ export function LandingPricing() {
         {/* Section Header */}
         <div className="mx-auto max-w-3xl text-center">
           <span className="text-xs sm:text-sm font-bold uppercase tracking-widest text-[var(--color-primary)]">
-            {isRTL ? 'الأسعار والاشتراكات' : 'Pricing & Plans'}
+            {t('sectionTag')}
           </span>
           <h2 className="mt-2 text-3xl font-black tracking-tight text-[var(--color-text-primary)] sm:text-4xl md:text-5xl">
-            {isRTL ? 'خطط مرنة تناسب طموح مشروعك' : 'Transparent, Scalable Plans for Every Stage'}
+            {t('title')}
           </h2>
           <p className="mt-4 text-base sm:text-lg text-[var(--color-text-secondary)] leading-relaxed">
-            {isRTL
-              ? 'اختر الخطة المناسبة لحجم نشاطك، بدون أي رسوم خفية أو عقود معقدة.'
-              : 'Simple, predictable pricing with zero hidden fees. Upgrade or pause anytime.'}
+            {t('description')}
           </p>
 
           {/* Billing Interval Toggle */}
@@ -94,7 +67,7 @@ export function LandingPricing() {
                   : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
               }`}
             >
-              {isRTL ? 'دفع شهري' : 'Monthly'}
+              {t('monthly')}
             </button>
             <button
               onClick={() => setIsAnnual(true)}
@@ -104,9 +77,9 @@ export function LandingPricing() {
                   : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
               }`}
             >
-              <span>{isRTL ? 'دفع سنوي' : 'Annual'}</span>
-              <span className="ms-2 rounded-full bg-emerald-500/20 text-emerald-400 px-2 py-0.5 text-[10px] font-black uppercase">
-                {isRTL ? 'وفّر 20%' : 'Save 20%'}
+              <span>{t('annual')}</span>
+              <span className="ms-2 rounded-full bg-emerald-500/20 text-emerald-500 dark:text-emerald-400 px-2 py-0.5 text-[10px] font-black uppercase">
+                {t('savePercent')}
               </span>
             </button>
           </div>
@@ -114,8 +87,14 @@ export function LandingPricing() {
 
         {/* Pricing Cards Grid */}
         <div className="mt-12 sm:mt-16 grid gap-8 lg:grid-cols-3 items-stretch">
-          {plans.map((plan) => {
+          {PLANS.map((plan) => {
             const price = isAnnual ? plan.annualPrice : plan.monthlyPrice;
+            const name = t(`plans.${plan.id}.name`);
+            const tagline = t(`plans.${plan.id}.tagline`);
+            const ctaText = t(`plans.${plan.id}.cta`);
+            const features = Array.from({ length: plan.featureCount }, (_, i) =>
+              t(`plans.${plan.id}.features.${i}`)
+            );
 
             return (
               <div
@@ -129,16 +108,16 @@ export function LandingPricing() {
                 {/* Popular Badge */}
                 {plan.isPopular && (
                   <div className="absolute -top-4 start-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] px-4 py-1 text-xs font-black text-white shadow-md">
-                    {plan.popularBadge}
+                    {t('popularBadge')}
                   </div>
                 )}
 
                 <div>
                   <h3 className="text-xl font-bold text-[var(--color-text-primary)]">
-                    {plan.name}
+                    {name}
                   </h3>
                   <p className="mt-2 text-xs sm:text-sm text-[var(--color-text-secondary)] min-h-[40px]">
-                    {plan.tagline}
+                    {tagline}
                   </p>
 
                   {/* Price */}
@@ -147,18 +126,18 @@ export function LandingPricing() {
                       {price}
                     </span>
                     <span className="text-xs font-bold text-[var(--color-text-muted)]">
-                      {isRTL ? 'ر.س / شهر' : 'SAR / mo'}
+                      {t('perMonth')}
                     </span>
                     {isAnnual && (
                       <span className="ms-auto text-[11px] font-semibold text-emerald-500">
-                        {isRTL ? 'تُفوتر سنوياً' : 'Billed annually'}
+                        {t('billedAnnually')}
                       </span>
                     )}
                   </div>
 
                   {/* Features List */}
                   <ul className="mt-6 space-y-3.5 text-sm text-[var(--color-text-primary)]">
-                    {plan.features.map((feat, idx) => (
+                    {features.map((feat, idx) => (
                       <li key={idx} className="flex items-start gap-3">
                         <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-500 mt-0.5">
                           <Check className="h-3 w-3 stroke-[3]" />
@@ -171,16 +150,19 @@ export function LandingPricing() {
 
                 {/* CTA Button */}
                 <div className="mt-8 pt-4">
-                  <button
+                  <a
+                    href="https://wa.me/966500000000"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className={`w-full inline-flex items-center justify-center gap-2 rounded-full py-3.5 text-sm font-bold transition-all duration-200 cursor-pointer ${
                       plan.isPopular
-                        ? 'bg-[var(--color-primary)] text-white shadow-md shadow-[var(--color-primary)]/30 hover:bg-[var(--color-primary-dark)] hover:shadow-lg'
+                        ? 'bg-[var(--color-primary)] text-white shadow-md shadow-[var(--color-primary)]/30 hover:brightness-105 hover:shadow-lg'
                         : 'border border-[var(--color-border)] bg-[var(--color-surface-subtle)] text-[var(--color-text-primary)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]'
                     }`}
                   >
-                    <span>{plan.ctaText}</span>
+                    <span>{ctaText}</span>
                     <ArrowIcon className="h-4 w-4" />
-                  </button>
+                  </a>
                 </div>
               </div>
             );

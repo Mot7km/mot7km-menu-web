@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   Menu,
@@ -13,40 +13,35 @@ import {
   ArrowLeft,
   Languages,
 } from 'lucide-react';
-import { applyThemePalette } from '@/config/theme';
+import { useTheme } from '@/hooks/useTheme';
 
 interface LandingNavbarProps {
   onScrollTo?: (sectionId: string) => void;
 }
 
 export function LandingNavbar({ onScrollTo }: LandingNavbarProps) {
+  const t = useTranslations('landing.navbar');
   const locale = useLocale();
   const isRTL = locale === 'ar';
   const pathname = usePathname();
   const router = useRouter();
+  const { setTheme, resolvedTheme } = useTheme();
 
-  const [isDark, setIsDark] = useState(true);
+  const isDark = resolvedTheme === 'dark';
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<string>('hero');
 
-  // List of real page sections in order
+  // List of real page sections in order with next-intl translation keys
   const sections = useMemo(
     () => [
-      { id: 'hero', label: isRTL ? 'الرئيسية' : 'Home' },
-      { id: 'summary', label: isRTL ? 'عن المنصة' : 'About' },
-      { id: 'features', label: isRTL ? 'المميزات' : 'Features' },
-      { id: 'clients', label: isRTL ? 'شركاؤنا' : 'Featured Menus' },
-      { id: 'plans', label: isRTL ? 'الأسعار' : 'Pricing' },
+      { id: 'hero', label: t('home') },
+      { id: 'summary', label: t('about') },
+      { id: 'features', label: t('features') },
+      { id: 'clients', label: t('clients') },
+      { id: 'plans', label: t('plans') },
     ],
-    [isRTL]
+    [t]
   );
-
-  // Initialize theme state from DOM
-  useEffect(() => {
-    if (typeof document !== 'undefined') {
-      setIsDark(document.documentElement.classList.contains('dark'));
-    }
-  }, []);
 
   // ScrollSpy: Detect which section is currently visible on scroll
   useEffect(() => {
@@ -114,14 +109,7 @@ export function LandingNavbar({ onScrollTo }: LandingNavbarProps) {
   );
 
   const toggleTheme = () => {
-    if (typeof document === 'undefined') return;
-    const nextDark = !document.documentElement.classList.contains('dark');
-    document.documentElement.classList.toggle('dark', nextDark);
-    applyThemePalette();
-    setIsDark(nextDark);
-    try {
-      localStorage.setItem('mot7km-theme-mode', nextDark ? 'dark' : 'light');
-    } catch {}
+    setTheme(isDark ? 'light' : 'dark');
   };
 
   const toggleLanguage = () => {
@@ -133,11 +121,10 @@ export function LandingNavbar({ onScrollTo }: LandingNavbarProps) {
   const ArrowIcon = isRTL ? ArrowLeft : ArrowRight;
 
   return (
-    <header className="sticky top-0 z-50 w-full py-3 px-4 sm:px-6 lg:px-8 bg-transparent">
-      {/* Container holding brand, centered pill navbar, and action buttons */}
+    <header className="sticky top-0 z-50 w-full py-3 px-4 sm:px-6 lg:px-8 bg-[var(--color-background)]/85 backdrop-blur-xl border-b border-[var(--color-border)]/50 transition-colors duration-200">
       <div className="mx-auto flex max-w-7xl items-center justify-between">
         
-        {/* ================= 1. Brand Logo (Left) ================= */}
+        {/* ================= 1. Brand Logo ================= */}
         <Link
           href={`/${locale}`}
           onClick={(e) => {
@@ -146,10 +133,10 @@ export function LandingNavbar({ onScrollTo }: LandingNavbarProps) {
           }}
           className="group flex items-center gap-2.5 shrink-0"
         >
-          {/* Stylized Interlocking Ribbon / Knot Icon */}
+          {/* Stylized Interlocking Logo Knot */}
           <div className="relative flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center transition-transform duration-300 group-hover:scale-105">
             <svg
-              className="h-8 w-8 sm:h-9 sm:w-9 text-[#00A3FF]"
+              className="h-8 w-8 sm:h-9 sm:w-9 text-[var(--color-primary)]"
               viewBox="0 0 40 40"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
@@ -163,7 +150,7 @@ export function LandingNavbar({ onScrollTo }: LandingNavbarProps) {
                 transform="rotate(22 20.5 16.5)"
                 stroke="currentColor"
                 strokeWidth="2.8"
-                className="drop-shadow-[0_0_8px_rgba(0,163,255,0.6)]"
+                className="drop-shadow-[0_0_8px_rgba(var(--color-primary-rgb,0,163,255),0.6)]"
               />
               <rect
                 x="8"
@@ -174,35 +161,35 @@ export function LandingNavbar({ onScrollTo }: LandingNavbarProps) {
                 transform="rotate(-22 17.5 22.5)"
                 stroke="currentColor"
                 strokeWidth="2.8"
-                className="opacity-80"
+                className="opacity-75"
               />
             </svg>
           </div>
 
-          {/* Brand Name + Pulsing Green Live Indicator */}
+          {/* Brand Name + Pulsing Status Indicator */}
           <div className="flex items-center gap-1.5">
-            <span className="text-lg sm:text-xl font-black tracking-tight text-white dark:text-white [text-shadow:_0_1px_8px_rgba(0,0,0,0.5)]">
+            <span className="text-lg sm:text-xl font-black tracking-tight text-[var(--color-text-primary)]">
               Mot7km
             </span>
             <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500 shadow-[0_0_8px_#10B981]"></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500 shadow-[0_0_8px_#10B981]" />
             </span>
           </div>
         </Link>
 
-        {/* ================= 2. Center Island Pill Navigation (Desktop ScrollSpy) ================= */}
-        <nav className="hidden md:flex items-center rounded-full border border-white/10 bg-[#081226]/85 dark:bg-[#070e1e]/90 backdrop-blur-xl px-2 py-1.5 shadow-[0_8px_32px_rgba(0,0,0,0.36)]">
+        {/* ================= 2. Center Island Pill Navigation ================= */}
+        <nav className="hidden md:flex items-center rounded-full border border-[var(--color-border)] bg-[var(--color-surface)]/90 backdrop-blur-xl px-2 py-1.5 shadow-sm">
           {sections.map((section) => {
             const isActive = activeSection === section.id;
             return (
               <button
                 key={section.id}
                 onClick={() => scrollToSection(section.id)}
-                className={`relative rounded-full px-4 py-1.5 text-xs sm:text-sm font-bold transition-all duration-300 cursor-pointer ${
+                className={`relative rounded-full px-4 py-1.5 text-xs sm:text-sm font-bold transition-all duration-200 cursor-pointer ${
                   isActive
-                    ? 'bg-[#162746] text-[#38BDF8] shadow-inner shadow-[#38BDF8]/20 scale-100'
-                    : 'text-slate-300 hover:text-white'
+                    ? 'bg-[var(--color-primary)] text-white shadow-sm'
+                    : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-subtle)]'
                 }`}
               >
                 <span>{section.label}</span>
@@ -213,42 +200,43 @@ export function LandingNavbar({ onScrollTo }: LandingNavbarProps) {
 
         {/* ================= 3. Right Action Controls ================= */}
         <div className="flex items-center gap-2 sm:gap-3">
-          {/* Theme Toggle (Moon / Sun) */}
+          {/* Theme Toggle */}
           <button
             onClick={toggleTheme}
-            aria-label="Toggle Theme"
-            className="flex h-9 w-9 items-center justify-center rounded-full text-slate-300 hover:text-white transition-colors cursor-pointer hover:bg-white/10"
+            aria-label={t('toggleTheme')}
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-subtle)] transition-colors cursor-pointer shadow-sm"
           >
             {isDark ? (
               <Sun className="h-4 w-4 text-amber-400" />
             ) : (
-              <Moon className="h-4 w-4 text-[#38BDF8]" />
+              <Moon className="h-4 w-4 text-[var(--color-primary)]" />
             )}
           </button>
 
-          {/* Language Switcher (Translate Icon 文A) */}
+          {/* Language Switcher */}
           <button
             onClick={toggleLanguage}
-            title={locale === 'ar' ? 'Switch to English' : 'التحويل للعربية'}
-            className="flex h-9 w-9 items-center justify-center rounded-full text-slate-300 hover:text-white transition-colors cursor-pointer hover:bg-white/10"
+            title={t('toggleLanguage')}
+            aria-label={t('toggleLanguage')}
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-subtle)] transition-colors cursor-pointer shadow-sm"
           >
             <Languages className="h-4 w-4" />
           </button>
 
-          {/* Primary Gradient CTA Pill Button: "Request Demo →" */}
-          <Link
-            href={`/${locale}/menu`}
-            className="relative hidden sm:inline-flex items-center gap-2 overflow-hidden rounded-full bg-gradient-to-r from-[#0094FF] via-[#0080FF] to-[#0066FE] px-5 py-2.5 text-xs sm:text-sm font-bold text-white shadow-[0_0_20px_rgba(0,148,255,0.4)] transition-all duration-300 hover:shadow-[0_0_28px_rgba(0,148,255,0.6)] hover:scale-105 active:scale-95"
+          {/* Primary CTA Button: "Request Demo" scrolls to plans or demo */}
+          <button
+            onClick={() => scrollToSection('plans')}
+            className="relative hidden sm:inline-flex items-center gap-2 overflow-hidden rounded-full bg-[var(--color-primary)] px-5 py-2 text-xs sm:text-sm font-bold text-white shadow-md shadow-[var(--color-primary)]/25 transition-all duration-300 hover:shadow-lg hover:shadow-[var(--color-primary)]/35 hover:scale-[1.03] active:scale-[0.98] cursor-pointer"
           >
-            <span>{isRTL ? 'طلب تجربة' : 'Request Demo'}</span>
+            <span>{t('requestDemo')}</span>
             <ArrowIcon className="h-3.5 w-3.5" />
-          </Link>
+          </button>
 
           {/* Mobile Hamburger Menu Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-white md:hidden cursor-pointer"
-            aria-label="Toggle Navigation Menu"
+            className="flex h-9 w-9 items-center justify-center rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-primary)] md:hidden cursor-pointer"
+            aria-label={t('toggleMenu')}
           >
             {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
@@ -257,7 +245,7 @@ export function LandingNavbar({ onScrollTo }: LandingNavbarProps) {
 
       {/* ================= Mobile Expandable Drawer ================= */}
       {mobileMenuOpen && (
-        <div className="mt-3 rounded-3xl border border-white/10 bg-[#091328]/95 backdrop-blur-2xl p-5 shadow-2xl md:hidden animate-in slide-in-from-top-3 duration-200">
+        <div className="mt-3 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)]/98 backdrop-blur-2xl p-4 shadow-xl md:hidden animate-in slide-in-from-top-3 duration-200">
           <div className="flex flex-col gap-1.5">
             {sections.map((section) => {
               const isActive = activeSection === section.id;
@@ -265,37 +253,36 @@ export function LandingNavbar({ onScrollTo }: LandingNavbarProps) {
                 <button
                   key={section.id}
                   onClick={() => scrollToSection(section.id)}
-                  className={`flex items-center justify-between rounded-xl px-4 py-3 text-start text-sm font-bold transition-all ${
+                  className={`flex items-center justify-between rounded-xl px-4 py-3 text-start text-sm font-bold transition-all cursor-pointer ${
                     isActive
-                      ? 'bg-[#162746] text-[#38BDF8]'
-                      : 'text-slate-300 hover:bg-white/5 hover:text-white'
+                      ? 'bg-[var(--color-primary)] text-white'
+                      : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-subtle)] hover:text-[var(--color-text-primary)]'
                   }`}
                 >
                   <span>{section.label}</span>
                   {isActive && (
-                    <span className="h-1.5 w-1.5 rounded-full bg-[#38BDF8] shadow-[0_0_6px_#38BDF8]" />
+                    <span className="h-1.5 w-1.5 rounded-full bg-white shadow-sm" />
                   )}
                 </button>
               );
             })}
 
-            <div className="mt-3 flex items-center justify-between border-t border-white/10 pt-4">
+            <div className="mt-3 flex items-center justify-between border-t border-[var(--color-border)] pt-4">
               <button
                 onClick={toggleLanguage}
-                className="flex items-center gap-2 text-xs font-bold text-slate-300"
+                className="flex items-center gap-2 text-xs font-bold text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] cursor-pointer"
               >
-                <Languages className="h-4 w-4 text-[#38BDF8]" />
+                <Languages className="h-4 w-4 text-[var(--color-primary)]" />
                 <span>{locale === 'ar' ? 'English' : 'العربية'}</span>
               </button>
 
-              <Link
-                href={`/${locale}/menu`}
-                onClick={() => setMobileMenuOpen(false)}
-                className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-[#0094FF] to-[#0066FE] px-4 py-2 text-xs font-bold text-white shadow-md"
+              <button
+                onClick={() => scrollToSection('plans')}
+                className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-primary)] px-4 py-2 text-xs font-bold text-white shadow-md cursor-pointer"
               >
-                <span>{isRTL ? 'طلب تجربة' : 'Request Demo'}</span>
+                <span>{t('requestDemo')}</span>
                 <ArrowIcon className="h-3.5 w-3.5" />
-              </Link>
+              </button>
             </div>
           </div>
         </div>

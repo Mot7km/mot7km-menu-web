@@ -1,7 +1,6 @@
 'use client';
 
 import { useCallback, useDeferredValue, useMemo, useState } from 'react';
-import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
 import Categories from '@/components/features/PromotionalCategories';
 import ListContainer from '@/components/common/ListContainer';

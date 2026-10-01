@@ -241,3 +241,18 @@ export interface StoreData {
   categories: ApiCategory[];
   products: ApiProduct[];
 }
+
+/**
+ * Complete normalized store data contract shared between SSR API fetchers and client store context.
+ */
+export interface CompleteStoreData {
+  businessName: string;
+  displayBusinessName: string;
+  menuId: number;
+  identity: ApiBusinessIdentity | null;
+  header: ApiStoreHeader | null;
+  sliders: ApiSliderItem[] | null;
+  sliderHeader: string | null;
+  categories: ApiCategory[] | null;
+  products: ApiProduct[] | null;
+}

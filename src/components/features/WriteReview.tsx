@@ -28,7 +28,7 @@ export default function ReviewForm({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (rating === 0 || comment.trim() === '') return;
-    onSubmit?.({ reviewer: reviewer.trim() || 'Anonymous', rating, comment });
+    onSubmit?.({ reviewer: reviewer.trim() || t('review.anonymous'), rating, comment });
     // Optionally reset form after successful submit (parent can handle)
   };
 

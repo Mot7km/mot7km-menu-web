@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Review } from '@/data/menu';
 import ReviewCard from '@/components/features/ReviewCard';
@@ -27,16 +27,17 @@ export default function ReviewSection({
   onAsyncReviewSubmit,
 }: ReviewSectionProps) {
   const t = useTranslations();
+  const [submittedReviews, setSubmittedReviews] = useState<Review[]>([]);
+  const [prevInitialReviews, setPrevInitialReviews] = useState(initialReviews);
   const [visibleCount, setVisibleCount] = useState(initialCount);
-  const [localReviews, setLocalReviews] = useState<Review[]>(initialReviews);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Sync when props change (e.g., after server-side update)
-  useEffect(() => {
-    setLocalReviews(initialReviews);
+  if (initialReviews !== prevInitialReviews) {
+    setPrevInitialReviews(initialReviews);
     setVisibleCount(initialCount);
-  }, [initialReviews, initialCount]);
+  }
 
+  const localReviews = [...submittedReviews, ...initialReviews];
   const hasMore = visibleCount < localReviews.length;
   const visibleItems = localReviews.slice(0, visibleCount);
 
@@ -51,7 +52,7 @@ export default function ReviewSection({
       if (onAsyncReviewSubmit) {
         const result = await onAsyncReviewSubmit(data);
         if (result && typeof result === 'object') {
-          setLocalReviews((prev) => [result, ...prev]);
+          setSubmittedReviews((prev) => [result, ...prev]);
           onNewReview?.(result);
         } else if (result !== false) {
           const fallbackReview: Review = {
@@ -60,7 +61,7 @@ export default function ReviewSection({
             comment: data.comment,
             date: new Date().toISOString(),
           };
-          setLocalReviews((prev) => [fallbackReview, ...prev]);
+          setSubmittedReviews((prev) => [fallbackReview, ...prev]);
           onNewReview?.(fallbackReview);
         }
       } else {
@@ -70,7 +71,7 @@ export default function ReviewSection({
           comment: data.comment,
           date: new Date().toISOString(),
         };
-        setLocalReviews((prev) => [newReview, ...prev]);
+        setSubmittedReviews((prev) => [newReview, ...prev]);
         onNewReview?.(newReview);
       }
     } catch (err) {

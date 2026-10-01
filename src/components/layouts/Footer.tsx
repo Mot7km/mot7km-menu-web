@@ -4,7 +4,6 @@ import { memo } from 'react';
 import Image from 'next/image';
 import { Phone, MapPin, Mail, Clock } from 'lucide-react';
 import { useTranslations, useLocale } from 'next-intl';
-import { isStoreOpen } from '@/data/storeInfo';
 import { useStore } from '@/store/storeHooks';
 
 // ── Social Icons ──

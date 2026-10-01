@@ -1,68 +1,103 @@
 'use client';
 
-import { useCallback, useEffect, useMemo } from 'react';
-import { usePathname } from 'next/navigation';
+import { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { Product } from '@/data/menu';
 import {
   addItem,
-  clearCart,
-  removeItem,
-  setBusinessName,
+  clearCart as clearCartAction,
+  removeItem as removeItemAction,
   setDrawerOpen,
-  updateQuantity,
+  updateQuantity as updateQuantityAction,
 } from './cartSlice';
 import type { AppDispatch, RootState } from './index';
 
 export const useAppDispatch = useDispatch.withTypes<AppDispatch>();
 export const useAppSelector = useSelector.withTypes<RootState>();
 
-export function useCart() {
+/**
+ * Isolated hook for adding items to the cart.
+ * Crucially, does NOT subscribe to cart state, preventing unnecessary re-renders of product cards!
+ */
+export function useAddToCart() {
   const dispatch = useAppDispatch();
-  const pathname = usePathname();
-  const businessName = useMemo(() => {
-    const segments = pathname.split('/').filter(Boolean);
-    // New URL structure: /[locale]/[businessName]/[id]
-    const value = segments[0] && (segments[0] === 'en' || segments[0] === 'ar') && segments[1]
-      ? segments[1]
-      : undefined;
-    return value ? decodeURIComponent(value) : null;
-  }, [pathname]);
-  const items = useAppSelector((state) => state.cart.items);
-  const isDrawerOpen = useAppSelector((state) => state.cart.isDrawerOpen);
-
-  useEffect(() => {
-    dispatch(setBusinessName(businessName));
-  }, [businessName, dispatch]);
-
-  // Close the drawer immediately on any navigation so it never appears
-  // during a View Transition (hero animation) or browser back swipe.
-  useEffect(() => {
-    dispatch(setDrawerOpen(false));
-  }, [pathname, dispatch]);
-
-  const addToCart = useCallback(
-    (product: Product, selections: Record<string, string>, quantity = 1) => {
+  return useCallback(
+    (product: Product, selections: Record<string, string> = {}, quantity = 1) => {
       dispatch(addItem({ product, selections, quantity }));
     },
     [dispatch]
   );
-  const removeFromCart = useCallback((itemId: string) => dispatch(removeItem(itemId)), [dispatch]);
-  const updateCartQuantity = useCallback(
-    (itemId: string, delta: number) => dispatch(updateQuantity({ itemId, delta })),
+}
+
+/**
+ * Lightweight selector for cart totals.
+ * Only components that display the badge/count or checkout total will re-render when totals change.
+ */
+export function useCartSummary() {
+  const items = useAppSelector((state) => state.cart.items);
+  const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
+  const totalPrice = items.reduce((sum, item) => sum + item.totalPrice * item.quantity, 0);
+  return { itemCount, totalPrice };
+}
+
+/**
+ * Hook for cart drawer controls and items.
+ */
+export function useCartDrawer() {
+  const dispatch = useAppDispatch();
+  const items = useAppSelector((state) => state.cart.items);
+  const isDrawerOpen = useAppSelector((state) => state.cart.isDrawerOpen);
+
+  const setIsDrawerOpen = useCallback(
+    (isOpen: boolean) => dispatch(setDrawerOpen(isOpen)),
     [dispatch]
   );
-  const resetCart = useCallback(() => dispatch(clearCart()), [dispatch]);
-  const setIsDrawerOpen = useCallback((isOpen: boolean) => dispatch(setDrawerOpen(isOpen)), [dispatch]);
+  const updateQuantity = useCallback(
+    (itemId: string, delta: number) => dispatch(updateQuantityAction({ itemId, delta })),
+    [dispatch]
+  );
+  const removeFromCart = useCallback(
+    (itemId: string) => dispatch(removeItemAction(itemId)),
+    [dispatch]
+  );
+  const clearCart = useCallback(
+    () => dispatch(clearCartAction()),
+    [dispatch]
+  );
+
+  return {
+    items,
+    isDrawerOpen,
+    setIsDrawerOpen,
+    updateQuantity,
+    removeFromCart,
+    clearCart,
+  };
+}
+
+/**
+ * Combined cart hook for full cart management in checkout and details pages.
+ */
+export function useCart() {
+  const addToCart = useAddToCart();
+  const { itemCount, totalPrice } = useCartSummary();
+  const {
+    items,
+    isDrawerOpen,
+    setIsDrawerOpen,
+    updateQuantity,
+    removeFromCart,
+    clearCart,
+  } = useCartDrawer();
 
   return {
     items,
     addToCart,
     removeFromCart,
-    updateQuantity: updateCartQuantity,
-    clearCart: resetCart,
-    itemCount: items.reduce((sum, item) => sum + item.quantity, 0),
-    totalPrice: items.reduce((sum, item) => sum + item.totalPrice * item.quantity, 0),
+    updateQuantity,
+    clearCart,
+    itemCount,
+    totalPrice,
     isDrawerOpen,
     setIsDrawerOpen,
   };

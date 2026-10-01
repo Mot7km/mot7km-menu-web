@@ -56,7 +56,7 @@ export default async function LocaleLayout({
 }: RootLayoutProps) {
   const { locale } = await params;
 
-  if (!i18n.locales.includes(locale as any)) {
+  if (!i18n.locales.includes(locale as (typeof i18n.locales)[number])) {
     notFound();
   }
 

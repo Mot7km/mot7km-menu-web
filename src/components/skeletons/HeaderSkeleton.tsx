@@ -1,5 +1,4 @@
 import { Settings, UtensilsCrossed, MapPin, Phone } from 'lucide-react';
-import { Skeleton } from './SkeletonBase';
 
 export function HeaderSkeleton() {
   return (

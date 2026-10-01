@@ -1,9 +1,12 @@
 'use client';
 
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useEffect, useRef, useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic';
-import { useCart } from '@/store/hooks';
+import { usePathname } from 'next/navigation';
+import { useAppDispatch, useCartSummary, useCartDrawer } from '@/store/hooks';
+import { setBusinessName, setDrawerOpen } from '@/store/cartSlice';
 import { FloatingCartButton } from './CartButton';
+import { i18n } from '@/config/i18n';
 
 const CartDrawer = dynamic(
   () => import('./CartDrawer').then((m) => m.CartDrawer),
@@ -11,20 +14,38 @@ const CartDrawer = dynamic(
 );
 
 export function CartOverlay() {
-  const { 
-    items, 
-    itemCount, 
-    totalPrice, 
-    isDrawerOpen, 
-    setIsDrawerOpen, 
-    updateQuantity, 
-    removeFromCart, 
-    clearCart 
-  } = useCart();
+  const dispatch = useAppDispatch();
+  const pathname = usePathname();
+
+  // Centralized route parameter extraction
+  const currentBusinessName = useMemo(() => {
+    const segments = pathname.split('/').filter(Boolean);
+    const hasLocale = segments[0] && i18n.locales.includes(segments[0] as never);
+    const rawBusiness = hasLocale ? segments[1] : segments[0];
+    return rawBusiness ? decodeURIComponent(rawBusiness) : null;
+  }, [pathname]);
+
+  // Synchronize tenant with Redux cart (clears cart if switching between different stores)
+  useEffect(() => {
+    dispatch(setBusinessName(currentBusinessName));
+  }, [currentBusinessName, dispatch]);
+
+  // Close the cart drawer immediately on navigation to prevent view transition overlap
+  useEffect(() => {
+    dispatch(setDrawerOpen(false));
+  }, [pathname, dispatch]);
+
+  const { itemCount, totalPrice } = useCartSummary();
+  const {
+    items,
+    isDrawerOpen,
+    setIsDrawerOpen,
+    updateQuantity,
+    removeFromCart,
+    clearCart,
+  } = useCartDrawer();
 
   // Prevent ghost touch events from re-opening the drawer immediately after close.
-  // On mobile, a touchend that fires onClose can bubble and trigger the cart button
-  // click event ~50-300ms later. The lock swallows those ghost clicks.
   const closeLockRef = useRef(false);
   const closeLockTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -44,7 +65,7 @@ export function CartOverlay() {
   }, [setIsDrawerOpen]);
 
   const handleOpen = useCallback(() => {
-    if (closeLockRef.current) return; // swallow ghost click
+    if (closeLockRef.current) return;
     setIsDrawerOpen(true);
   }, [setIsDrawerOpen]);
 
@@ -54,27 +75,29 @@ export function CartOverlay() {
     };
   }, []);
 
-  // Completely unmount if the cart is empty AND the drawer is closed
-  if (itemCount === 0 && !isDrawerOpen) {
+  // Only show the floating cart button on store pages (not on root / landing page)
+  const isStorePage = Boolean(currentBusinessName);
+
+  if ((itemCount === 0 && !isDrawerOpen) || !isStorePage) {
     return null;
   }
 
   return (
     <>
-      <FloatingCartButton 
-        itemCount={itemCount} 
-        onOpenDrawer={handleOpen} 
+      <FloatingCartButton
+        itemCount={itemCount}
+        onOpenDrawer={handleOpen}
         isVisible={!isDrawerOpen && itemCount > 0}
       />
 
-      <CartDrawer 
-        isOpen={isDrawerOpen} 
-        onClose={handleClose} 
-        items={items} 
-        totalPrice={totalPrice} 
-        updateQuantity={updateQuantity} 
-        removeFromCart={removeFromCart} 
-        clearCart={clearCart} 
+      <CartDrawer
+        isOpen={isDrawerOpen}
+        onClose={handleClose}
+        items={items}
+        totalPrice={totalPrice}
+        updateQuantity={updateQuantity}
+        removeFromCart={removeFromCart}
+        clearCart={clearCart}
       />
     </>
   );

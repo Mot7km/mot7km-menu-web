@@ -10,6 +10,7 @@ import type {
   ApiProductDetails,
   ApiReviewItem,
   ApiReviewRequest,
+  CompleteStoreData,
 } from '../types/menuApi';
 
 /**
@@ -171,17 +172,7 @@ export const webMenuApi = {
    * - GET /api/menu/{businessName}/categories for category taxonomy
    * - GET /api/menu/{businessName}/products for products list
    */
-  getCompleteStoreData: cache(async (customBusinessName?: string): Promise<{
-    businessName: string;
-    displayBusinessName: string;
-    menuId: number;
-    identity: import('../types/menuApi').ApiBusinessIdentity | null;
-    header: import('../types/menuApi').ApiStoreHeader | null;
-    sliders: import('../types/menuApi').ApiSliderItem[] | null;
-    sliderHeader: string | null;
-    categories: ApiCategory[] | null;
-    products: ApiProduct[] | null;
-  }> => {
+  getCompleteStoreData: cache(async (customBusinessName?: string): Promise<CompleteStoreData> => {
     const businessName = customBusinessName;
 
     if (!businessName) {

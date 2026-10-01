@@ -2,27 +2,15 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type {
   ApiBusinessInfo,
   ApiBusinessMenu,
-  ApiBusinessIdentity,
   ApiCategory,
   ApiProduct,
   ApiProductDetails,
   ApiReviewItem,
-  ApiSliderItem,
   ApiSlidersResponse,
-  ApiStoreHeader,
+  CompleteStoreData,
 } from '@/lib/types/menuApi';
 
-export interface CompleteStoreData {
-  businessName: string;
-  displayBusinessName: string;
-  menuId: number;
-  identity: ApiBusinessIdentity | null;
-  header: ApiStoreHeader | null;
-  sliders: ApiSliderItem[] | null;
-  sliderHeader: string | null;
-  categories: ApiCategory[] | null;
-  products: ApiProduct[] | null;
-}
+export type { CompleteStoreData };
 
 function normalizeMenu(rawMenu: ApiBusinessMenu, requestedBusinessName: string): CompleteStoreData {
   const categories = rawMenu.categories?.map((category) => ({

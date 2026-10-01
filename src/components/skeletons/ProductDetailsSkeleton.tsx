@@ -2,11 +2,15 @@ import { ArrowLeft, Sparkles, UtensilsCrossed, Star } from 'lucide-react';
 import { Skeleton } from './SkeletonBase';
 
 
-export function ProductDetailsSkeleton({ id }: { id?: string | number } = {}) {
+export interface ProductDetailsSkeletonProps {
+  id?: string | number;
+}
+
+export function ProductDetailsSkeleton({ id }: ProductDetailsSkeletonProps = {}) {
   const heroHeight = 45; // Matches product page hero height (45vh)
 
   return (
-    <div className="relative min-h-screen overflow-x-clip bg-[var(--color-background)]" aria-busy="true">
+    <div key={id} className="relative min-h-screen overflow-x-clip bg-[var(--color-background)]" aria-busy="true">
       {/* 1. Background Ambient Glow Orbs */}
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[var(--color-primary)]/10 blur-[100px] rounded-full pointer-events-none -z-10" />
       <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-[var(--color-accent)]/10 blur-[80px] rounded-full pointer-events-none -z-10" />

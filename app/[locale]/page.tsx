@@ -1,7 +1,6 @@
 'use client';
 
 import { useCallback } from 'react';
-import { useLocale } from 'next-intl';
 import {
   LandingNavbar,
   LandingHero,
@@ -15,8 +14,6 @@ import {
 import { FEATURED_BUSINESSES } from '@/data/featuredBusinesses';
 
 export default function Home() {
-  const locale = useLocale();
-
   const handleScrollTo = useCallback((sectionId: string) => {
     const el = document.getElementById(sectionId);
     if (el) {

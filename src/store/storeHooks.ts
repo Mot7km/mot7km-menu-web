@@ -1,5 +1,3 @@
-'use client';
-
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
 import { skipToken } from '@reduxjs/toolkit/query';
@@ -8,10 +6,10 @@ import {
   useGetSlidersQuery,
   useGetCategoriesQuery,
   useGetProductsQuery,
+  type CompleteStoreData,
 } from './menuApi';
 import { applyThemePalette } from '@/config/theme';
 import { loadGoogleFont } from '@/helpers/fontLoader';
-import { useInitialStoreContext } from '@/context/InitialStoreContext';
 import { i18n, type Locale } from '@/config/i18n';
 import type { ApiBusinessIdentity, ApiCategory, ApiProduct, ApiSliderItem, ApiStoreHeader } from '@/lib/types/menuApi';
 import type { StoreInfo } from '@/data/storeInfo';
@@ -39,23 +37,29 @@ export interface StoreState {
   refresh: () => Promise<void>;
 }
 
-export function useStore(): StoreState {
+/**
+ * Custom hook that derives the complete normalized store state.
+ * When called inside `StoreProvider`, this runs exactly ONCE for the whole tree.
+ */
+export function useStoreStateCalculation(initialData?: CompleteStoreData | null): StoreState {
   const pathname = usePathname();
-  const locale: Locale = i18n.locales.includes(pathname.split('/').filter(Boolean)[0] as Locale)
-    ? pathname.split('/').filter(Boolean)[0] as Locale
+  const segments = useMemo(() => pathname.split('/').filter(Boolean), [pathname]);
+  const locale: Locale = i18n.locales.includes(segments[0] as Locale)
+    ? (segments[0] as Locale)
     : i18n.defaultLocale;
+
   const requestedBusinessName = useMemo(() => {
-    const segments = pathname.split('/').filter(Boolean);
-    // New URL structure: /[locale]/[businessName]/[id]
-    const businessName = segments[0] && (segments[0] === 'en' || segments[0] === 'ar') && segments[1]
-      ? segments[1]
-      : undefined;
+    const businessSegment =
+      segments[0] && (segments[0] === 'en' || segments[0] === 'ar') && segments[1]
+        ? segments[1]
+        : undefined;
 
-    return businessName ? decodeURIComponent(businessName) : undefined;
-  }, [pathname]);
+    return businessSegment ? decodeURIComponent(businessSegment) : undefined;
+  }, [segments]);
 
-  const initialData = useInitialStoreContext();
-  const hasInitialData = Boolean(initialData && (initialData.categories?.length || initialData.products?.length || initialData.header));
+  const hasInitialData = Boolean(
+    initialData && (initialData.categories?.length || initialData.products?.length || initialData.header)
+  );
 
   const [forceFetch, setForceFetch] = useState(false);
   const shouldSkip = hasInitialData && !forceFetch;
@@ -80,9 +84,10 @@ export function useStore(): StoreState {
   const businessName = infoData?.businessName || initialData?.businessName || requestedBusinessName || '';
   const displayBusinessName = infoData?.displayBusinessName || initialData?.displayBusinessName || businessName;
   const identity = infoData?.businessIdentity || initialData?.identity || null;
+
   const header = useMemo<ApiStoreHeader | null>(() => {
     const rawHeader = infoData?.header || initialData?.header;
-    const rawDesc = infoData?.businessDescription || (initialData as any)?.businessDescription;
+    const rawDesc = infoData?.businessDescription || initialData?.identity?.businessDescription;
     if (!rawHeader && !rawDesc) return null;
 
     return {
@@ -90,6 +95,7 @@ export function useStore(): StoreState {
       slogan: rawHeader?.slogan || rawDesc || null,
     };
   }, [infoData, initialData]);
+
   const sliders = slidersData?.sliderItems ?? initialData?.sliders ?? EMPTY_SLIDERS;
   const sliderHeader = slidersData?.sliderHeader || initialData?.sliderHeader || null;
 
@@ -118,7 +124,9 @@ export function useStore(): StoreState {
     (infoQuery.isError || (!infoData && !categoriesData && !productsData))
   );
 
+  // Synchronize Google Fonts and Theme palette (runs once per tenant)
   useEffect(() => {
+    if (typeof document === 'undefined') return;
     const root = document.documentElement;
     const requestedArabic = identity?.typography?.arabicFont?.trim();
     const requestedEnglish = identity?.typography?.englishFont?.trim();
@@ -145,7 +153,9 @@ export function useStore(): StoreState {
     root.style.setProperty('--font-display', locale === 'ar' ? arabicStack : englishStack);
   }, [identity, locale]);
 
+  // Synchronize document title
   useEffect(() => {
+    if (typeof document === 'undefined') return;
     const title = displayBusinessName || header?.businessName || identity?.businessName || businessName;
     const slogan = header?.slogan || identity?.slogan || '';
 
@@ -266,3 +276,5 @@ export function useStore(): StoreState {
     refresh,
   ]);
 }
+
+export { useStore, StoreProvider, InitialStoreProvider } from '@/context/InitialStoreContext';

@@ -1,10 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Sparkles, ArrowRight, ArrowLeft, MessageSquare, CheckCircle2 } from 'lucide-react';
 
 export function LandingCTA() {
+  const t = useTranslations('landing.cta');
   const locale = useLocale();
   const isRTL = locale === 'ar';
   const ArrowIcon = isRTL ? ArrowLeft : ArrowRight;
@@ -21,26 +22,24 @@ export function LandingCTA() {
             {/* Tag Badge */}
             <div className="inline-flex items-center gap-2 rounded-full bg-white/15 backdrop-blur-md px-3.5 py-1.5 text-xs font-bold text-white shadow-sm mb-6 border border-white/20">
               <Sparkles className="h-3.5 w-3.5" />
-              <span>{isRTL ? 'إطلاق فوري خلال دقائق' : 'Launch in Minutes'}</span>
+              <span>{t('tag')}</span>
             </div>
 
             <h2 className="text-3xl font-black tracking-tight sm:text-4xl md:text-5xl lg:text-6xl leading-tight">
-              {isRTL ? 'جاهز لترقية تجربة ضيوفك وزيادة مبيعاتك؟' : 'Ready to Elevate Your Dining Experience?'}
+              {t('title')}
             </h2>
 
             <p className="mt-5 text-base sm:text-lg md:text-xl text-white/90 leading-relaxed max-w-2xl mx-auto">
-              {isRTL
-                ? 'انضم إلى نخبة المطاعم والمقاهي التي تثق بمنصة مُتحكّم لتقديم قائمة طعام رقمية سريعة، تفاعلية وعصرية.'
-                : 'Join top hospitality brands using MOT7KM for lightning-fast, high-converting digital menus.'}
+              {t('subtitle')}
             </p>
 
             {/* Action Buttons */}
             <div className="mt-8 sm:mt-10 flex flex-wrap items-center justify-center gap-4">
               <Link
-                href={`/${locale}/menu`}
+                href={`/${locale}/artisan-roastery`}
                 className="inline-flex items-center gap-2.5 rounded-full bg-white px-8 py-4 text-sm sm:text-base font-bold text-[var(--color-primary)] shadow-xl transition-all duration-300 hover:bg-slate-50 hover:scale-[1.02] active:scale-[0.98]"
               >
-                <span>{isRTL ? 'ابدأ تجربتك الآن' : 'Get Started Now'}</span>
+                <span>{t('getStarted')}</span>
                 <ArrowIcon className="h-4 w-4" />
               </Link>
 
@@ -51,7 +50,7 @@ export function LandingCTA() {
                 className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 backdrop-blur-md px-7 py-4 text-sm sm:text-base font-bold text-white transition-all duration-200 hover:bg-white/20 hover:border-white/50"
               >
                 <MessageSquare className="h-4 w-4" />
-                <span>{isRTL ? 'تحدث مع مستشار المبيعات' : 'Chat with Sales'}</span>
+                <span>{t('chatSales')}</span>
               </a>
             </div>
 
@@ -59,15 +58,15 @@ export function LandingCTA() {
             <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-xs text-white/85">
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="h-4 w-4 text-white" />
-                <span>{isRTL ? 'بدون بطاقة ائتمانية للبدء' : 'No credit card required'}</span>
+                <span>{t('guarantees.noCard')}</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="h-4 w-4 text-white" />
-                <span>{isRTL ? 'إعداد سريع في نفس اليوم' : 'Same-day setup assistance'}</span>
+                <span>{t('guarantees.sameDay')}</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="h-4 w-4 text-white" />
-                <span>{isRTL ? 'دعم فني وتدريب مجاني' : 'Free onboarding & support'}</span>
+                <span>{t('guarantees.support')}</span>
               </div>
             </div>
           </div>

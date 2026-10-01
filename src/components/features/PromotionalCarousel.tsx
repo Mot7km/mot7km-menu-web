@@ -2,13 +2,13 @@
 
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
-import { Coffee, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
+import { Coffee, ChevronLeft, ChevronRight } from 'lucide-react';
 import useEmblaCarousel from 'embla-carousel-react';
 import type { EmblaCarouselType } from 'embla-carousel';
 import Autoplay from 'embla-carousel-autoplay';
 import { PromoCardData } from '@/data/menupromo';
 import { useStore } from '@/store/storeHooks';
-import { useLocale, useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
 
 // -------------------------------------------------------------------
 // Tween constants — tweak these to control the coverflow intensity
@@ -25,10 +25,9 @@ const clamp = (v: number, min: number, max: number) =>
 // Main Carousel – full‑width on mobile, container‑width on larger screens
 // -------------------------------------------------------------------
 export const PromotionalCarousel = memo(function PromotionalCarousel() {
-  const t = useTranslations();
   const locale = useLocale();
   const isRTL = locale === 'ar';
-  const { promoCards, sliderHeader, loading } = useStore();
+  const { promoCards, loading } = useStore();
 
   const slideCount = promoCards?.length ?? 0;
 

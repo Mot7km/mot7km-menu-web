@@ -1,55 +1,60 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { useTheme } from '@/hooks/useTheme';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { usePathname, useRouter } from 'next/navigation';
-import { THEME_STORAGE_KEY } from '@/config/theme';
-import { i18n } from '@/config/i18n';
 import { Settings, Sun, Moon, Monitor, Globe, Check } from 'lucide-react';
+import { useTheme } from '@/hooks/useTheme';
+import { i18n } from '@/config/i18n';
 import { useLocaleTransition } from '@/context/LocaleTransitionContext';
+
+function setLocaleCookie(newLocale: string) {
+  if (typeof document !== 'undefined') {
+    document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=31536000; SameSite=Lax; Secure`;
+  }
+}
 
 export function SettingsMenu() {
   const t = useTranslations();
-  const { theme, setTheme, resolvedTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const locale = useLocale();
   const pathname = usePathname();
   const router = useRouter();
   const { startLocaleTransition } = useLocaleTransition();
 
-  const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
-
-  // Refs for positioning and click‑outside detection
   const triggerRef = useRef<HTMLButtonElement>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const popoverRef = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState({ top: 0, left: 0 });
 
-  useEffect(() => {
-    setMounted(true);
-    try {
-      const stored = localStorage.getItem(THEME_STORAGE_KEY) as 'light' | 'dark' | 'system' | null;
-      if (stored) {
-        applyTheme(stored === 'system' ? 'system' : stored);
-      } else if (theme) {
-        applyTheme(theme === 'system' ? 'system' : (theme as 'light' | 'dark'));
-      }
-    } catch (e) {}
+  const currentTheme = theme || 'system';
+
+  const segments = pathname.split('/').filter(Boolean);
+  const currentLocale = segments[0] && i18n.locales.includes(segments[0] as (typeof i18n.locales)[number])
+    ? segments[0]
+    : locale;
+
+  const updatePosition = useCallback(() => {
+    const rect = triggerRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const popoverWidth = 240;
+    const padding = 12;
+    const isRtl = document.documentElement.dir === 'rtl';
+
+    let left = isRtl
+      ? rect.left
+      : rect.right - popoverWidth;
+
+    // Viewport bounds clamp
+    left = Math.max(padding, Math.min(left, window.innerWidth - popoverWidth - padding));
+    const top = rect.bottom + 8;
+
+    setPosition({ top, left });
   }, []);
 
-  // ─── Update dropdown position ───
   useEffect(() => {
     if (!open) return;
-    const updatePosition = () => {
-      const rect = triggerRef.current?.getBoundingClientRect();
-      if (rect) {
-        setPosition({
-          top: rect.bottom + window.scrollY + 8, // 8px gap
-          left: rect.right - 224 + window.scrollX, // 224px = w-56 (dropdown width)
-        });
-      }
-    };
     updatePosition();
     window.addEventListener('resize', updatePosition);
     window.addEventListener('scroll', updatePosition, true);
@@ -57,60 +62,45 @@ export function SettingsMenu() {
       window.removeEventListener('resize', updatePosition);
       window.removeEventListener('scroll', updatePosition, true);
     };
-  }, [open]);
+  }, [open, updatePosition]);
 
-  // ─── Close on outside click ───
+  // Click outside to close
   useEffect(() => {
-    const handler = (e: MouseEvent) => {
+    if (!open) return;
+    const handleOutsideClick = (e: MouseEvent | TouchEvent) => {
       const target = e.target as Node;
-      const isTrigger = triggerRef.current?.contains(target);
-      const isDropdown = dropdownRef.current?.contains(target);
-      if (!isTrigger && !isDropdown) {
-        setOpen(false);
+      if (
+        triggerRef.current?.contains(target) ||
+        popoverRef.current?.contains(target)
+      ) {
+        return;
       }
+      setOpen(false);
     };
-    if (open) document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
+
+    document.addEventListener('mousedown', handleOutsideClick);
+    document.addEventListener('touchstart', handleOutsideClick);
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+      document.removeEventListener('touchstart', handleOutsideClick);
+    };
   }, [open]);
 
-  // ─── Close on Escape ───
+  // Escape key to close
   useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
+    if (!open) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setOpen(false);
     };
-    if (open) document.addEventListener('keydown', handler);
-    return () => document.removeEventListener('keydown', handler);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
   }, [open]);
 
-  if (!mounted) return null;
+  const switchLocale = (newLocale: string) => {
+    if (newLocale === currentLocale) return;
+    startLocaleTransition();
+    setLocaleCookie(newLocale);
 
-  // ─── Theme logic ───
-  const applyTheme = (name: 'light' | 'dark' | 'system') => {
-    try {
-      if (name === 'system') {
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        document.documentElement.classList.toggle('dark', prefersDark);
-      } else {
-        document.documentElement.classList.toggle('dark', name === 'dark');
-      }
-      localStorage.setItem(THEME_STORAGE_KEY, name);
-    } catch (e) {}
-  };
-
-  const handleThemeChange = (mode: 'light' | 'dark' | 'system') => {
-    setTheme(mode);
-    applyTheme(mode);
-  };
-
-  const currentTheme = theme || 'system';
-
-  // ─── Language logic ───
-  const segments = pathname.split('/').filter(Boolean);
-  const currentLocale = segments[0] && i18n.locales.includes(segments[0] as (typeof i18n.locales)[number])
-    ? segments[0]
-    : locale;
-
-  const getLocalizedPath = (newLocale: string) => {
     const segs = pathname.split('/').filter(Boolean);
     const hasLocalePrefix = segs[0] && i18n.locales.includes(segs[0] as (typeof i18n.locales)[number]);
     if (hasLocalePrefix) {
@@ -118,19 +108,12 @@ export function SettingsMenu() {
     } else {
       segs.unshift(newLocale);
     }
-    return `/${segs.join('/')}`;
-  };
 
-  const switchLocale = (newLocale: string) => {
-    if (newLocale === currentLocale) return;
-    startLocaleTransition();
-    document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=31536000; SameSite=Lax; Secure`;
-    router.push(getLocalizedPath(newLocale));
-    router.refresh();
     setOpen(false);
+    router.push(`/${segs.join('/')}`);
+    router.refresh();
   };
 
-  // ─── Config ───
   const themeOptions = [
     { id: 'light' as const, icon: Sun, label: t('settings.light') },
     { id: 'dark' as const, icon: Moon, label: t('settings.dark') },
@@ -142,121 +125,122 @@ export function SettingsMenu() {
     label: loc === 'en' ? t('languages.en') : t('languages.ar'),
   }));
 
-  // ─── Dropdown content ───
-  const dropdownContent = (
-    <div
-      ref={dropdownRef}
-      className="w-56 glass rounded-2xl shadow-xl animate-scale-in origin-top-right overflow-hidden"
-      style={{
-        position: 'fixed',
-        top: position.top,
-        left: position.left,
-        zIndex: 9999,
-      }}
-    >
-      {/* Language Section */}
-      <div className="px-3 pt-3 pb-1">
-        <div className="flex items-center gap-2 px-1 pb-2">
-          <Globe className="h-3.5 w-3.5 text-[var(--color-text-muted)]" />
-          <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
-            {t('settings.language')}
-          </span>
-        </div>
-        <div className="flex gap-1.5">
-          {languageOptions.map((lang) => {
-            const isActive = currentLocale === lang.id;
-            return (
-              <button
-                key={lang.id}
-                onClick={() => switchLocale(lang.id)}
-                className={`
-                  flex-1 flex items-center justify-center gap-1.5
-                  py-2 rounded-xl text-sm font-medium
-                  transition-all duration-200 ease-out
-                  cursor-pointer
-                  ${isActive
-                    ? 'text-[var(--color-text-on-primary)] shadow-md'
-                    : 'bg-[var(--color-primary-50)] text-[var(--color-text-secondary)] hover:bg-[var(--color-primary-100)]'
-                  }
-                `}
-                style={isActive ? { background: 'var(--gradient-primary)' } : undefined}
-              >
-                {isActive && <Check className="h-3 w-3" />}
-                {lang.label}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Divider */}
-      <div className="section-divider mx-3 my-2" />
-
-      {/* Theme Section */}
-      <div className="px-3 pt-1 pb-3">
-        <div className="flex items-center gap-2 px-1 pb-2">
-          <Sun className="h-3.5 w-3.5 text-[var(--color-text-muted)]" />
-          <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
-            {t('settings.theme')}
-          </span>
-        </div>
-        <div className="flex flex-col gap-1">
-          {themeOptions.map(({ id, icon: Icon, label }) => {
-            const isActive = currentTheme === id;
-            return (
-              <button
-                key={id}
-                onClick={() => handleThemeChange(id)}
-                className={`
-                  flex items-center gap-3
-                  w-full px-3 py-2.5 rounded-xl
-                  text-sm font-medium
-                  transition-all duration-200 ease-out
-                  cursor-pointer
-                  ${isActive
-                    ? 'text-[var(--color-text-on-primary)] shadow-md'
-                    : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-primary-50)]'
-                  }
-                `}
-                style={isActive ? { background: 'var(--gradient-primary)' } : undefined}
-              >
-                <Icon className="h-4 w-4 flex-shrink-0" />
-                <span className="flex-1 text-start">{label}</span>
-                {isActive && <Check className="h-3.5 w-3.5 flex-shrink-0" />}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-    </div>
-  );
-
   return (
-    <div className="relative z-30">
-      {/* ─── Trigger Button ─── */}
+    <>
       <button
         ref={triggerRef}
-        onClick={() => setOpen((v) => !v)}
-        className={`
+        type="button"
+        onClick={() => setOpen((prev) => !prev)}
+        className="
           flex items-center justify-center
-          w-10 h-10 rounded-full
-          transition-all duration-250 ease-out
+          h-9 w-9 sm:h-10 sm:w-10
+          rounded-xl
+          bg-[var(--color-surface)]/80 backdrop-blur-md
+          border border-[var(--color-border)]/60
+          text-[var(--color-text-secondary)]
+          hover:text-[var(--color-text-primary)]
+          hover:bg-[var(--color-surface)]
+          hover:border-[var(--color-border-strong)]
+          transition-all duration-200
+          shadow-sm
           cursor-pointer
-          hover:scale-105 active:scale-95
-          ${open
-            ? 'text-white shadow-lg'
-            : 'glass text-white/80 hover:text-white'
-          }
-        `}
-        style={open ? { background: 'var(--gradient-primary)' } : undefined}
+        "
         aria-label={t('settings.title')}
         aria-expanded={open}
       >
-        <Settings className={`h-[18px] w-[18px] transition-transform duration-300 ${open ? 'rotate-90' : ''}`} />
+        <Settings className="h-4 w-4 sm:h-4.5 sm:w-4.5" />
       </button>
 
-      {/* ─── Dropdown via Portal ─── */}
-      {open && createPortal(dropdownContent, document.body)}
-    </div>
+      {open &&
+        typeof document !== 'undefined' &&
+        createPortal(
+          <div
+            ref={popoverRef}
+            className="fixed z-50 animate-scale-in"
+            style={{
+              top: `${position.top}px`,
+              left: `${position.left}px`,
+              width: '240px',
+            }}
+          >
+            <div
+              className="
+                rounded-2xl p-1.5
+                bg-[var(--color-surface)]/95 backdrop-blur-xl
+                border border-[var(--color-border)]/80
+                shadow-2xl shadow-black/15
+                space-y-1 text-sm
+              "
+            >
+              {/* Language Section */}
+              <div className="px-3 pt-2.5 pb-1">
+                <div className="flex items-center gap-1.5 pb-2 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
+                  <Globe className="h-3.5 w-3.5" />
+                  <span>{t('settings.language')}</span>
+                </div>
+                <div className="flex gap-1.5">
+                  {languageOptions.map((lang) => {
+                    const isActive = currentLocale === lang.id;
+                    return (
+                      <button
+                        key={lang.id}
+                        type="button"
+                        onClick={() => switchLocale(lang.id)}
+                        className={`
+                          flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2.5 rounded-lg text-xs font-medium transition-all cursor-pointer
+                          ${
+                            isActive
+                              ? 'bg-[var(--color-primary)] text-[var(--color-text-on-primary)] shadow-sm'
+                              : 'bg-[var(--color-surface-subtle)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-elevated)]'
+                          }
+                        `}
+                      >
+                        {isActive && <Check className="h-3 w-3 stroke-[2.5]" />}
+                        <span>{lang.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Divider */}
+              <div className="border-t border-[var(--color-border)]/40 my-1" />
+
+              {/* Theme Section */}
+              <div className="px-3 pt-1 pb-2">
+                <div className="flex items-center gap-1.5 pb-2 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
+                  <span>{t('settings.theme')}</span>
+                </div>
+                <div className="grid grid-cols-3 gap-1.5">
+                  {themeOptions.map((mode) => {
+                    const Icon = mode.icon;
+                    const isActive = currentTheme === mode.id;
+                    return (
+                      <button
+                        key={mode.id}
+                        type="button"
+                        onClick={() => setTheme(mode.id)}
+                        className={`
+                          flex flex-col items-center justify-center gap-1 py-2 px-1.5 rounded-lg text-[11px] font-medium transition-all cursor-pointer
+                          ${
+                            isActive
+                              ? 'bg-[var(--color-primary)] text-[var(--color-text-on-primary)] shadow-sm'
+                              : 'bg-[var(--color-surface-subtle)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-elevated)]'
+                          }
+                        `}
+                        title={mode.label}
+                      >
+                        <Icon className="h-4 w-4" />
+                        <span className="truncate max-w-full">{mode.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </div>,
+          document.body
+        )}
+    </>
   );
 }

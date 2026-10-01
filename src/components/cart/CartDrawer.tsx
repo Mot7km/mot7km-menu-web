@@ -9,7 +9,7 @@ import { usePathname } from 'next/navigation';
 interface CartItem {
   id: string;
   product: { id: string; name: string; image: string };
-  selections: Record<string, any>;
+  selections: Record<string, string>;
   totalPrice: number;
   quantity: number;
 }
@@ -39,8 +39,8 @@ export function CartDrawer({
     const map = new Map<
       string,
       {
-        product: any;
-        selections: Record<string, any>;
+        product: CartItem['product'];
+        selections: Record<string, string>;
         unitPrice: number;
         quantity: number;
         itemIds: string[];
@@ -94,38 +94,30 @@ export function CartDrawer({
 
   const CLOSE_DURATION = 380; // ms — must match the CSS transition duration
 
-  // `isVisible` tracks if the sheet is physically rendered (for animation).
-  // We keep it true for CLOSE_DURATION after isOpen becomes false so the
-  // slide-out animation can finish before we stop rendering.
-  // EXCEPTION: on navigation (pathname changes), we hide instantly so the
-  // drawer never appears during a View Transition or browser back animation.
+  const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
   const [isVisible, setIsVisible] = useState(isOpen);
-  const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pathname = usePathname();
   const prevPathnameRef = useRef(pathname);
 
-  useEffect(() => {
+  if (isOpen !== prevIsOpen) {
+    setPrevIsOpen(isOpen);
     if (isOpen) {
-      // Immediately show when opening
-      if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
       setIsVisible(true);
-    } else {
+    }
+  }
+
+  useEffect(() => {
+    if (!isOpen) {
       const isNavigation = prevPathnameRef.current !== pathname;
       prevPathnameRef.current = pathname;
 
       if (isNavigation) {
-        // Hide immediately — no animation during page transitions
-        if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
         setIsVisible(false);
       } else {
-        // Normal close: delay hiding until slide-out animation completes
-        closeTimeoutRef.current = setTimeout(() => setIsVisible(false), CLOSE_DURATION);
+        const timer = setTimeout(() => setIsVisible(false), CLOSE_DURATION);
+        return () => clearTimeout(timer);
       }
     }
-    return () => {
-      if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
-    };
-  // pathname in deps ensures we re-evaluate when route changes
   }, [isOpen, pathname]);
 
   return (

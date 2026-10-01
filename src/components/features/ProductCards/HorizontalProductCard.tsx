@@ -7,7 +7,7 @@ import { Star, ShoppingBag, Check, SlidersHorizontal } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Product } from '@/data/menu';
 import { useBusinessRoute } from '@/hooks/useLocale';
-import { useCart } from '@/store/hooks';
+import { useAddToCart } from '@/store/hooks';
 
 
 interface HorizontalProductCardProps {
@@ -22,7 +22,7 @@ export const HorizontalProductCard = memo(function HorizontalProductCard({
   const t = useTranslations();
   const { getPath } = useBusinessRoute();
   const href = getPath(product.id);
-  const { addToCart } = useCart();
+  const addToCart = useAddToCart();
 
   const [justAdded, setJustAdded] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
