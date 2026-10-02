@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import { Coffee, ChevronLeft, ChevronRight } from 'lucide-react';
 import useEmblaCarousel from 'embla-carousel-react';
@@ -10,39 +10,38 @@ import { PromoCardData } from '@/data/menupromo';
 import { useStore } from '@/store/storeHooks';
 import { useLocale } from 'next-intl';
 
-// -------------------------------------------------------------------
-// Tween constants — tweak these to control the coverflow intensity
-// -------------------------------------------------------------------
-const TWEEN_SCALE_FACTOR = 0.9;   // smooth scaling transition
-const SCALE_MIN = 0.88;           // side slides scale (88% of center slide)
-const OPACITY_MIN = 0.65;         // side slides opacity (clear and legible)
+const SCALE_MIN = 0.88; // Side slides scale
+const OPACITY_MIN = 0.65; // Side slides opacity
 
-/** Clamp a value between min and max. */
 const clamp = (v: number, min: number, max: number) =>
   Math.min(max, Math.max(min, v));
 
-// -------------------------------------------------------------------
-// Main Carousel – full‑width on mobile, container‑width on larger screens
-// -------------------------------------------------------------------
 export const PromotionalCarousel = memo(function PromotionalCarousel() {
   const locale = useLocale();
   const isRTL = locale === 'ar';
   const { promoCards, loading } = useStore();
 
-  const slideCount = promoCards?.length ?? 0;
+  const originalCards = promoCards ?? [];
+  const originalCount = originalCards.length;
 
-  // Loop only when there are enough slides to fill more than one "page".
-  // With 1–2 slides on wide screens, loop:true makes Embla ignore
-  // `containScroll` and produces dead snaps.
-  const loop = slideCount > 2;
+  // Automatically pad/duplicate cards so Embla's native loop engine always triggers
+  const extendedCards = useMemo(() => {
+    if (originalCount === 0) return [];
+    let list = [...originalCards];
+    while (list.length < 4) {
+      list = [...list, ...originalCards];
+    }
+    return list;
+  }, [originalCards, originalCount]);
 
-  // Lazy-init Autoplay exactly once. Calling Autoplay() during render would
-  // create a new plugin instance on every render and leak listeners.
+  const loop = extendedCards.length > 1;
+
   const autoplayRef = useRef<ReturnType<typeof Autoplay> | null>(null);
   if (autoplayRef.current === null) {
     autoplayRef.current = Autoplay({
       delay: 4000,
       stopOnInteraction: true,
+      stopOnMouseEnter: true,
     });
   }
 
@@ -50,7 +49,7 @@ export const PromotionalCarousel = memo(function PromotionalCarousel() {
     {
       loop,
       align: 'center',
-      containScroll: 'trimSnaps',
+      containScroll: false,
       dragFree: false,
       direction: isRTL ? 'rtl' : 'ltr',
     },
@@ -58,14 +57,8 @@ export const PromotionalCarousel = memo(function PromotionalCarousel() {
   );
 
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [snapCount, setSnapCount] = useState(0);
-  const [canPrev, setCanPrev] = useState(false);
-  const [canNext, setCanNext] = useState(false);
-
-  // ---- Coverflow tween refs (direct DOM manipulation → 60 fps) ----
   const tweenNodesRef = useRef<HTMLElement[]>([]);
 
-  /** Cache the inner wrapper of every slide so we don't query the DOM on every frame. */
   const setTweenNodes = useCallback((api: EmblaCarouselType) => {
     tweenNodesRef.current = api.slideNodes().map((node) => {
       const inner = node.querySelector<HTMLElement>('[data-tween-target]');
@@ -73,120 +66,79 @@ export const PromotionalCarousel = memo(function PromotionalCarousel() {
     });
   }, []);
 
-  /** Apply scale + opacity to every slide based on distance from center. */
-  const tweenSlides = useCallback((api: EmblaCarouselType) => {
-    const progress = api.scrollProgress();
-    const snaps = api.scrollSnapList();
-
-    snaps.forEach((snap, idx) => {
-      const node = tweenNodesRef.current[idx];
-      if (!node) return;
-
-      // Distance from center: 0 = perfectly centered, ±1 = one full page away
-      let diff = snap - progress;
-
-      // Handle looping: pick the shortest wrap-around distance
-      if (loop) {
-        if (diff > 0.5) diff -= 1;
-        else if (diff < -0.5) diff += 1;
-      }
-
-      const absDiff = Math.abs(diff);
-      const scale = clamp(1 - absDiff * TWEEN_SCALE_FACTOR, SCALE_MIN, 1);
-      const opacity = clamp(1 - absDiff * TWEEN_SCALE_FACTOR, OPACITY_MIN, 1);
-      // Subtle 3D tilt (Apple Coverflow angle)
-      const rotate = clamp(diff * 6, -6, 6);
-
-      node.style.transform = `scale(${scale}) rotateY(${rotate}deg)`;
-      node.style.opacity = `${opacity}`;
-    });
-  }, [loop]);
-
-  // ---- Standard sync (selected index, snap count, nav) ----
   useEffect(() => {
     if (!emblaApi) return;
 
-    const sync = () => {
-      setSelectedIndex(emblaApi.selectedScrollSnap());
-      setSnapCount(emblaApi.scrollSnapList().length);
-      setCanPrev(emblaApi.canScrollPrev());
-      setCanNext(emblaApi.canScrollNext());
+    const updateStyles = () => {
+      const scrollProgress = emblaApi.scrollProgress();
+
+      emblaApi.scrollSnapList().forEach((scrollSnap, snapIndex) => {
+        const node = tweenNodesRef.current[snapIndex];
+        if (!node) return;
+
+        let diff = scrollSnap - scrollProgress;
+        if (loop) {
+          if (diff > 0.5) diff -= 1;
+          else if (diff < -0.5) diff += 1;
+        }
+
+        const absDiff = Math.abs(diff);
+        const scale = clamp(1 - absDiff * 0.3, SCALE_MIN, 1);
+        const opacity = clamp(1 - absDiff * 0.35, OPACITY_MIN, 1);
+
+        node.style.transform = `scale(${scale})`;
+        node.style.opacity = `${opacity}`;
+      });
     };
 
-    // Init tween nodes & run first tween pass
     setTweenNodes(emblaApi);
-    tweenSlides(emblaApi);
+    updateStyles();
 
-    sync();
-    emblaApi.on('select', sync);
-    emblaApi.on('reInit', sync);
-    emblaApi.on('reInit', setTweenNodes);
-    emblaApi.on('reInit', tweenSlides);
-    emblaApi.on('scroll', tweenSlides);
-    emblaApi.on('slideFocus', tweenSlides);
+    const onSelect = () => {
+      setSelectedIndex(emblaApi.selectedScrollSnap());
+    };
+
+    emblaApi.on('select', onSelect);
+    emblaApi.on('scroll', updateStyles);
+    emblaApi.on('reInit', () => {
+      setTweenNodes(emblaApi);
+      updateStyles();
+    });
 
     return () => {
-      emblaApi.off('select', sync);
-      emblaApi.off('reInit', sync);
-      emblaApi.off('reInit', setTweenNodes);
-      emblaApi.off('reInit', tweenSlides);
-      emblaApi.off('scroll', tweenSlides);
-      emblaApi.off('slideFocus', tweenSlides);
+      emblaApi.off('select', onSelect);
+      emblaApi.off('scroll', updateStyles);
     };
-  }, [emblaApi, setTweenNodes, tweenSlides]);
+  }, [emblaApi, setTweenNodes, loop]);
 
-  // Pause autoplay when there's nothing to rotate through.
-  useEffect(() => {
-    const autoplay = autoplayRef.current;
-    if (!autoplay) return;
-    if (snapCount > 1) autoplay.play();
-    else autoplay.stop();
-  }, [snapCount]);
-
-  const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
-  const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
-  const scrollTo = useCallback(
-    (i: number) => emblaApi?.scrollTo(i),
-    [emblaApi]
-  );
-
-  // ---------------- Loading / empty state ----------------
-  if (loading || !promoCards?.length) {
-    return (
-      <></>
-    );
+  if (loading || originalCount === 0) {
+    return <></>;
   }
 
-  // Only show navigation when Embla actually has more than one snap.
-  const showNav = snapCount > 1;
+  // Map the active carousel index back to the original unique cards for the pagination dots
+  const activeOriginalIndex = originalCount > 0 ? selectedIndex % originalCount : 0;
+  const showNav = originalCount > 1;
 
   return (
-    <section className="relative overflow-x-hidden w-full py-1" style={{ perspective: '1200px' }}>
-      {/* Adaptive Stage: Full-bleed on mobile (<md), centered container with padding on desktop (md+) */}
+    <section className="relative overflow-hidden w-full py-2">
       <div className="relative w-full md:max-w-6xl xl:max-w-7xl md:mx-auto md:px-6 lg:px-8">
-        {/* Carousel Viewport */}
         <div
-          className="overflow-hidden touch-pan-y"
+          className="overflow-hidden cursor-grab active:cursor-grabbing touch-pan-y py-4"
           ref={emblaRef}
           dir={isRTL ? 'rtl' : 'ltr'}
-          onMouseEnter={() => autoplayRef.current?.stop()}
-          onMouseLeave={() => {
-            if (snapCount > 1) autoplayRef.current?.play();
-          }}
         >
-          <div className="flex">
-            {promoCards.map((card, index) => (
+          <div className="flex -ml-4">
+            {extendedCards.map((card, index) => (
               <div
-                key={card.id}
+                key={`${card.id}-${index}`}
                 onClick={() => {
-                  if (index !== selectedIndex) scrollTo(index);
+                  if (index !== selectedIndex) emblaApi?.scrollTo(index);
                 }}
-                className="min-w-0 shrink-0 grow-0 basis-[74%] sm:basis-[62%] md:basis-[50%] lg:basis-[45%] xl:basis-[42%] px-1 sm:px-1.5 py-1 cursor-pointer"
+                className="min-w-0 shrink-0 grow-0 basis-[85%] sm:basis-[65%] md:basis-[50%] lg:basis-[42%] pl-4"
               >
-                {/* Inner wrapper targeted by the tween effect — never conflict with Embla's own transforms */}
                 <div
                   data-tween-target
-                  className="transition-[transform,opacity] duration-300 ease-out will-change-[transform,opacity] origin-center"
+                  className="will-change-[transform,opacity] origin-center"
                 >
                   <PromoCard {...card} isFirst={index === 0} />
                 </div>
@@ -195,67 +147,51 @@ export const PromotionalCarousel = memo(function PromotionalCarousel() {
           </div>
         </div>
 
-        {/* Navigation Arrows — Framed within the stage on desktop */}
+        {/* Navigation Buttons */}
         {showNav && (
           <>
             <button
-              onClick={scrollPrev}
-              disabled={!loop && !canPrev}
+              onClick={() => emblaApi?.scrollPrev()}
               aria-label={isRTL ? 'التالي' : 'Previous'}
-              className="absolute top-1/2 left-2 sm:left-3 md:left-8 -translate-y-1/2 z-20
+              className="absolute top-1/2 left-2 sm:left-3 md:left-4 -translate-y-1/2 z-20
                 hidden sm:flex items-center justify-center
                 w-10 h-10 md:w-11 md:h-11 rounded-full
-                bg-black/40 hover:bg-black/60 text-white backdrop-blur-md border border-white/20
-                shadow-xl
-                transition-all duration-200
-                hover:scale-110 active:scale-95
-                focus:outline-none focus-ring
-                cursor-pointer
-                disabled:opacity-0 disabled:pointer-events-none"
+                bg-black/50 hover:bg-black/70 text-white backdrop-blur-md border border-white/20
+                shadow-xl transition-all duration-200 hover:scale-110 active:scale-95 cursor-pointer"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
-
             <button
-              onClick={scrollNext}
-              disabled={!loop && !canNext}
+              onClick={() => emblaApi?.scrollNext()}
               aria-label={isRTL ? 'السابق' : 'Next'}
-              className="absolute top-1/2 right-2 sm:right-3 md:right-8 -translate-y-1/2 z-20
+              className="absolute top-1/2 right-2 sm:right-3 md:right-4 -translate-y-1/2 z-20
                 hidden sm:flex items-center justify-center
                 w-10 h-10 md:w-11 md:h-11 rounded-full
-                bg-black/40 hover:bg-black/60 text-white backdrop-blur-md border border-white/20
-                shadow-xl
-                transition-all duration-200
-                hover:scale-110 active:scale-95
-                focus:outline-none focus-ring
-                cursor-pointer
-                disabled:opacity-0 disabled:pointer-events-none"
+                bg-black/50 hover:bg-black/70 text-white backdrop-blur-md border border-white/20
+                shadow-xl transition-all duration-200 hover:scale-110 active:scale-95 cursor-pointer"
             >
               <ChevronRight className="w-5 h-5" />
             </button>
           </>
         )}
 
-        {/* Dots — driven by actual snap count, not card count */}
+        {/* Pagination Dots mapped to original unique cards */}
         {showNav && (
-          <div className="flex justify-center gap-2">
-            {Array.from({ length: snapCount }).map((_, index) => (
+          <div className="flex justify-center gap-2 mt-4">
+            {originalCards.map((_, index) => (
               <button
                 key={index}
-                onClick={() => scrollTo(index)}
+                onClick={() => emblaApi?.scrollTo(index)}
                 aria-label={`Go to slide ${index + 1}`}
-                className="group flex items-center justify-center min-w-[16px] min-h-[36px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] rounded-full"
+                className="group flex items-center justify-center min-w-[16px] min-h-[36px] cursor-pointer focus:outline-none rounded-full"
               >
                 <span
-                  className={`h-2 rounded-full transition-[width,opacity] duration-300 ease-out block
-                    ${
-                      index === selectedIndex
-                        ? 'w-7'
-                        : 'w-2 bg-[var(--color-border-strong)]'
-                    }
-                  `}
+                  className={`h-2 rounded-full transition-all duration-300 ease-out block ${index === activeOriginalIndex
+                      ? 'w-7'
+                      : 'w-2 bg-[var(--color-border-strong)]'
+                    }`}
                   style={
-                    index === selectedIndex
+                    index === activeOriginalIndex
                       ? { background: 'var(--gradient-primary)' }
                       : undefined
                   }
@@ -269,9 +205,6 @@ export const PromotionalCarousel = memo(function PromotionalCarousel() {
   );
 });
 
-// -------------------------------------------------------------------
-// Individual Promo Card – fully responsive
-// -------------------------------------------------------------------
 const PromoCard = memo(function PromoCard({
   title,
   description,
@@ -287,16 +220,12 @@ const PromoCard = memo(function PromoCard({
 
   return (
     <div
-      className="group relative h-[210px] sm:h-[250px] md:h-[280px] lg:h-[310px] xl:h-[330px] w-full overflow-hidden rounded-xl sm:rounded-2xl
+      className="group relative h-[210px] sm:h-[250px] md:h-[280px] lg:h-[310px] xl:h-[330px] w-full overflow-hidden rounded-2xl
         border border-[var(--color-border)]
-        shadow-[0_4px_20px_-4px_rgba(0,0,0,0.3)]
-        hover:shadow-[0_12px_32px_-6px_rgba(0,0,0,0.45)]
-        hover:border-[var(--color-primary)]/50
-        transition-all duration-300 ease-out
-        hover:scale-[1.01]
+        shadow-lg hover:shadow-2xl
+        transition-shadow duration-300 ease-out
         cursor-pointer"
     >
-      {/* Image */}
       {hasImage && (
         <>
           <Image
@@ -309,14 +238,11 @@ const PromoCard = memo(function PromoCard({
             loading={isFirst ? undefined : 'lazy'}
             sizes="(max-width: 640px) 85vw, (max-width: 768px) 75vw, (max-width: 1024px) 60vw, 50vw"
           />
-          {/* Gradient overlay */}
           {gradient && <div className="absolute inset-0 opacity-80" style={{ background: gradient }} />}
-          {/* Depth overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/10 group-hover:from-black/20 transition-colors duration-400" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/10" />
         </>
       )}
 
-      {/* No-image background */}
       {!hasImage && (
         <div
           className="absolute inset-0 bg-[var(--color-card-light)] dark:bg-[var(--color-card-dark)]"
@@ -324,23 +250,20 @@ const PromoCard = memo(function PromoCard({
         />
       )}
 
-      {/* Decorative Icon */}
       {hasIcon && (
         <div className="absolute bottom-0 right-0 opacity-[0.07] group-hover:opacity-[0.14] transition-opacity duration-400">
           <Coffee className="h-32 w-32 sm:h-36 sm:w-36 text-[var(--color-primary)]" />
         </div>
       )}
 
-      {/* Content */}
-      <div className="relative z-10 flex h-full flex-col justify-center px-4 sm:px-6 md:px-8 py-4 sm:py-6">
+      <div className="relative z-10 flex h-full flex-col justify-center px-6 sm:px-8 py-6">
         {badge && (
           <span
-            className={`mb-2 sm:mb-3 inline-flex w-fit items-center rounded-full
-              px-2.5 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-semibold tracking-wider uppercase
-              backdrop-blur-sm border ${
-                hasImage || backgroundColor
-                  ? 'bg-black/40 text-white border-white/20'
-                  : 'bg-[var(--color-primary-50)] text-[var(--color-primary)] border-[var(--color-primary-100)]'
+            className={`mb-3 inline-flex w-fit items-center rounded-full
+              px-3 py-1 text-xs font-semibold tracking-wider uppercase
+              backdrop-blur-sm border ${hasImage || backgroundColor
+                ? 'bg-black/45 text-white border-white/20'
+                : 'bg-[var(--color-primary-50)] text-[var(--color-primary)] border-[var(--color-primary-100)]'
               }`}
           >
             {badge}
@@ -348,7 +271,7 @@ const PromoCard = memo(function PromoCard({
         )}
 
         <h3
-          className={`text-xl sm:text-2xl md:text-3xl lg:text-[2rem] font-bold leading-tight tracking-tight
+          className={`text-xl sm:text-2xl md:text-3xl font-bold leading-tight tracking-tight
             ${hasImage || backgroundColor ? 'text-white' : 'text-[var(--color-text-primary)]'}
             line-clamp-2
           `}
@@ -359,7 +282,7 @@ const PromoCard = memo(function PromoCard({
 
         {description && (
           <p
-            className={`mt-1.5 sm:mt-2 text-xs sm:text-sm md:text-base font-medium leading-relaxed max-w-sm sm:max-w-md lg:max-w-lg
+            className={`mt-2 text-xs sm:text-sm md:text-base font-medium leading-relaxed max-w-md
               ${hasImage || backgroundColor ? 'text-white/95' : 'text-[var(--color-text-secondary)]'}
               line-clamp-2 sm:line-clamp-3
             `}
