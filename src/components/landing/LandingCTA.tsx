@@ -36,7 +36,7 @@ export function LandingCTA() {
             {/* Action Buttons */}
             <div className="mt-8 sm:mt-10 flex flex-wrap items-center justify-center gap-4">
               <Link
-                href={`/${locale}/artisan-roastery`}
+                href="#clients"
                 className="inline-flex items-center gap-2.5 rounded-full bg-white px-8 py-4 text-sm sm:text-base font-bold text-[var(--color-primary)] shadow-xl transition-all duration-300 hover:bg-slate-50 hover:scale-[1.02] active:scale-[0.98]"
               >
                 <span>{t('getStarted')}</span>

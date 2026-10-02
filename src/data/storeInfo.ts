@@ -1,8 +1,8 @@
 /**
- * Store Information — Single source of truth
+ * Store Information Types and Utilities
  * 
- * This file holds all store-related info (phone, address, hours, socials)
- * and exports a helper to determine if the store is currently open.
+ * Defines the contract for store hours, socials, and contact information,
+ * and provides open/closed calculations based on real API-supplied data.
  */
 
 export interface WorkingHours {
@@ -31,49 +31,25 @@ export interface StoreInfo {
 }
 
 // ─────────────────────────────────────────────────────────────────────
-// STORE DATA  (replace placeholder values with real data)
-// ─────────────────────────────────────────────────────────────────────
-export const storeInfo: StoreInfo = {
-  name: 'The Gourmet Kitchen',
-  nameAr: 'مطبخ الذواقة',
-  phone: '+201234567890',
-  email: 'info@gourmetkitchen.com',
-  address: '123 El-Tahrir St, Downtown, Cairo',
-  addressAr: '١٢٣ شارع التحرير، وسط البلد، القاهرة',
-  mapUrl: 'https://maps.google.com/?q=30.0444,31.2357',
-  workingHours: [
-    // Sunday – Thursday: 10:00 AM to 12:00 AM (midnight)
-    { day: 0, open: '10:00', close: '00:00' },
-    { day: 1, open: '10:00', close: '00:00' },
-    { day: 2, open: '10:00', close: '00:00' },
-    { day: 3, open: '10:00', close: '00:00' },
-    { day: 4, open: '10:00', close: '00:00' },
-    // Friday – Saturday: 12:00 PM to 02:00 AM
-    { day: 5, open: '12:00', close: '02:00' },
-    { day: 6, open: '12:00', close: '02:00' },
-  ],
-  socials: [
-    { platform: 'whatsapp', url: 'https://wa.me/201234567890' },
-    { platform: 'instagram', url: 'https://instagram.com/gourmetkitchen' },
-    { platform: 'facebook', url: 'https://facebook.com/gourmetkitchen' },
-    { platform: 'tiktok', url: 'https://tiktok.com/@gourmetkitchen' },
-  ],
-};
-
-// ─────────────────────────────────────────────────────────────────────
-// OPEN / CLOSED LOGIC
+// OPEN / CLOSED LOGIC (Operates dynamically on API store data)
 // ─────────────────────────────────────────────────────────────────────
 
 function timeToMinutes(time: string): number {
+  if (!time || typeof time !== 'string' || !time.includes(':')) return 0;
   const [h, m] = time.split(':').map(Number);
+  if (isNaN(h) || isNaN(m)) return 0;
   return h * 60 + m;
 }
 
 /**
- * Checks whether the store is currently open.
+ * Checks whether the store is currently open based on API-supplied working hours.
  * Handles overnight hours (e.g. open 12:00, close 02:00).
  */
-export function isStoreOpen(info: StoreInfo = storeInfo): boolean {
+export function isStoreOpen(info?: StoreInfo | null): boolean {
+  if (!info || !info.workingHours || info.workingHours.length === 0) {
+    return true; // Default to open if no hours specified
+  }
+
   const now = new Date();
   const currentDay = now.getDay();          // 0-6
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
@@ -91,7 +67,6 @@ export function isStoreOpen(info: StoreInfo = storeInfo): boolean {
     }
     // Overnight hours (open > close): e.g. 12:00 – 02:00
     else if (openMin > closeMin) {
-      // After opening today?
       if (currentMinutes >= openMin) return true;
     }
     // open === close → 24-hour operation
@@ -116,9 +91,10 @@ export function isStoreOpen(info: StoreInfo = storeInfo): boolean {
 }
 
 /**
- * Returns the formatted working hours for today.
+ * Returns the formatted working hours for today from API store data.
  */
-export function getTodayHours(info: StoreInfo = storeInfo): { open: string; close: string } | null {
+export function getTodayHours(info?: StoreInfo | null): { open: string; close: string } | null {
+  if (!info || !info.workingHours || info.workingHours.length === 0) return null;
   const today = new Date().getDay();
   const schedule = info.workingHours.find((wh) => wh.day === today);
   if (!schedule) return null;

@@ -66,6 +66,7 @@ export interface ApiStoreHeader {
   phoneNumber?: string | null;
   address?: string | null;
   addressAr?: string | null;
+  addressDetails?: ApiAddressDetails | null;
   socialLinks?: ApiSocials | null;
   socials?: ApiSocials | null;
   workingHours?: Array<{
@@ -77,11 +78,21 @@ export interface ApiStoreHeader {
   branches?: ApiBranch[] | null;
 }
 
+export interface ApiAddressDetails {
+  street?: string | null;
+  city?: string | null;
+  state?: string | null;
+  country?: string | null;
+  formattedAddress?: string | null;
+  mapsUrl?: string | null;
+}
+
 export interface ApiBranch {
   id: number | string;
   name?: string | null;
   location?: string | null;
   isMainBranch?: boolean;
+  address?: ApiAddressDetails | null;
 }
 
 export interface ApiSliderItem {
@@ -216,6 +227,32 @@ export interface ApiBusinessInfo {
   businessDescription?: string | null;
   businessIdentity?: ApiBusinessIdentity | null;
   header?: ApiStoreHeader | null;
+}
+
+/**
+ * Item in the paginated response from GET /api/menu/infos
+ */
+export interface ApiBusinessInfoItem {
+  businessName: string;
+  displayBusinessName?: string | null;
+  businessDescription?: string | null;
+  businessIdentity?: ApiBusinessIdentity | null;
+  header?: ApiStoreHeader | null;
+  address?: ApiAddressDetails | null;
+  branches?: ApiBranch[] | null;
+}
+
+/**
+ * Paginated businesses response from GET /api/menu/infos
+ */
+export interface ApiPaginatedBusinessInfos {
+  items: ApiBusinessInfoItem[];
+  pageNumber: number;
+  pageSize: number;
+  totalCount: number;
+  totalPages: number;
+  hasPreviousPage: boolean;
+  hasNextPage: boolean;
 }
 
 export interface ApiBusinessMenu {

@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type {
   ApiBusinessInfo,
+  ApiPaginatedBusinessInfos,
   ApiBusinessMenu,
   ApiCategory,
   ApiProduct,
@@ -97,12 +98,30 @@ export const menuApi = createApi({
       providesTags: (_result, _error, { productId }) => [{ type: 'Reviews', id: productId }],
       keepUnusedDataFor: 600, // 10 min
     }),
+
+    /** GET /api/menu/infos?pageNumber=&pageSize= — Paginated business information and branding */
+    getBusinessInfos: builder.query<ApiPaginatedBusinessInfos, { pageNumber?: number; pageSize?: number } | void>({
+      query: (params) => {
+        const pageNumber = params?.pageNumber ?? 1;
+        const pageSize = params?.pageSize ?? 10;
+        return `/api/menu/infos?pageNumber=${pageNumber}&pageSize=${pageSize}`;
+      },
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.items.map((item) => ({ type: 'BusinessInfo' as const, id: item.businessName })),
+              { type: 'BusinessInfo', id: 'LIST' },
+            ]
+          : [{ type: 'BusinessInfo', id: 'LIST' }],
+      keepUnusedDataFor: 300,
+    }),
   }),
 });
 
 export const {
   useGetMenuQuery,
   useGetBusinessInfoQuery,
+  useGetBusinessInfosQuery,
   useGetSlidersQuery,
   useGetCategoriesQuery,
   useGetProductsQuery,

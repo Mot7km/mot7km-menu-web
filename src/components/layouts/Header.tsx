@@ -8,12 +8,15 @@ import {
   Phone,
   MapPin,
 } from 'lucide-react';
-import { isStoreOpen } from '@/data/storeInfo';
+import { isStoreOpen, getTodayHours } from '@/data/storeInfo';
 import { useStore } from '@/store/storeHooks';
 import { SettingsMenu } from '@/components/common/SettingsMenu';
 
-function formatTimeLocalized(time24: string, locale: string): string {
-  const [h, m] = time24.split(':').map(Number);
+function formatTimeLocalized(time24?: string | null, locale = 'en'): string {
+  if (!time24 || typeof time24 !== 'string') return '';
+  const parts = time24.split(':').map(Number);
+  if (parts.length < 2 || isNaN(parts[0]) || isNaN(parts[1])) return time24;
+  const [h, m] = parts;
   const date = new Date();
   date.setHours(h, m, 0, 0);
 
@@ -22,7 +25,11 @@ function formatTimeLocalized(time24: string, locale: string): string {
     minute: '2-digit',
     hour12: locale !== 'ar',
   };
-  return new Intl.DateTimeFormat(locale, options).format(date);
+  try {
+    return new Intl.DateTimeFormat(locale, options).format(date);
+  } catch {
+    return time24;
+  }
 }
 
 export const Header = memo(function Header() {
@@ -32,25 +39,33 @@ export const Header = memo(function Header() {
   const { storeInfo, header, identity, displayBusinessName } = useStore();
 
   const [open, setOpen] = useState(() => isStoreOpen(storeInfo));
-  const [todayHours, setTodayHours] = useState<{ open: string; close: string } | null>(() => {
-    const today = new Date().getDay();
-    return storeInfo.workingHours.find((wh) => wh.day === today) || null;
-  });
+  const [todayHours, setTodayHours] = useState<{ open: string; close: string } | null>(() =>
+    getTodayHours(storeInfo)
+  );
 
   useEffect(() => {
     const updateStatus = () => {
       setOpen(isStoreOpen(storeInfo));
-      const curToday = new Date().getDay();
-      const curEntry = storeInfo.workingHours.find((wh) => wh.day === curToday);
-      setTodayHours(curEntry || null);
+      setTodayHours(getTodayHours(storeInfo));
     };
 
+    updateStatus();
     const timer = setInterval(updateStatus, 60_000);
     return () => clearInterval(timer);
   }, [storeInfo]);
 
-  const displayAddress = isRTL ? (storeInfo.addressAr || storeInfo.address) : storeInfo.address;
-  const brandName = displayBusinessName || header?.businessName || identity?.businessName || storeInfo.name;
+  const displayAddress = isRTL
+    ? (storeInfo?.addressAr || storeInfo?.address || '')
+    : (storeInfo?.address || '');
+  const brandName =
+    displayBusinessName ||
+    header?.businessName ||
+    identity?.businessName ||
+    storeInfo?.name ||
+    '';
+  const phone = storeInfo?.phone || header?.phoneNumber || '';
+  const mapUrl = storeInfo?.mapUrl;
+
   const slogan =
     header?.slogan ||
     identity?.businessDescription ||
@@ -225,12 +240,12 @@ export const Header = memo(function Header() {
             )}
 
             {/* Essential Contact Meta: Address & Phone */}
-            {(displayAddress || storeInfo.phone) && (
+            {(displayAddress || phone) && (
               <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] sm:text-xs text-white/85 drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
                 {displayAddress && (
-                  storeInfo.mapUrl ? (
+                  mapUrl ? (
                     <a
-                      href={storeInfo.mapUrl}
+                      href={mapUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1 hover:text-white transition-colors cursor-pointer"
@@ -247,26 +262,26 @@ export const Header = memo(function Header() {
                   )
                 )}
 
-                {displayAddress && storeInfo.phone && (
+                {displayAddress && phone && (
                   <span className="inline-block w-1 h-1 rounded-full bg-white/40 flex-shrink-0" />
                 )}
 
-                {storeInfo.phone && (
+                {phone && (
                   <a
-                    href={`tel:${storeInfo.phone}`}
+                    href={`tel:${phone}`}
                     className="inline-flex items-center gap-1 hover:text-white transition-colors cursor-pointer"
                     dir="ltr"
-                    title={storeInfo.phone}
+                    title={phone}
                   >
                     <Phone size={12} className="text-[var(--color-accent)] flex-shrink-0" />
-                    <span className="font-semibold tracking-wide">{storeInfo.phone}</span>
+                    <span className="font-semibold tracking-wide">{phone}</span>
                   </a>
                 )}
               </div>
             )}
 
             {/* Decorative accent line */}
-            <div className="mt-1.5 h-[2px] w-12 sm:w-16 rounded-full bg-gradient-to-r from-[var(--color-accent)] to-transparent shadow-sm" />
+            <div className="mt-1.5 h-[2px] w-12 sm:w-16 rounded-full bg-gradient-to-r rtl:bg-gradient-to-l from-[var(--color-accent)] to-transparent shadow-sm" />
           </div>
         </div>
       </div>

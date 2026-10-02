@@ -11,7 +11,6 @@ import {
   LandingCTA,
   LandingFooter,
 } from '@/components/landing';
-import { FEATURED_BUSINESSES } from '@/data/featuredBusinesses';
 
 export default function Home() {
   const handleScrollTo = useCallback((sectionId: string) => {
@@ -46,7 +45,7 @@ export default function Home() {
         <LandingFeatures />
 
         {/* Featured Partner Menus (Client Cards) */}
-        <LandingFeaturedMenus businesses={FEATURED_BUSINESSES} />
+        <LandingFeaturedMenus />
 
         {/* Subscription Plans */}
         <LandingPricing />

@@ -3,6 +3,7 @@ import { cache } from 'react';
 import { API_BASE_URL } from '../constants';
 import type {
   ApiBusinessInfo,
+  ApiPaginatedBusinessInfos,
   ApiBusinessMenu,
   ApiSlidersResponse,
   ApiCategory,
@@ -66,6 +67,16 @@ export const webMenuApi = {
   /** GET /api/menu/businesses — Get all business names. */
   async getBusinesses(): Promise<string[] | null> {
     return fetchApi<string[]>('/api/menu/businesses');
+  },
+
+  /**
+   * GET /api/menu/infos?pageNumber=&pageSize=
+   * Get paginated business information and branding for all businesses.
+   */
+  async getBusinessInfos(params?: { pageNumber?: number; pageSize?: number }): Promise<ApiPaginatedBusinessInfos | null> {
+    const pageNumber = params?.pageNumber ?? 1;
+    const pageSize = params?.pageSize ?? 10;
+    return fetchApi<ApiPaginatedBusinessInfos>(`/api/menu/infos?pageNumber=${pageNumber}&pageSize=${pageSize}`);
   },
 
   /** GET /api/menu/{businessName} — Get complete store menu. */

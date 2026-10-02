@@ -12,13 +12,56 @@ import { applyThemePalette } from '@/config/theme';
 import { loadGoogleFont } from '@/helpers/fontLoader';
 import { i18n, type Locale } from '@/config/i18n';
 import type { ApiBusinessIdentity, ApiCategory, ApiProduct, ApiSliderItem, ApiStoreHeader } from '@/lib/types/menuApi';
-import type { StoreInfo } from '@/data/storeInfo';
+import type { StoreInfo, WorkingHours } from '@/data/storeInfo';
 import type { Product } from '@/data/menu';
 import type { PromoCardData } from '@/data/menupromo';
 
 const EMPTY_SLIDERS: ApiSliderItem[] = [];
 const EMPTY_CATEGORIES: ApiCategory[] = [];
 const EMPTY_PRODUCTS: ApiProduct[] = [];
+
+function parseWorkingHours(raw: unknown): WorkingHours[] {
+  if (!raw) return [];
+
+  if (typeof raw === 'string') {
+    try {
+      const parsed = JSON.parse(raw);
+      return parseWorkingHours(parsed);
+    } catch {
+      return [];
+    }
+  }
+
+  if (Array.isArray(raw)) {
+    return raw
+      .filter((item): item is Record<string, unknown> => typeof item === 'object' && item !== null)
+      .map((item) => ({
+        day: typeof item.day === 'number' ? item.day : Number(item.day ?? 0),
+        open: typeof item.open === 'string' ? item.open : String(item.open ?? ''),
+        close: typeof item.close === 'string' ? item.close : String(item.close ?? ''),
+      }))
+      .filter((wh) => !isNaN(wh.day) && Boolean(wh.open) && Boolean(wh.close));
+  }
+
+  if (typeof raw === 'object') {
+    const rawObj = raw as Record<string, unknown>;
+    if ('open' in rawObj && 'close' in rawObj) {
+      return [
+        {
+          day: typeof rawObj.day === 'number' ? rawObj.day : Number(rawObj.day ?? 0),
+          open: String(rawObj.open ?? ''),
+          close: String(rawObj.close ?? ''),
+        },
+      ].filter((wh) => !isNaN(wh.day) && Boolean(wh.open) && Boolean(wh.close));
+    }
+    const values = Object.values(rawObj);
+    if (values.length > 0 && typeof values[0] === 'object' && values[0] !== null) {
+      return parseWorkingHours(values);
+    }
+  }
+
+  return [];
+}
 
 export interface StoreState {
   loading: boolean;
@@ -192,13 +235,13 @@ export function useStoreStateCalculation(initialData?: CompleteStoreData | null)
       address,
       addressAr: header?.addressAr || address,
       mapUrl: address ? `https://maps.google.com/?q=${encodeURIComponent(address)}` : undefined,
-      workingHours: header?.workingHours?.map(({ day, open, close }) => ({ day, open, close })) || [],
+      workingHours: parseWorkingHours(header?.workingHours),
       socials,
       businessDescription: infoData?.businessDescription || identity?.businessDescription || undefined,
     };
   }, [header, identity, businessName, displayBusinessName, infoData]);
 
-  const promoCards = useMemo<PromoCardData[]>(() => sliders.map((slider, index) => ({
+  const promoCards = useMemo<PromoCardData[]>(() => (Array.isArray(sliders) ? sliders : []).map((slider, index) => ({
     id: slider.id || index + 1,
     title: slider.header || slider.title || slider.name || slider.titleAr || '',
     description: slider.desc || slider.description || slider.descriptionAr || '',
@@ -212,7 +255,7 @@ export function useStoreStateCalculation(initialData?: CompleteStoreData | null)
     hasIcon: false,
   })), [sliders]);
 
-  const products = useMemo<Product[]>(() => apiProducts.map((product) => ({
+  const products = useMemo<Product[]>(() => (Array.isArray(apiProducts) ? apiProducts : []).map((product) => ({
     id: String(product.id),
     name: product.productName || product.product_Name || product.name || '',
     description: product.description || '',
@@ -225,14 +268,14 @@ export function useStoreStateCalculation(initialData?: CompleteStoreData | null)
       (product as { featured?: boolean; isFeatured?: boolean; is_Featured?: boolean }).is_Featured
     ),
     category: product.categoryName || product.category || categories.find((category) => String(category.id) === String(product.categoryId))?.categoryName || '',
-    ingredients: product.ingredients || [],
-    customizationOptions: product.customizationOptions || [],
-    reviews: product.reviews?.map((review) => ({
+    ingredients: Array.isArray(product.ingredients) ? product.ingredients : [],
+    customizationOptions: Array.isArray(product.customizationOptions) ? product.customizationOptions : [],
+    reviews: Array.isArray(product.reviews) ? product.reviews.map((review) => ({
       reviewer: review.reviewer || review.nameCustomer || 'Customer',
       date: review.date || review.createdAt || '',
       rating: review.rating || 5,
       comment: review.comment || review.content || '',
-    })),
+    })) : undefined,
   })), [apiProducts, categories]);
 
   const refresh = useCallback(async () => {

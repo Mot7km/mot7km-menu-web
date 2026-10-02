@@ -287,7 +287,12 @@
       "menuHandle": "Menu Handle",
       "viewMenu": "View Menu",
       "browseAll": "Browse All Menus on MOT7KM",
-      "featuredBadge": "Featured"
+      "featuredBadge": "Featured",
+      "previousPage": "Previous",
+      "nextPage": "Next",
+      "pageOf": "Page {current} of {total}",
+      "emptyTitle": "No Menus Found",
+      "emptyDescription": "There are no partner menus available in this category right now."
     },
     "pricing": {
       "sectionTag": "Pricing & Plans",

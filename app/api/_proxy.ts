@@ -9,16 +9,29 @@ export async function proxyToBackend(
 
   const isGetOrHead = request.method === 'GET' || request.method === 'HEAD';
 
+  const forwardHeaders = new Headers();
+  for (const [key, value] of request.headers.entries()) {
+    const lower = key.toLowerCase();
+    if (lower !== 'host' && lower !== 'connection') {
+      forwardHeaders.set(key, value);
+    }
+  }
+
   try {
     const response = await fetch(backendUrl, {
       method: request.method,
-      headers: request.headers,
+      headers: forwardHeaders,
       body: isGetOrHead ? undefined : await request.arrayBuffer(),
       cache: isGetOrHead ? undefined : 'no-store',
       next: isGetOrHead ? { revalidate: 60 } : undefined,
     });
 
     const headers = new Headers(response.headers);
+    // fetch() decompresses body automatically; remove stale encoding/length headers
+    headers.delete('content-encoding');
+    headers.delete('content-length');
+    headers.delete('transfer-encoding');
+
     if (isGetOrHead && response.ok) {
       headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
     }
