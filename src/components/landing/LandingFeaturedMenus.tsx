@@ -9,6 +9,7 @@ import { useTheme } from '@/hooks/useTheme';
 import { parseThemePalettes, withAlpha } from '@/config/theme';
 import { loadGoogleFont } from '@/helpers/fontLoader';
 import { useGetBusinessInfosQuery } from '@/store/menuApi';
+import { SocialLinkButton } from '@/components/icons';
 
 // TikTok Icon Helper
 function TikTokIcon({ size = 14, className = '' }: { size?: number; className?: string }) {
@@ -171,7 +172,7 @@ export function LandingFeaturedMenus() {
                 item.businessIdentity?.logo ||
                 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=200&auto=format&fit=crop&q=80';
 
-              // Location info from top-level or header address (branch info completely removed)
+              // Location info from top-level or header address
               const locationText =
                 item.header?.addressDetails?.formattedAddress ||
                 '';
@@ -215,56 +216,56 @@ export function LandingFeaturedMenus() {
                     {/* Gradient overlay */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
 
-                    {/* Social Media Links (Interactive) */}
+                    {/* Social Media Links (Safe max-width wrapping container preventing side cutoffs) */}
                     {socialLinks && (
-                      <div className="absolute top-3 end-3 z-30 flex items-center gap-1.5 pointer-events-auto">
+                      <div className="absolute top-3.5 end-3.5 z-30 flex flex-wrap items-center justify-end gap-1.5 max-w-[150px] pointer-events-auto">
                         {socialLinks.instagram && (
-                          <a
-                            href={socialLinks.instagram}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label="Instagram"
-                            className="flex h-7 w-7 items-center justify-center rounded-full backdrop-blur-md transition-all shadow-sm hover:scale-110"
-                            style={{
-                              backgroundColor: withAlpha(palette.surface, 0.85),
-                              color: palette.textPrimary,
-                              border: `1px solid ${withAlpha(palette.border, 0.6)}`,
-                            }}
-                          >
-                            <InstagramIcon size={13} />
-                          </a>
+                          <SocialLinkButton
+                            platform="instagram"
+                            url={socialLinks.instagram}
+                            size={26}
+                            iconSize={12}
+                            defaultBg={withAlpha(palette.surface, 0.85)}
+                            defaultColor={palette.textPrimary}
+                            defaultBorder={`1px solid ${withAlpha(palette.border, 0.6)}`}
+                            className="backdrop-blur-md"
+                          />
                         )}
                         {socialLinks.facebook && (
-                          <a
-                            href={socialLinks.facebook}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label="Facebook"
-                            className="flex h-7 w-7 items-center justify-center rounded-full backdrop-blur-md transition-all shadow-sm hover:scale-110"
-                            style={{
-                              backgroundColor: withAlpha(palette.surface, 0.85),
-                              color: palette.textPrimary,
-                              border: `1px solid ${withAlpha(palette.border, 0.6)}`,
-                            }}
-                          >
-                            <FacebookIcon size={13} />
-                          </a>
+                          <SocialLinkButton
+                            platform="facebook"
+                            url={socialLinks.facebook}
+                            size={26}
+                            iconSize={12}
+                            defaultBg={withAlpha(palette.surface, 0.85)}
+                            defaultColor={palette.textPrimary}
+                            defaultBorder={`1px solid ${withAlpha(palette.border, 0.6)}`}
+                            className="backdrop-blur-md"
+                          />
                         )}
                         {socialLinks.tiktok && (
-                          <a
-                            href={socialLinks.tiktok}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label="TikTok"
-                            className="flex h-7 w-7 items-center justify-center rounded-full backdrop-blur-md transition-all shadow-sm hover:scale-110"
-                            style={{
-                              backgroundColor: withAlpha(palette.surface, 0.85),
-                              color: palette.textPrimary,
-                              border: `1px solid ${withAlpha(palette.border, 0.6)}`,
-                            }}
-                          >
-                            <TikTokIcon size={13} />
-                          </a>
+                          <SocialLinkButton
+                            platform="tiktok"
+                            url={socialLinks.tiktok}
+                            size={26}
+                            iconSize={12}
+                            defaultBg={withAlpha(palette.surface, 0.85)}
+                            defaultColor={palette.textPrimary}
+                            defaultBorder={`1px solid ${withAlpha(palette.border, 0.6)}`}
+                            className="backdrop-blur-md"
+                          />
+                        )}
+                        {socialLinks.whatsapp && (
+                          <SocialLinkButton
+                            platform="whatsapp"
+                            url={socialLinks.whatsapp}
+                            size={26}
+                            iconSize={12}
+                            defaultBg={withAlpha(palette.surface, 0.85)}
+                            defaultColor={palette.textPrimary}
+                            defaultBorder={`1px solid ${withAlpha(palette.border, 0.6)}`}
+                            className="backdrop-blur-md"
+                          />
                         )}
                       </div>
                     )}

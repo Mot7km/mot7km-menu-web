@@ -15,6 +15,7 @@ import type { ApiBusinessIdentity, ApiCategory, ApiProduct, ApiSliderItem, ApiSt
 import type { StoreInfo, WorkingHours } from '@/data/storeInfo';
 import type { Product } from '@/data/menu';
 import type { PromoCardData } from '@/data/menupromo';
+import { formatSocialUrl } from '@/components/icons';
 
 const EMPTY_SLIDERS: ApiSliderItem[] = [];
 const EMPTY_CATEGORIES: ApiCategory[] = [];
@@ -209,16 +210,6 @@ export function useStoreStateCalculation(initialData?: CompleteStoreData | null)
     const name = displayBusinessName || header?.businessName || identity?.businessName || businessName;
     const address = header?.address || '';
     const rawSocials = header?.socialLinks || header?.socials;
-    const formatSocialUrl = (platform: string, value?: string | null) => {
-      if (!value) return '';
-      const handle = value.trim();
-      if (handle.startsWith('http://') || handle.startsWith('https://')) return handle;
-      if (platform === 'facebook') return `https://facebook.com/${handle}`;
-      if (platform === 'instagram') return `https://instagram.com/${handle}`;
-      if (platform === 'tiktok') return `https://tiktok.com/@${handle.replace(/^@/, '')}`;
-      if (platform === 'whatsapp') return `https://wa.me/${handle.replace(/[^0-9]/g, '')}`;
-      return handle;
-    };
     const socials = rawSocials
       ? [
           rawSocials.whatsapp ? { platform: 'whatsapp' as const, url: formatSocialUrl('whatsapp', rawSocials.whatsapp) } : null,

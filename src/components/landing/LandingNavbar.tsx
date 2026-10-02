@@ -121,9 +121,9 @@ export function LandingNavbar({ onScrollTo }: LandingNavbarProps) {
   const ArrowIcon = isRTL ? ArrowLeft : ArrowRight;
 
   return (
-    <header className="sticky top-0 z-50 w-full py-3 px-4 sm:px-6 lg:px-8 bg-[var(--color-background)]/85 backdrop-blur-xl border-b border-[var(--color-border)]/50 transition-colors duration-200">
+    <header className="sticky top-0 z-50 w-full py-3 px-4 sm:px-6 lg:px-8 backdrop-blur-xl border-b border-[var(--color-border)]/50 transition-colors duration-200">
       <div className="mx-auto flex max-w-7xl items-center justify-between">
-        
+
         {/* ================= 1. Brand Logo ================= */}
         <Link
           href={`/${locale}`}
@@ -186,11 +186,10 @@ export function LandingNavbar({ onScrollTo }: LandingNavbarProps) {
               <button
                 key={section.id}
                 onClick={() => scrollToSection(section.id)}
-                className={`relative rounded-full px-4 py-1.5 text-xs sm:text-sm font-bold transition-all duration-200 cursor-pointer ${
-                  isActive
+                className={`relative rounded-full px-4 py-1.5 text-xs sm:text-sm font-bold transition-all duration-200 cursor-pointer ${isActive
                     ? 'bg-[var(--color-primary)] text-white shadow-sm'
                     : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-subtle)]'
-                }`}
+                  }`}
               >
                 <span>{section.label}</span>
               </button>
@@ -253,11 +252,10 @@ export function LandingNavbar({ onScrollTo }: LandingNavbarProps) {
                 <button
                   key={section.id}
                   onClick={() => scrollToSection(section.id)}
-                  className={`flex items-center justify-between rounded-xl px-4 py-3 text-start text-sm font-bold transition-all cursor-pointer ${
-                    isActive
+                  className={`flex items-center justify-between rounded-xl px-4 py-3 text-start text-sm font-bold transition-all cursor-pointer ${isActive
                       ? 'bg-[var(--color-primary)] text-white'
                       : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-subtle)] hover:text-[var(--color-text-primary)]'
-                  }`}
+                    }`}
                 >
                   <span>{section.label}</span>
                   {isActive && (
