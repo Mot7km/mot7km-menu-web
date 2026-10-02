@@ -11,33 +11,6 @@ import { loadGoogleFont } from '@/helpers/fontLoader';
 import { useGetBusinessInfosQuery } from '@/store/menuApi';
 import { SocialLinkButton } from '@/components/icons';
 
-// TikTok Icon Helper
-function TikTokIcon({ size = 14, className = '' }: { size?: number; className?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" className={className}>
-      <path d="M19.589 6.686a4.793 4.793 0 0 1-3.77-4.245V2h-3.45v13.67a2.892 2.892 0 0 1-5.201 1.745l-.002-.005a2.895 2.895 0 0 1 2.751-3.91c.298 0 .59.044.867.13V10.1a6.34 6.34 0 0 0-.867-.063A6.344 6.344 0 0 0 3.25 16.38a6.344 6.344 0 0 0 10.84 4.485 6.345 6.345 0 0 0 1.84-4.485V8.59a8.196 8.196 0 0 0 4.75 1.513V6.65a4.793 4.793 0 0 1-1.091.036z" />
-    </svg>
-  );
-}
-
-// Facebook Icon Helper
-function FacebookIcon({ size = 14, className = '' }: { size?: number; className?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" className={className}>
-      <path d="M12 2C6.477 2 2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12c0-5.523-4.477-10-10-10z" />
-    </svg>
-  );
-}
-
-// Instagram Icon Helper
-function InstagramIcon({ size = 14, className = '' }: { size?: number; className?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" className={className}>
-      <path d="M12 2c2.717 0 3.056.01 4.122.06 1.065.05 1.79.217 2.428.465.66.254 1.216.598 1.772 1.153.555.556.9 1.112 1.153 1.772.248.637.415 1.363.465 2.428.047 1.066.06 1.405.06 4.122 0 2.717-.01 3.056-.06 4.122-.05 1.065-.218 1.79-.465 2.428a4.88 4.88 0 0 1-1.153 1.772c-.556.555-1.112.9-1.772 1.153-.637.248-1.363.415-2.428.465-1.066.047-1.405.06-4.122.06-2.717 0-3.056-.01-4.122-.06-1.065-.05-1.79-.218-2.428-.465a4.89 4.89 0 0 1-1.772-1.153 4.904 4.904 0 0 1-1.153-1.772c-.248-.637-.415-1.363-.465-2.428C2.013 15.056 2 14.717 2 12c0-2.717.01-3.056.06-4.122.05-1.065.218-1.79.465-2.428a4.88 4.88 0 0 1 1.153-1.772c.556-.555 1.112-.9 1.772-1.153.637-.248 1.363-.415 2.428-.465C8.944 2.013 9.283 2 12 2zm0 5a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm6.5-.25a1.25 1.25 0 0 0-2.5 0 1.25 1.25 0 0 0 2.5 0zM12 9a3 3 0 1 1 0 6 3 3 0 0 1 0-6z" />
-    </svg>
-  );
-}
-
 export function LandingFeaturedMenus() {
   const t = useTranslations('landing.featuredMenus');
   const locale = useLocale();

@@ -2,7 +2,7 @@
 
 import { ThemeProvider } from 'next-themes';
 import { ReactNode, useEffect } from 'react';
-import { applyThemePalette, getActiveThemePalette, THEME_STORAGE_KEY } from '@/config/theme';
+import { applyThemePalette, THEME_STORAGE_KEY } from '@/config/theme';
 import { CartOverlay } from '@/components/cart/CartOverlay';
 import { LocaleTransitionProvider } from '@/context/LocaleTransitionContext';
 import { StoreProvider as ReduxStoreProvider } from '@/store/StoreProvider';
@@ -13,22 +13,8 @@ interface ProvidersProps {
 
 function ThemePaletteInitializer() {
   useEffect(() => {
-    const syncPalette = () => {
-      applyThemePalette(getActiveThemePalette());
-    };
-
-    syncPalette();
-
-    const observer = new MutationObserver(() => {
-      syncPalette();
-    });
-
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['class'],
-    });
-
-    return () => observer.disconnect();
+    // Initialize unified theme styles once on app mount
+    applyThemePalette();
   }, []);
 
   return null;

@@ -1,6 +1,7 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
+import { resetThemePalette } from '@/config/theme';
 import {
   LandingNavbar,
   LandingHero,
@@ -13,6 +14,11 @@ import {
 } from '@/components/landing';
 
 export default function Home() {
+  useEffect(() => {
+    // Ensure landing page always uses standard Mot7km default theme
+    resetThemePalette();
+  }, []);
+
   const handleScrollTo = useCallback((sectionId: string) => {
     const el = document.getElementById(sectionId);
     if (el) {

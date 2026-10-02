@@ -535,26 +535,51 @@ export function generateThemeVariables(input?: ThemePaletteInput) {
 }
 
 /**
- * Applies the given theme palette to document.documentElement.
- * Accepts new 11-color light/dark palettes or legacy 3 colors,
- * dynamically selecting active variables based on `.dark` class.
+ * Applies the given theme palette to the application by injecting a unified
+ * stylesheet with scoped :root (light) and .dark (dark) CSS variables.
+ * This guarantees the browser switches automatically on .dark class toggle,
+ * preventing any color drifting, mutation, or race conditions.
  */
 export function applyThemePalette(input?: ThemePaletteInput) {
   if (typeof document === "undefined") return;
 
-  if (input !== undefined) {
+  if (input !== undefined && input !== null) {
     currentThemePalettes = parseThemePalettes(input);
+  } else if (input === null) {
+    currentThemePalettes = {
+      light: { ...DEFAULT_LIGHT_PALETTE },
+      dark: { ...DEFAULT_DARK_PALETTE },
+    };
   }
 
-  const root = document.documentElement;
-  const isDark = root.classList.contains("dark");
   const { light, dark } = generateThemeVariables(currentThemePalettes);
-  const activeTheme = isDark ? dark : light;
+  const lightCss = Object.entries(light).map(([k, v]) => `${k}:${v};`).join(' ');
+  const darkCss = Object.entries(dark).map(([k, v]) => `${k}:${v};`).join(' ');
 
-  // Apply all active variables
-  Object.entries(activeTheme).forEach(([key, value]) => {
-    root.style.setProperty(key, value);
+  // 1. Inject or update the dynamic style element for :root and .dark
+  let styleEl = document.getElementById("mot7km-theme-styles") as HTMLStyleElement | null;
+  if (!styleEl) {
+    styleEl = document.createElement("style");
+    styleEl.id = "mot7km-theme-styles";
+    document.head.appendChild(styleEl);
+  }
+  styleEl.textContent = `:root { ${lightCss} } .dark { ${darkCss} }`;
+
+  // 2. Clear any inline style properties on documentElement so stylesheet takes precedence cleanly
+  const root = document.documentElement;
+  Object.keys(light).forEach((key) => {
+    root.style.removeProperty(key);
   });
+  Object.keys(dark).forEach((key) => {
+    root.style.removeProperty(key);
+  });
+}
+
+/**
+ * Resets the active theme palettes back to standard Mot7km defaults.
+ */
+export function resetThemePalette() {
+  applyThemePalette(null);
 }
 
 /**
