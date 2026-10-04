@@ -5,6 +5,7 @@
   ================================================================= */
 :root {
   --color-primary: #2B9FD9;
+  --color-primary-light: #5BB6E5;
   --color-secondary: #0B529E;
   --color-accent: #10B981;
   --color-on-primary: #FFFFFF;
@@ -52,6 +53,7 @@
 
 .dark {
   --color-primary: #3DA9E0;
+  --color-primary-light: #67C1EC;
   --color-secondary: #1E6BB8;
   --color-accent: #34D399;
   --color-on-primary: #FFFFFF;

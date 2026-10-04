@@ -359,6 +359,10 @@
         "support": "Free onboarding & support"
       }
     },
+    "nav": {
+      "features": "Features",
+      "pricing": "Pricing Plans"
+    },
     "footer": {
       "brandDescription": "Next-generation cloud digital menu ecosystem for restaurants and cafes. Fast, intuitive, and conversion-focused.",
       "navTitle": "Navigation",
@@ -372,7 +376,29 @@
       "privacyPolicy": "Privacy Policy",
       "slaStatus": "SLA Status",
       "copyright": "© {year} MOT7KM Cloud Systems. All rights reserved.",
-      "craftedWith": "Crafted with care for modern dining"
+      "craftedWith": "Crafted with care for modern dining",
+      "ctaTitle": "Ready to take your business to the next level?",
+      "ctaDesc": "Join hundreds of dining brands that rely on Mot7km for lightning-fast digital menus and effortless growth.",
+      "trustBadge1": "Instant Setup",
+      "trustBadge2": "Cloud-native & Fast",
+      "trustBadge3": "Enterprise Security",
+      "emailPlaceholder": "Enter your email address...",
+      "subscribe": "Subscribe",
+      "subSuccess": "Subscribed successfully! We'll keep you updated.",
+      "desc": "Next-generation cloud digital menu ecosystem for restaurants and cafes. Fast, intuitive, and conversion-focused.",
+      "statusOperational": "All systems operational 99.9%",
+      "links": "Quick Links",
+      "solutions": "Solutions",
+      "solutionCafe": "For Cafes & Coffee Shops",
+      "solutionGaming": "For Gaming Lounges",
+      "solutionJuice": "For Juice & Beverage Bars",
+      "solutionRestaurant": "For Casual & Fast Food",
+      "aboutUs": "About Us",
+      "blog": "Blog & Articles",
+      "contact": "Contact Us",
+      "address": "Riyadh, Saudi Arabia",
+      "rights": "© 2026 MOT7KM Cloud Systems. All rights reserved.",
+      "backToTop": "Back to top"
     }
   }
 }
