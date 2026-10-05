@@ -21,47 +21,118 @@ const EMPTY_SLIDERS: ApiSliderItem[] = [];
 const EMPTY_CATEGORIES: ApiCategory[] = [];
 const EMPTY_PRODUCTS: ApiProduct[] = [];
 
-function parseWorkingHours(raw: unknown): WorkingHours[] {
-  if (!raw) return [];
+export function parseWorkingHours(raw: unknown, fallback?: unknown): WorkingHours[] {
+  if (!raw && !fallback) return [];
 
-  if (typeof raw === 'string') {
-    try {
-      const parsed = JSON.parse(raw);
-      return parseWorkingHours(parsed);
-    } catch {
-      return [];
+  const mapItem = (item: Record<string, unknown>): WorkingHours | null => {
+    let dayNum: number | null = null;
+    if (typeof item.dayOfWeek === 'number') {
+      dayNum = item.dayOfWeek;
+    } else if (typeof item.day === 'number') {
+      dayNum = item.day;
+    } else if (item.dayOfWeek !== undefined) {
+      const parsed = Number(item.dayOfWeek);
+      if (!isNaN(parsed)) dayNum = parsed;
+    } else if (item.day !== undefined) {
+      if (typeof item.day === 'string') {
+        const daysMap: Record<string, number> = {
+          sunday: 0,
+          monday: 1,
+          tuesday: 2,
+          wednesday: 3,
+          thursday: 4,
+          friday: 5,
+          saturday: 6,
+        };
+        const mapped = daysMap[item.day.toLowerCase().trim()];
+        if (mapped !== undefined) dayNum = mapped;
+        else {
+          const parsed = Number(item.day);
+          if (!isNaN(parsed)) dayNum = parsed;
+        }
+      } else {
+        const parsed = Number(item.day);
+        if (!isNaN(parsed)) dayNum = parsed;
+      }
     }
-  }
 
-  if (Array.isArray(raw)) {
-    return raw
-      .filter((item): item is Record<string, unknown> => typeof item === 'object' && item !== null)
-      .map((item) => ({
-        day: typeof item.day === 'number' ? item.day : Number(item.day ?? 0),
-        open: typeof item.open === 'string' ? item.open : String(item.open ?? ''),
-        close: typeof item.close === 'string' ? item.close : String(item.close ?? ''),
-      }))
-      .filter((wh) => !isNaN(wh.day) && Boolean(wh.open) && Boolean(wh.close));
-  }
-
-  if (typeof raw === 'object') {
-    const rawObj = raw as Record<string, unknown>;
-    if ('open' in rawObj && 'close' in rawObj) {
-      return [
-        {
-          day: typeof rawObj.day === 'number' ? rawObj.day : Number(rawObj.day ?? 0),
-          open: String(rawObj.open ?? ''),
-          close: String(rawObj.close ?? ''),
-        },
-      ].filter((wh) => !isNaN(wh.day) && Boolean(wh.open) && Boolean(wh.close));
+    if (dayNum === null || isNaN(dayNum) || dayNum < 0 || dayNum > 6) {
+      return null;
     }
-    const values = Object.values(rawObj);
-    if (values.length > 0 && typeof values[0] === 'object' && values[0] !== null) {
-      return parseWorkingHours(values);
-    }
-  }
 
-  return [];
+    const rawOpen = String(item.openTime ?? item.open ?? '').trim();
+    const rawClose = String(item.closeTime ?? item.close ?? '').trim();
+
+    // Normalize HH:mm:ss -> HH:mm
+    const open = rawOpen.split(':').slice(0, 2).join(':');
+    const close = rawClose.split(':').slice(0, 2).join(':');
+
+    const isClosed =
+      item.isClosed === true ||
+      item.isOpen === false ||
+      (!rawOpen && !rawClose);
+
+    const dayName = typeof item.dayName === 'string' ? item.dayName : undefined;
+
+    return {
+      day: dayNum,
+      open,
+      close,
+      isClosed,
+      dayName,
+    };
+  };
+
+  const tryParse = (val: unknown): WorkingHours[] => {
+    if (!val) return [];
+
+    if (typeof val === 'string') {
+      try {
+        const parsed = JSON.parse(val);
+        return tryParse(parsed);
+      } catch {
+        return [];
+      }
+    }
+
+    if (Array.isArray(val)) {
+      return val
+        .filter((item): item is Record<string, unknown> => typeof item === 'object' && item !== null)
+        .map(mapItem)
+        .filter((item): item is WorkingHours => item !== null);
+    }
+
+    if (typeof val === 'object') {
+      const obj = val as Record<string, unknown>;
+
+      if (Array.isArray(obj.days)) {
+        const parsed = tryParse(obj.days);
+        if (parsed.length > 0) return parsed;
+      }
+
+      if (Array.isArray(obj.openClosedTimes)) {
+        const parsed = tryParse(obj.openClosedTimes);
+        if (parsed.length > 0) return parsed;
+      }
+
+      if ('open' in obj || 'openTime' in obj) {
+        const single = mapItem(obj);
+        if (single) return [single];
+      }
+
+      const values = Object.values(obj);
+      if (values.length > 0 && typeof values[0] === 'object' && values[0] !== null) {
+        const parsed = tryParse(values);
+        if (parsed.length > 0) return parsed;
+      }
+    }
+
+    return [];
+  };
+
+  const primary = tryParse(raw);
+  if (primary.length > 0) return primary;
+  return tryParse(fallback);
 }
 
 export interface StoreState {
@@ -132,11 +203,20 @@ export function useStoreStateCalculation(initialData?: CompleteStoreData | null)
   const header = useMemo<ApiStoreHeader | null>(() => {
     const rawHeader = infoData?.header || initialData?.header;
     const rawDesc = infoData?.businessDescription || initialData?.identity?.businessDescription;
-    if (!rawHeader && !rawDesc) return null;
+    if (!rawHeader && !rawDesc && !infoData) return null;
 
     return {
+      businessName: rawHeader?.businessName || infoData?.businessName || initialData?.businessName || null,
+      displayBusinessName: rawHeader?.displayBusinessName || infoData?.displayBusinessName || initialData?.displayBusinessName || null,
       ...rawHeader,
       slogan: rawHeader?.slogan || rawDesc || null,
+      branches: rawHeader?.branches || (infoData as any)?.branches || null,
+      workingHours: rawHeader?.workingHours || (infoData as any)?.workingHours || null,
+      openClosedTimes: rawHeader?.openClosedTimes || (infoData as any)?.openClosedTimes || null,
+      isCurrentlyOpen: rawHeader?.isCurrentlyOpen ?? (infoData as any)?.isCurrentlyOpen,
+      isTemporarilyClosed: rawHeader?.isTemporarilyClosed ?? (infoData as any)?.isTemporarilyClosed,
+      addressDetails: rawHeader?.addressDetails || (infoData as any)?.address || null,
+      address: rawHeader?.address || (infoData as any)?.address?.formattedAddress || rawHeader?.addressDetails?.formattedAddress || null,
     };
   }, [infoData, initialData]);
 
@@ -207,17 +287,26 @@ export function useStoreStateCalculation(initialData?: CompleteStoreData | null)
   }, [header, identity, businessName, displayBusinessName]);
 
   const storeInfo = useMemo<StoreInfo>(() => {
-    const name = displayBusinessName || header?.businessName || identity?.businessName || businessName;
-    const address = header?.address || '';
+    const name = displayBusinessName || header?.displayBusinessName || header?.businessName || identity?.businessName || businessName;
+    const address = header?.addressDetails?.formattedAddress || header?.address || '';
     const rawSocials = header?.socialLinks || header?.socials;
     const socials = rawSocials
       ? [
-          rawSocials.whatsapp ? { platform: 'whatsapp' as const, url: formatSocialUrl('whatsapp', rawSocials.whatsapp) } : null,
-          rawSocials.instagram ? { platform: 'instagram' as const, url: formatSocialUrl('instagram', rawSocials.instagram) } : null,
-          rawSocials.facebook ? { platform: 'facebook' as const, url: formatSocialUrl('facebook', rawSocials.facebook) } : null,
-          rawSocials.tiktok ? { platform: 'tiktok' as const, url: formatSocialUrl('tiktok', rawSocials.tiktok) } : null,
-        ].filter(Boolean) as StoreInfo['socials']
+        rawSocials.whatsapp ? { platform: 'whatsapp' as const, url: formatSocialUrl('whatsapp', rawSocials.whatsapp) } : null,
+        rawSocials.instagram ? { platform: 'instagram' as const, url: formatSocialUrl('instagram', rawSocials.instagram) } : null,
+        rawSocials.facebook ? { platform: 'facebook' as const, url: formatSocialUrl('facebook', rawSocials.facebook) } : null,
+        rawSocials.tiktok ? { platform: 'tiktok' as const, url: formatSocialUrl('tiktok', rawSocials.tiktok) } : null,
+      ].filter(Boolean) as StoreInfo['socials']
       : [];
+
+    const workingHours = parseWorkingHours(
+      header?.workingHours,
+      header?.openClosedTimes || (infoData as any)?.openClosedTimes
+    );
+
+    const mapUrl =
+      header?.addressDetails?.mapsUrl?.trim() ||
+      (address ? `https://maps.google.com/?q=${encodeURIComponent(address)}` : undefined);
 
     return {
       name,
@@ -225,10 +314,12 @@ export function useStoreStateCalculation(initialData?: CompleteStoreData | null)
       phone: header?.phoneNumber || '',
       address,
       addressAr: header?.addressAr || address,
-      mapUrl: address ? `https://maps.google.com/?q=${encodeURIComponent(address)}` : undefined,
-      workingHours: parseWorkingHours(header?.workingHours),
+      mapUrl,
+      workingHours,
       socials,
       businessDescription: infoData?.businessDescription || identity?.businessDescription || undefined,
+      isCurrentlyOpen: header?.isCurrentlyOpen ?? (infoData as any)?.isCurrentlyOpen,
+      isTemporarilyClosed: header?.isTemporarilyClosed ?? (infoData as any)?.isTemporarilyClosed,
     };
   }, [header, identity, businessName, displayBusinessName, infoData]);
 

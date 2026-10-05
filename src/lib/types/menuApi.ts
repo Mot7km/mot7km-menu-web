@@ -56,8 +56,35 @@ export interface ApiSocials {
   tiktok?: string | null;
 }
 
+export interface ApiWorkingHoursDay {
+  dayOfWeek: number;
+  dayName?: string;
+  isOpen?: boolean;
+  openTime?: string;
+  closeTime?: string;
+}
+
+export interface ApiWorkingHoursObject {
+  isTemporarilyClosed?: boolean;
+  isClosed?: boolean;
+  isCurrentlyOpen?: boolean;
+  notes?: string;
+  openTime?: string;
+  closeTime?: string;
+  days?: ApiWorkingHoursDay[];
+}
+
+export interface ApiOpenClosedTime {
+  dayOfWeek: number;
+  dayName?: string;
+  openTime?: string;
+  closeTime?: string;
+  isClosed?: boolean;
+}
+
 export interface ApiStoreHeader {
   businessName?: string | null;
+  displayBusinessName?: string | null;
   logo?: string | null;
   logoUrl?: string | null;
   slogan?: string | null;
@@ -69,12 +96,18 @@ export interface ApiStoreHeader {
   addressDetails?: ApiAddressDetails | null;
   socialLinks?: ApiSocials | null;
   socials?: ApiSocials | null;
-  workingHours?: Array<{
-    day: number;
-    open: string;
-    close: string;
-    isClosed?: boolean;
-  }> | null;
+  workingHours?:
+    | ApiWorkingHoursObject
+    | Array<{
+        day: number;
+        open: string;
+        close: string;
+        isClosed?: boolean;
+      }>
+    | null;
+  openClosedTimes?: ApiOpenClosedTime[] | null;
+  isCurrentlyOpen?: boolean;
+  isTemporarilyClosed?: boolean;
   branches?: ApiBranch[] | null;
 }
 
@@ -93,6 +126,7 @@ export interface ApiBranch {
   location?: string | null;
   isMainBranch?: boolean;
   address?: ApiAddressDetails | null;
+  workingHours?: ApiWorkingHoursObject | null;
 }
 
 export interface ApiSliderItem {
@@ -227,6 +261,12 @@ export interface ApiBusinessInfo {
   businessDescription?: string | null;
   businessIdentity?: ApiBusinessIdentity | null;
   header?: ApiStoreHeader | null;
+  address?: ApiAddressDetails | null;
+  branches?: ApiBranch[] | null;
+  workingHours?: ApiWorkingHoursObject | null;
+  openClosedTimes?: ApiOpenClosedTime[] | null;
+  isCurrentlyOpen?: boolean;
+  isTemporarilyClosed?: boolean;
 }
 
 /**

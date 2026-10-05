@@ -10,6 +10,8 @@ export interface WorkingHours {
   day: number;
   open: string;   // "HH:mm" (24h)
   close: string;  // "HH:mm" (24h)
+  isClosed?: boolean;
+  dayName?: string;
 }
 
 export interface SocialLink {
@@ -28,6 +30,8 @@ export interface StoreInfo {
   workingHours: WorkingHours[];
   socials: SocialLink[];
   businessDescription?: string | null;
+  isCurrentlyOpen?: boolean;
+  isTemporarilyClosed?: boolean;
 }
 
 // ─────────────────────────────────────────────────────────────────────
@@ -46,7 +50,10 @@ function timeToMinutes(time: string): number {
  * Handles overnight hours (e.g. open 12:00, close 02:00).
  */
 export function isStoreOpen(info?: StoreInfo | null): boolean {
-  if (!info || !info.workingHours || info.workingHours.length === 0) {
+  if (!info) return true;
+  if (info.isTemporarilyClosed) return false;
+  if (typeof info.isCurrentlyOpen === 'boolean') return info.isCurrentlyOpen;
+  if (!info.workingHours || info.workingHours.length === 0) {
     return true; // Default to open if no hours specified
   }
 
@@ -58,6 +65,7 @@ export function isStoreOpen(info?: StoreInfo | null): boolean {
   const todaySchedule = info.workingHours.find((wh) => wh.day === currentDay);
 
   if (todaySchedule) {
+    if (todaySchedule.isClosed) return false;
     const openMin = timeToMinutes(todaySchedule.open);
     const closeMin = timeToMinutes(todaySchedule.close);
 
