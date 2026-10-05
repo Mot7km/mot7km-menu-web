@@ -55,7 +55,7 @@ function ProductSection({
       <section className="w-full max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex flex-col gap-6">
           <h2
-            className="accent-line font-bold text-2xl leading-8 text-[var(--color-text-primary)]"
+            className="accent-line font-bold text-xl sm:text-3xl leading-8 text-[var(--color-text-primary)]"
             style={{ fontFamily: 'var(--font-display)' }}
           >
             {sectionTitle}
@@ -117,11 +117,10 @@ function ProductSection({
           <div className="flex items-center rounded-full p-0.5 border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm">
             <button
               onClick={() => setLayout('grid')}
-              className={`p-1.5 rounded-full transition-transform duration-200 cursor-pointer ${
-                layout === 'grid'
+              className={`p-1.5 rounded-full transition-transform duration-200 cursor-pointer ${layout === 'grid'
                   ? 'bg-[var(--color-primary)] text-[var(--color-text-on-primary)] shadow-[var(--shadow-glow)]'
                   : 'text-[var(--color-text-muted)] hover:text-[var(--color-primary)] hover:bg-[var(--color-primary)]/10'
-              }`}
+                }`}
               aria-label="Grid view"
               title="Grid view"
             >
@@ -129,11 +128,10 @@ function ProductSection({
             </button>
             <button
               onClick={() => setLayout('horizontal')}
-              className={`p-1.5 rounded-full transition-transform duration-200 cursor-pointer ${
-                layout === 'horizontal'
+              className={`p-1.5 rounded-full transition-transform duration-200 cursor-pointer ${layout === 'horizontal'
                   ? 'bg-[var(--color-primary)] text-[var(--color-text-on-primary)] shadow-[var(--shadow-glow)]'
                   : 'text-[var(--color-text-muted)] hover:text-[var(--color-primary)] hover:bg-[var(--color-primary)]/10'
-              }`}
+                }`}
               aria-label="Horizontal list view"
               title="Horizontal list view"
             >
@@ -145,11 +143,10 @@ function ProductSection({
 
       {/* Cards Grid */}
       <div
-        className={`grid gap-4 justify-items-center ${
-          layout === 'grid'
+        className={`grid gap-4 justify-items-center ${layout === 'grid'
             ? 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
             : 'grid-cols-1'
-        }`}
+          }`}
       >
         {visibleItems.map((product, index) => (
           <div

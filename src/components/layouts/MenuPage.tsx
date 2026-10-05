@@ -95,7 +95,7 @@ export function MenuPage() {
             {sliderHeader && (
               <div className="mx-auto max-w-5xl md:max-w-6xl px-4 sm:px-6 lg:px-8">
                 <h2
-                  className="accent-line mb-4 text-2xl font-bold text-[var(--color-text-primary)] sm:text-3xl"
+                  className="accent-line mb-4 text-xl sm:text-3xl font-bold text-[var(--color-text-primary)]"
                   style={{ fontFamily: 'var(--font-display)' }}
                 >
                   {sliderHeader}

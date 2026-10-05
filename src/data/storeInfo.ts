@@ -15,7 +15,7 @@ export interface WorkingHours {
 }
 
 export interface SocialLink {
-  platform: 'whatsapp' | 'instagram' | 'facebook' | 'tiktok' | 'twitter' | 'snapchat';
+  platform: 'whatsapp' | 'instagram' | 'facebook' | 'tiktok' | 'twitter' | 'x' | 'snapchat';
   url: string;
 }
 

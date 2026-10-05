@@ -146,9 +146,7 @@ export function LandingFeaturedMenus() {
                 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=200&auto=format&fit=crop&q=80';
 
               // Location info from top-level or header address
-              const locationText =
-                item.header?.addressDetails?.formattedAddress ||
-                '';
+              const locationText = item.header?.addressDetails?.formattedAddress || '';
 
               const phoneNumber = item.header?.phoneNumber;
               const socialLinks = item.header?.socialLinks || item.header?.socials;
@@ -338,13 +336,16 @@ export function LandingFeaturedMenus() {
                         </span>
                       </div>
 
-                      {/* Action Button styled using the business's unique primary color */}
+                      {/* Action Button — now a real Link so it always navigates */}
                       <div className="relative z-10 flex-shrink-0 pointer-events-auto">
-                        <span
+                        <Link
+                          href={menuUrl}
+                          aria-label={t('viewMenu')}
                           className="inline-flex items-center justify-center gap-2
                             min-h-[40px] px-4 sm:px-5 py-2 rounded-full
                             text-xs sm:text-sm font-bold shadow-md
-                            active:scale-95 transition-all duration-200 ease-out cursor-pointer"
+                            active:scale-95 transition-all duration-200 ease-out cursor-pointer
+                            focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
                           style={{
                             backgroundColor: palette.primary,
                             color: palette.onPrimary,
@@ -354,7 +355,7 @@ export function LandingFeaturedMenus() {
                           <UtensilsCrossed size={14} className="flex-shrink-0" />
                           <span>{t('viewMenu')}</span>
                           <ArrowIcon size={14} />
-                        </span>
+                        </Link>
                       </div>
                     </div>
                   </div>

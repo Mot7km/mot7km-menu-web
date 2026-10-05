@@ -54,6 +54,10 @@ export interface ApiSocials {
   instagram?: string | null;
   facebook?: string | null;
   tiktok?: string | null;
+  twitter?: string | null;
+  x?: string | null;
+  snapchat?: string | null;
+  [key: string]: string | null | undefined;
 }
 
 export interface ApiWorkingHoursDay {
@@ -127,6 +131,8 @@ export interface ApiBranch {
   isMainBranch?: boolean;
   address?: ApiAddressDetails | null;
   workingHours?: ApiWorkingHoursObject | null;
+  phone?: string | null;
+  phoneNumber?: string | null;
 }
 
 export interface ApiSliderItem {

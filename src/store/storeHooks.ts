@@ -296,6 +296,8 @@ export function useStoreStateCalculation(initialData?: CompleteStoreData | null)
         rawSocials.instagram ? { platform: 'instagram' as const, url: formatSocialUrl('instagram', rawSocials.instagram) } : null,
         rawSocials.facebook ? { platform: 'facebook' as const, url: formatSocialUrl('facebook', rawSocials.facebook) } : null,
         rawSocials.tiktok ? { platform: 'tiktok' as const, url: formatSocialUrl('tiktok', rawSocials.tiktok) } : null,
+        (rawSocials.twitter || rawSocials.x) ? { platform: 'twitter' as const, url: formatSocialUrl('twitter', rawSocials.twitter || rawSocials.x) } : null,
+        rawSocials.snapchat ? { platform: 'snapchat' as const, url: formatSocialUrl('snapchat', rawSocials.snapchat) } : null,
       ].filter(Boolean) as StoreInfo['socials']
       : [];
 
