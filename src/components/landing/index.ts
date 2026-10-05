@@ -4,5 +4,4 @@ export * from './LandingSummary';
 export * from './LandingFeatures';
 export * from './LandingPricing';
 export * from './LandingFeaturedMenus';
-export * from './LandingCTA';
 export * from './LandingFooter';

@@ -4,14 +4,15 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 import { usePathname, useRouter } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Menu,
   X,
   Moon,
   Sun,
   ArrowRight,
-  ArrowLeft,
   Languages,
+  Check,
 } from 'lucide-react';
 import { useTheme } from '@/hooks/useTheme';
 
@@ -22,14 +23,20 @@ interface LandingNavbarProps {
 export function LandingNavbar({ onScrollTo }: LandingNavbarProps) {
   const t = useTranslations('landing.navbar');
   const locale = useLocale();
-  const isRTL = locale === 'ar';
+  const isRtl = locale === 'ar';
   const pathname = usePathname();
   const router = useRouter();
   const { setTheme, resolvedTheme } = useTheme();
 
   const isDark = resolvedTheme === 'dark';
+  const [mounted, setMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<string>('hero');
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // List of real page sections in order with next-intl translation keys
   const sections = useMemo(
@@ -78,12 +85,21 @@ export function LandingNavbar({ onScrollTo }: LandingNavbarProps) {
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll(); // Initial check
+    handleScroll();
 
     return () => window.removeEventListener('scroll', handleScroll);
   }, [sections]);
 
-  // Smooth scroll handler with offset for sticky navbar
+  // Close menus on outside click
+  useEffect(() => {
+    const handleClickOutside = () => {
+      setIsLangMenuOpen(false);
+    };
+    window.addEventListener('click', handleClickOutside);
+    return () => window.removeEventListener('click', handleClickOutside);
+  }, []);
+
+  // Smooth scroll handler with offset for floating navbar
   const scrollToSection = useCallback(
     (sectionId: string) => {
       setActiveSection(sectionId);
@@ -96,7 +112,7 @@ export function LandingNavbar({ onScrollTo }: LandingNavbarProps) {
 
       const el = document.getElementById(sectionId);
       if (el) {
-        const navHeight = 85;
+        const navHeight = 90;
         const elementPosition = el.getBoundingClientRect().top;
         const offsetPosition = elementPosition + window.pageYOffset - navHeight;
         window.scrollTo({
@@ -112,63 +128,39 @@ export function LandingNavbar({ onScrollTo }: LandingNavbarProps) {
     setTheme(isDark ? 'light' : 'dark');
   };
 
-  const toggleLanguage = () => {
-    const nextLocale = locale === 'ar' ? 'en' : 'ar';
+  const switchLocale = (newLocale: string) => {
+    if (newLocale === locale) {
+      setIsLangMenuOpen(false);
+      return;
+    }
     const cleanPath = pathname.replace(/^\/(ar|en)/, '');
-    router.push(`/${nextLocale}${cleanPath || ''}`);
+    router.push(`/${newLocale}${cleanPath || ''}`);
+    setIsLangMenuOpen(false);
   };
 
-  const ArrowIcon = isRTL ? ArrowLeft : ArrowRight;
-
   return (
-    <header className="sticky top-0 z-50 w-full py-3 px-4 sm:px-6 lg:px-8 backdrop-blur-xl border-b border-[var(--color-border)]/50 transition-colors duration-200">
-      <div className="mx-auto flex max-w-7xl items-center justify-between">
-
-        {/* ================= 1. Brand Logo ================= */}
+    <header className="fixed top-3 sm:top-4 left-0 right-0 z-50 flex justify-center px-4 sm:px-8 pointer-events-none transition-all duration-300">
+      <div className="container mx-auto flex items-center justify-between pointer-events-auto relative max-w-7xl">
+        
+        {/* ================= 1. Left (RTL: Right): Brand Logo & Name ================= */}
         <Link
           href={`/${locale}`}
           onClick={(e) => {
             e.preventDefault();
             scrollToSection('hero');
           }}
-          className="group flex items-center gap-2.5 shrink-0"
+          className="flex items-center gap-3 shrink-0 group py-1"
         >
-          {/* Stylized Interlocking Logo Knot */}
-          <div className="relative flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center transition-transform duration-300 group-hover:scale-105">
-            <svg
-              className="h-8 w-8 sm:h-9 sm:w-9 text-[var(--color-primary)]"
-              viewBox="0 0 40 40"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <rect
-                x="11"
-                y="7"
-                width="19"
-                height="19"
-                rx="4.5"
-                transform="rotate(22 20.5 16.5)"
-                stroke="currentColor"
-                strokeWidth="2.8"
-                className="drop-shadow-[0_0_8px_rgba(var(--color-primary-rgb,0,163,255),0.6)]"
-              />
-              <rect
-                x="8"
-                y="13"
-                width="19"
-                height="19"
-                rx="4.5"
-                transform="rotate(-22 17.5 22.5)"
-                stroke="currentColor"
-                strokeWidth="2.8"
-                className="opacity-75"
-              />
-            </svg>
+          <div className="relative flex items-center justify-center">
+            <div className="absolute inset-0 bg-[#2B9FD9]/30 blur-md rounded-full group-hover:bg-[#2B9FD9]/50 transition-all duration-500 scale-125" />
+            <img
+              src="/assets/logo/mot7km_logo%20(2).png"
+              alt="Mot7km Logo"
+              className="h-8 sm:h-9 w-auto relative z-10 group-hover:rotate-12 transition-transform duration-300"
+            />
           </div>
-
-          {/* Brand Name + Pulsing Status Indicator */}
           <div className="flex items-center gap-1.5">
-            <span className="text-lg sm:text-xl font-black tracking-tight text-[var(--color-text-primary)]">
+            <span className="font-black text-lg sm:text-xl tracking-tight text-slate-900 dark:text-white group-hover:text-[#2B9FD9] transition-colors">
               Mot7km
             </span>
             <span className="relative flex h-2 w-2">
@@ -178,18 +170,19 @@ export function LandingNavbar({ onScrollTo }: LandingNavbarProps) {
           </div>
         </Link>
 
-        {/* ================= 2. Center Island Pill Navigation ================= */}
-        <nav className="hidden md:flex items-center rounded-full border border-[var(--color-border)] bg-[var(--color-surface)]/90 backdrop-blur-xl px-2 py-1.5 shadow-sm">
+        {/* ================= 2. Center: Floating Island Pill Navigation ================= */}
+        <nav className="hidden md:flex items-center gap-1 px-3 py-1.5 rounded-full border border-black/10 dark:border-white/10 shadow-lg dark:shadow-[0_10px_40px_rgba(0,0,0,0.5)] bg-white/85 dark:bg-[#090d16]/85 backdrop-blur-2xl relative">
           {sections.map((section) => {
             const isActive = activeSection === section.id;
             return (
               <button
                 key={section.id}
                 onClick={() => scrollToSection(section.id)}
-                className={`relative rounded-full px-4 py-1.5 text-xs sm:text-sm font-bold transition-all duration-200 cursor-pointer ${isActive
-                    ? 'bg-[var(--color-primary)] text-white shadow-sm'
-                    : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-subtle)]'
-                  }`}
+                className={`relative px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-extrabold transition-all duration-200 cursor-pointer ${
+                  isActive
+                    ? 'text-white bg-[#2B9FD9] shadow-[0_2px_12px_rgba(43,159,217,0.45)]'
+                    : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10'
+                }`}
               >
                 <span>{section.label}</span>
               </button>
@@ -197,94 +190,170 @@ export function LandingNavbar({ onScrollTo }: LandingNavbarProps) {
           })}
         </nav>
 
-        {/* ================= 3. Right Action Controls ================= */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        {/* ================= 3. Right (RTL: Left): Controls & CTA Button ================= */}
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          
           {/* Theme Toggle */}
-          <button
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={toggleTheme}
+            className="p-2 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors rounded-full hover:bg-black/5 dark:hover:bg-white/10 flex items-center justify-center w-9 h-9 cursor-pointer"
             aria-label={t('toggleTheme')}
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-subtle)] transition-colors cursor-pointer shadow-sm"
           >
-            {isDark ? (
-              <Sun className="h-4 w-4 text-amber-400" />
-            ) : (
-              <Moon className="h-4 w-4 text-[var(--color-primary)]" />
+            {mounted && (
+              <motion.div
+                key={resolvedTheme}
+                initial={{ rotate: -90, opacity: 0 }}
+                animate={{ rotate: 0, opacity: 1 }}
+                transition={{ duration: 0.3 }}
+              >
+                {isDark ? (
+                  <Sun size={18} className="text-amber-400" />
+                ) : (
+                  <Moon size={18} className="text-[#2B9FD9]" />
+                )}
+              </motion.div>
             )}
-          </button>
+          </motion.button>
 
-          {/* Language Switcher */}
-          <button
-            onClick={toggleLanguage}
-            title={t('toggleLanguage')}
-            aria-label={t('toggleLanguage')}
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-subtle)] transition-colors cursor-pointer shadow-sm"
-          >
-            <Languages className="h-4 w-4" />
-          </button>
+          {/* Language Selector */}
+          <div className="relative">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsLangMenuOpen(!isLangMenuOpen);
+              }}
+              className="p-2 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors rounded-full hover:bg-black/5 dark:hover:bg-white/10 flex items-center justify-center w-9 h-9 cursor-pointer"
+              aria-label={t('toggleLanguage')}
+            >
+              <Languages size={18} />
+            </motion.button>
 
-          {/* Primary CTA Button: "Request Demo" scrolls to plans or demo */}
+            <AnimatePresence>
+              {isLangMenuOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                  transition={{ duration: 0.15 }}
+                  onClick={(e) => e.stopPropagation()}
+                  className="absolute right-0 rtl:left-0 rtl:right-auto mt-2 w-32 bg-white/95 dark:bg-[#0c1626]/95 backdrop-blur-2xl border border-black/10 dark:border-white/15 rounded-2xl shadow-xl py-1.5 z-50 overflow-hidden"
+                >
+                  <button
+                    onClick={() => switchLocale('ar')}
+                    className={`w-full text-start px-4 py-2 text-xs font-bold transition-colors flex items-center justify-between hover:bg-[#2B9FD9]/10 cursor-pointer ${
+                      locale === 'ar' ? 'text-[#2B9FD9]' : 'text-slate-800 dark:text-white'
+                    }`}
+                  >
+                    <span>العربية</span>
+                    {locale === 'ar' && <Check size={14} className="text-[#2B9FD9]" />}
+                  </button>
+                  <button
+                    onClick={() => switchLocale('en')}
+                    className={`w-full text-start px-4 py-2 text-xs font-bold transition-colors flex items-center justify-between hover:bg-[#2B9FD9]/10 cursor-pointer ${
+                      locale === 'en' ? 'text-[#2B9FD9]' : 'text-slate-800 dark:text-white'
+                    }`}
+                  >
+                    <span>English</span>
+                    {locale === 'en' && <Check size={14} className="text-[#2B9FD9]" />}
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* Prominent High-Converting SaaS Demo CTA Button */}
           <button
             onClick={() => scrollToSection('plans')}
-            className="relative hidden sm:inline-flex items-center gap-2 overflow-hidden rounded-full bg-[var(--color-primary)] px-5 py-2 text-xs sm:text-sm font-bold text-white shadow-md shadow-[var(--color-primary)]/25 transition-all duration-300 hover:shadow-lg hover:shadow-[var(--color-primary)]/35 hover:scale-[1.03] active:scale-[0.98] cursor-pointer"
+            className="group hidden sm:flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-[#2B9FD9] via-[#38BDF8] to-[#10B981] text-white font-extrabold text-xs sm:text-sm shadow-[0_0_20px_rgba(43,159,217,0.4)] hover:shadow-[0_0_30px_rgba(43,159,217,0.7)] hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer"
           >
             <span>{t('requestDemo')}</span>
-            <ArrowIcon className="h-3.5 w-3.5" />
+            <ArrowRight size={15} className="rtl:rotate-180 group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 transition-transform" />
           </button>
 
-          {/* Mobile Hamburger Menu Button */}
+          {/* Mobile Menu Toggle Button */}
           <button
+            className="md:hidden p-2 text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white rounded-full hover:bg-black/5 dark:hover:bg-white/10 cursor-pointer"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="flex h-9 w-9 items-center justify-center rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-primary)] md:hidden cursor-pointer"
             aria-label={t('toggleMenu')}
           >
-            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
+
         </div>
+
       </div>
 
       {/* ================= Mobile Expandable Drawer ================= */}
-      {mobileMenuOpen && (
-        <div className="mt-3 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)]/98 backdrop-blur-2xl p-4 shadow-xl md:hidden animate-in slide-in-from-top-3 duration-200">
-          <div className="flex flex-col gap-1.5">
-            {sections.map((section) => {
-              const isActive = activeSection === section.id;
-              return (
-                <button
-                  key={section.id}
-                  onClick={() => scrollToSection(section.id)}
-                  className={`flex items-center justify-between rounded-xl px-4 py-3 text-start text-sm font-bold transition-all cursor-pointer ${isActive
-                      ? 'bg-[var(--color-primary)] text-white'
-                      : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-subtle)] hover:text-[var(--color-text-primary)]'
-                    }`}
-                >
-                  <span>{section.label}</span>
-                  {isActive && (
-                    <span className="h-1.5 w-1.5 rounded-full bg-white shadow-sm" />
-                  )}
-                </button>
-              );
-            })}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 bg-black/60 backdrop-blur-md pointer-events-auto z-40 md:hidden"
+              onClick={() => setMobileMenuOpen(false)}
+            />
+            
+            <motion.div
+              initial={{ opacity: 0, y: -20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -20, scale: 0.95 }}
+              transition={{ duration: 0.25, ease: 'easeOut' }}
+              className="md:hidden pointer-events-auto absolute top-16 left-4 right-4 bg-white/95 dark:bg-[#090d16]/95 backdrop-blur-3xl border border-black/10 dark:border-white/15 rounded-3xl p-5 flex flex-col gap-3 shadow-2xl z-50 overflow-y-auto max-h-[85vh]"
+            >
+              <div className="flex flex-col gap-1.5">
+                {sections.map((section) => {
+                  const isActive = activeSection === section.id;
+                  return (
+                    <button
+                      key={section.id}
+                      onClick={() => scrollToSection(section.id)}
+                      className={`flex items-center justify-between rounded-2xl px-4 py-3 text-start text-sm font-bold transition-all cursor-pointer ${
+                        isActive
+                          ? 'bg-[#2B9FD9] text-white shadow-md shadow-[#2B9FD9]/25'
+                          : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/[0.06] hover:text-slate-900 dark:hover:text-white'
+                      }`}
+                    >
+                      <span>{section.label}</span>
+                      {isActive && (
+                        <span className="h-2 w-2 rounded-full bg-white shadow-sm" />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
 
-            <div className="mt-3 flex items-center justify-between border-t border-[var(--color-border)] pt-4">
-              <button
-                onClick={toggleLanguage}
-                className="flex items-center gap-2 text-xs font-bold text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] cursor-pointer"
-              >
-                <Languages className="h-4 w-4 text-[var(--color-primary)]" />
-                <span>{locale === 'ar' ? 'English' : 'العربية'}</span>
-              </button>
+              <hr className="border-black/10 dark:border-white/10 my-1" />
+
+              <div className="flex items-center justify-between px-2">
+                <button
+                  onClick={() => switchLocale(locale === 'ar' ? 'en' : 'ar')}
+                  className="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white cursor-pointer py-1"
+                >
+                  <Languages size={16} className="text-[#2B9FD9]" />
+                  <span>{locale === 'ar' ? 'English' : 'العربية'}</span>
+                </button>
+              </div>
 
               <button
                 onClick={() => scrollToSection('plans')}
-                className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-primary)] px-4 py-2 text-xs font-bold text-white shadow-md cursor-pointer"
+                className="w-full text-center py-3.5 rounded-2xl bg-gradient-to-r from-[#2B9FD9] via-[#38BDF8] to-[#10B981] text-white font-extrabold text-sm shadow-[0_0_20px_rgba(43,159,217,0.4)] hover:shadow-[0_0_30px_rgba(43,159,217,0.7)] cursor-pointer"
               >
-                <span>{t('requestDemo')}</span>
-                <ArrowIcon className="h-3.5 w-3.5" />
+                {t('requestDemo')}
               </button>
-            </div>
-          </div>
-        </div>
-      )}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
     </header>
   );
 }
+
+export default LandingNavbar;

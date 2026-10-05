@@ -9,7 +9,6 @@ import {
   LandingFeatures,
   LandingPricing,
   LandingFeaturedMenus,
-  LandingCTA,
   LandingFooter,
 } from '@/components/landing';
 
@@ -55,9 +54,6 @@ export default function Home() {
 
         {/* Subscription Plans */}
         <LandingPricing />
-
-        {/* Call to Action Banner */}
-        <LandingCTA />
       </main>
 
       {/* Footer */}
