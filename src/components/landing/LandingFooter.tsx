@@ -3,18 +3,18 @@
 import { useState, useRef } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
-import { 
-  Mail, 
-  Phone, 
-  MapPin, 
-  ArrowRight, 
-  ArrowUp, 
-  Sparkles, 
-  CheckCircle2, 
-  ShieldCheck, 
+import {
+  Mail,
+  Phone,
+  MapPin,
+  ArrowRight,
+  ArrowUp,
+  Sparkles,
+  CheckCircle2,
+  ShieldCheck,
   Zap,
   Star,
-  Store
+  Store,
 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
@@ -28,23 +28,23 @@ const XIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 const Instagram = (props: React.SVGProps<SVGSVGElement>) => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-    <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
-    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
-    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
+    <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
   </svg>
 );
 
 const Facebook = (props: React.SVGProps<SVGSVGElement>) => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
   </svg>
 );
 
 const Linkedin = (props: React.SVGProps<SVGSVGElement>) => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
-    <rect width="4" height="12" x="2" y="9"/>
-    <circle cx="4" cy="4" r="2"/>
+    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+    <rect width="4" height="12" x="2" y="9" />
+    <circle cx="4" cy="4" r="2" />
   </svg>
 );
 
@@ -150,7 +150,7 @@ const FOOTER_TRANSLATIONS: Record<string, { ar: string; en: string }> = {
 export function LandingFooter() {
   const locale = useLocale();
   const isRtl = locale === 'ar';
-  
+
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
 
@@ -174,7 +174,7 @@ export function LandingFooter() {
   const footerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: footerRef,
-    offset: ['start end', 'end end']
+    offset: ['start end', 'end end'],
   });
 
   // Jisr-style scroll unveil transform for MOT7KM background watermark
@@ -203,8 +203,10 @@ export function LandingFooter() {
       : rawCtaTitle;
 
   return (
-    <footer ref={footerRef} className="relative bg-[#060c18] border-t border-white/10 pt-16 sm:pt-24 md:pt-28 pb-8 overflow-hidden z-0">
-      
+    <footer
+      ref={footerRef}
+      className="relative bg-[#060c18] border-t border-white/10 pt-16 sm:pt-24 md:pt-28 pb-8 overflow-hidden z-0"
+    >
       {/* Background Lighting Orbs */}
       <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#2B9FD9]/50 to-transparent" />
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[450px] opacity-[0.08] pointer-events-none -z-10">
@@ -212,12 +214,12 @@ export function LandingFooter() {
       </div>
       <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-[#0B529E]/10 blur-[140px] rounded-full pointer-events-none -z-10" />
 
-      {/* JISR-STYLE GIANT BACKDROP WATERMARK "MOT7KM" (Placed behind links and unveiled on scroll) */}
-      <motion.div 
-        style={{ 
-          y: watermarkY, 
-          opacity: watermarkOpacity, 
-          scale: watermarkScale 
+      {/* JISR-STYLE GIANT BACKDROP WATERMARK "MOT7KM" */}
+      <motion.div
+        style={{
+          y: watermarkY,
+          opacity: watermarkOpacity,
+          scale: watermarkScale,
         }}
         className="absolute bottom-12 left-1/2 -translate-x-1/2 pointer-events-none select-none overflow-hidden w-full flex justify-center z-0"
       >
@@ -227,133 +229,93 @@ export function LandingFooter() {
       </motion.div>
 
       <div className="container mx-auto px-4 md:px-8 relative z-10">
-        
-        {/* Masterpiece Premium SaaS Banner CTA */}
-        <div className="relative mb-16 md:mb-24 p-8 sm:p-12 md:p-14 rounded-3xl sm:rounded-[2.5rem] bg-gradient-to-br from-[#0c1626] via-[#09111e] to-[#0d1c30] border border-white/15 backdrop-blur-3xl shadow-[0_30px_80px_rgba(0,0,0,0.6)] overflow-hidden group">
-          
-          <div className="absolute top-0 right-0 w-96 h-96 bg-[#2B9FD9]/20 blur-[100px] rounded-full pointer-events-none group-hover:bg-[#2B9FD9]/30 transition-all duration-700" />
-          <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#10B981]/15 blur-[100px] rounded-full pointer-events-none group-hover:bg-[#10B981]/25 transition-all duration-700" />
-          
-          <div 
-            className="absolute inset-0 opacity-[0.04] pointer-events-none" 
-            style={{
-              backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)',
-              backgroundSize: '24px 24px'
-            }}
-          />
+        {/* ============================================================
+            CTA CARD — redesigned, less "AI landing page" energy
+            ============================================================ */}
+        <div className="relative mb-16 md:mb-24 rounded-3xl bg-[#0a121f] border border-white/[0.08] overflow-hidden">
+          {/* Single soft accent glow, no hover animation */}
+          <div className="absolute -top-32 -right-24 w-[420px] h-[420px] bg-[#2B9FD9]/[0.12] blur-[130px] rounded-full pointer-events-none" />
 
-          <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-14">
-            
-            <div className="max-w-2xl text-center lg:text-start flex flex-col items-center lg:items-start">
-              
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#2B9FD9]/15 border border-[#2B9FD9]/35 text-[#38BDF8] text-xs font-extrabold mb-5 shadow-sm backdrop-blur-md">
-                <Sparkles size={14} className="text-[#38BDF8] animate-pulse" />
-                <span className="tracking-wider uppercase">Mot7km SaaS Platform v1.1</span>
-              </div>
-
-              <h3 className="text-2xl sm:text-4xl md:text-5xl font-black text-white mb-4 tracking-tight leading-[1.2]">
+          <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 p-8 sm:p-10 md:p-14 items-center">
+            {/* Left: copy */}
+            <div className="lg:col-span-7 text-center lg:text-start">
+              <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white leading-[1.25] tracking-tight">
                 {ctaTitlePrefix}
-                <span className="block sm:inline text-transparent bg-clip-text bg-gradient-to-r from-[#2B9FD9] via-[#38BDF8] to-[#10B981]">
+                <span className="text-[#38BDF8]">
                   {isRtl ? ' في مكان واحد؟' : ' in one place?'}
                 </span>
               </h3>
-              
-              <p className="text-slate-300 text-sm sm:text-base md:text-lg leading-relaxed mb-8 max-w-xl">
+
+              <p className="mt-4 text-sm sm:text-base text-slate-400 leading-relaxed max-w-xl mx-auto lg:mx-0">
                 {t('footer.ctaDesc')}
               </p>
 
-              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 text-xs font-bold">
-                <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#10B981]/15 border border-[#10B981]/30 text-emerald-300 backdrop-blur-md shadow-sm">
-                  <CheckCircle2 size={16} />
-                  <span>{t('footer.trustBadge1')}</span>
-                </div>
-                <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#2B9FD9]/15 border border-[#2B9FD9]/30 text-[#38BDF8] backdrop-blur-md shadow-sm">
-                  <Zap size={16} />
-                  <span>{t('footer.trustBadge2')}</span>
-                </div>
-                <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 backdrop-blur-md shadow-sm">
-                  <ShieldCheck size={16} />
-                  <span>{t('footer.trustBadge3')}</span>
-                </div>
+              <div className="mt-6 flex flex-wrap items-center justify-center lg:justify-start gap-x-5 gap-y-2 text-xs text-slate-500">
+                <span>{t('footer.trustBadge1')}</span>
+                <span className="hidden sm:inline h-3 w-px bg-white/10" />
+                <span>{t('footer.trustBadge2')}</span>
+                <span className="hidden sm:inline h-3 w-px bg-white/10" />
+                <span>{t('footer.trustBadge3')}</span>
               </div>
-
             </div>
 
-            <div className="flex flex-col w-full lg:w-auto min-w-[300px] sm:min-w-[420px] max-w-full">
-              
-              <form onSubmit={handleSubscribe} className="relative p-2 rounded-2xl bg-white/[0.06] border border-white/15 backdrop-blur-2xl shadow-[0_15px_40px_rgba(0,0,0,0.5)] focus-within:border-[#2B9FD9] focus-within:ring-2 focus-within:ring-[#2B9FD9]/30 transition-all duration-300 flex items-center">
-                <div className="pl-3 rtl:pl-0 rtl:pr-3 text-slate-400 flex-shrink-0">
-                  <Mail size={20} />
+            {/* Right: subscribe form */}
+            <div className="lg:col-span-5 w-full">
+              <form
+                onSubmit={handleSubscribe}
+                className="flex flex-col sm:flex-row items-stretch gap-2 p-1.5 rounded-2xl bg-white/[0.03] border border-white/[0.08] focus-within:border-[#2B9FD9]/50 transition-colors"
+              >
+                <div className="relative flex-1 flex items-center">
+                  <div className="pl-3 rtl:pl-0 rtl:pr-3 text-slate-500 pointer-events-none">
+                    <Mail size={16} />
+                  </div>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder={t('footer.emailPlaceholder')}
+                    required
+                    className="w-full bg-transparent border-none outline-none text-sm text-white px-3 py-3 placeholder:text-slate-500"
+                  />
                 </div>
-                <input 
-                  type="email" 
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder={t('footer.emailPlaceholder')}
-                  required
-                  className="w-full bg-transparent border-none outline-none text-sm text-white px-3 py-2.5 placeholder:text-slate-400 flex-1 font-medium"
-                />
-                <button 
+                <button
                   type="submit"
-                  className="group bg-gradient-to-r from-[#2B9FD9] to-[#10B981] hover:from-[#38BDF8] hover:to-[#2B9FD9] text-white font-bold px-6 py-3.5 rounded-xl text-xs sm:text-sm flex items-center gap-2 shadow-[0_0_25px_rgba(43,159,217,0.45)] hover:shadow-[0_0_35px_rgba(43,159,217,0.75)] transition-all duration-300 hover:scale-[1.03] active:scale-95 cursor-pointer whitespace-nowrap flex-shrink-0"
+                  className="bg-[#2B9FD9] hover:bg-[#2181B5] text-white font-semibold px-5 py-3 rounded-xl text-sm flex items-center justify-center gap-2 transition-colors cursor-pointer whitespace-nowrap flex-shrink-0"
                 >
                   <span>{t('footer.subscribe')}</span>
-                  <ArrowRight size={16} className="rtl:rotate-180 group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-transform duration-200" />
+                  <ArrowRight
+                    size={14}
+                    className="rtl:rotate-180 rtl:order-first"
+                  />
                 </button>
               </form>
-
-              <div className="flex items-center justify-between mt-4 px-2 text-xs text-slate-300">
-                <div className="flex items-center gap-1.5">
-                  <div className="flex -space-x-2 rtl:space-x-reverse">
-                    <div className="w-6 h-6 rounded-full bg-[#2B9FD9]/30 border border-white/20 flex items-center justify-center text-[10px] font-bold text-white shadow-sm">
-                      ☕
-                    </div>
-                    <div className="w-6 h-6 rounded-full bg-[#0B529E]/40 border border-white/20 flex items-center justify-center text-[10px] font-bold text-white shadow-sm">
-                      🍕
-                    </div>
-                    <div className="w-6 h-6 rounded-full bg-[#10B981]/30 border border-white/20 flex items-center justify-center text-[10px] font-bold text-white shadow-sm">
-                      🧃
-                    </div>
-                  </div>
-                  <span className="font-semibold text-slate-300 ml-1 rtl:mr-1">
-                    {isRtl ? 'انضم لـ 500+ مطعم وكافيه' : 'Join 500+ food businesses'}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-1 text-amber-400 font-bold">
-                  <Star size={13} className="fill-amber-400" />
-                  <span>4.9/5</span>
-                </div>
-              </div>
 
               <AnimatePresence>
                 {subscribed && (
                   <motion.div
-                    initial={{ opacity: 0, y: 10 }}
+                    initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0 }}
-                    className="mt-3 p-3 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-semibold text-center backdrop-blur-md"
+                    className="mt-3 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs text-center"
                   >
                     {t('footer.subSuccess')}
                   </motion.div>
                 )}
               </AnimatePresence>
             </div>
-
           </div>
         </div>
 
-        {/* Main Footer Content Grid (Covers upper MOT7KM text initially, reveals on scroll) */}
+        {/* Main Footer Content Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-8 mb-16 relative z-10">
-          
           {/* Brand Column */}
           <div className="sm:col-span-2 lg:col-span-4 flex flex-col items-center lg:items-start text-center lg:text-start">
             <Link href={`${BASE_URL}/`} className="flex items-center gap-3 mb-5 group">
               <div className="relative">
                 <div className="absolute inset-0 bg-[#2B9FD9]/30 blur-xl rounded-full group-hover:bg-[#2B9FD9]/60 transition-colors duration-500" />
-                <img 
-                  src="/assets/logo/mot7km_logo%20(2).png" 
-                  alt="Mot7km Logo" 
+                <img
+                  src="/assets/logo/mot7km_logo%20(2).png"
+                  alt="Mot7km Logo"
                   className="h-11 sm:h-12 w-auto relative z-10 group-hover:scale-105 transition-transform duration-500"
                 />
               </div>
@@ -361,7 +323,7 @@ export function LandingFooter() {
                 Mot7km
               </span>
             </Link>
-            
+
             <p className="text-slate-400 text-sm leading-relaxed mb-6 max-w-sm">
               {t('footer.desc')}
             </p>
@@ -379,13 +341,13 @@ export function LandingFooter() {
                 { Icon: Facebook, href: 'https://www.facebook.com/profile.php?id=61591358790071', label: 'Facebook' },
                 { Icon: Instagram, href: 'https://www.instagram.com/mot7km', label: 'Instagram' },
                 { Icon: XIcon, href: '#', label: 'X' },
-                { Icon: Linkedin, href: '#', label: 'LinkedIn' }
+                { Icon: Linkedin, href: '#', label: 'LinkedIn' },
               ].map((item, idx) => (
-                <a 
-                  key={idx} 
-                  href={item.href} 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
+                <a
+                  key={idx}
+                  href={item.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   aria-label={item.label}
                   className="w-10 h-10 rounded-xl bg-white/[0.05] border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-[#2B9FD9] hover:border-[#38BDF8] hover:shadow-[0_0_20px_rgba(43,159,217,0.7)] hover:-translate-y-1 transition-all duration-300 shadow-sm cursor-pointer active:scale-95"
                 >
@@ -408,8 +370,8 @@ export function LandingFooter() {
                 { label: isRtl ? 'سجل التحديثات' : 'Changelog', href: `${BASE_URL}/changelog` },
               ].map((link, i) => (
                 <li key={i}>
-                  <Link 
-                    href={link.href} 
+                  <Link
+                    href={link.href}
                     className="text-slate-400 hover:text-[#38BDF8] transition-all duration-200 inline-flex items-center gap-2.5 group hover:translate-x-1.5 rtl:hover:-translate-x-1.5"
                   >
                     <span className="w-1.5 h-1.5 rounded-full bg-[#2B9FD9]/50 group-hover:bg-[#38BDF8] group-hover:scale-150 group-hover:shadow-[0_0_8px_#38BDF8] transition-all duration-300 flex-shrink-0" />
@@ -430,11 +392,11 @@ export function LandingFooter() {
                 { label: t('footer.solutionCafe'), href: `${BASE_URL}/solutions/cafe` },
                 { label: t('footer.solutionGaming'), href: `${BASE_URL}/solutions/gaming` },
                 { label: t('footer.solutionJuice'), href: `${BASE_URL}/solutions/juice` },
-                { label: t('footer.solutionRestaurant'), href: `${BASE_URL}/solutions/restaurant` }
+                { label: t('footer.solutionRestaurant'), href: `${BASE_URL}/solutions/restaurant` },
               ].map((link, i) => (
                 <li key={i}>
-                  <Link 
-                    href={link.href} 
+                  <Link
+                    href={link.href}
                     className="text-slate-400 hover:text-[#38BDF8] transition-all duration-200 inline-flex items-center gap-2.5 group hover:translate-x-1.5 rtl:hover:-translate-x-1.5"
                   >
                     <span className="w-1.5 h-1.5 rounded-full bg-[#2B9FD9]/50 group-hover:bg-[#38BDF8] group-hover:scale-150 group-hover:shadow-[0_0_8px_#38BDF8] transition-all duration-300 flex-shrink-0" />
@@ -460,8 +422,8 @@ export function LandingFooter() {
                 { label: isRtl ? 'اتصل بنا' : 'Contact Us', href: `${BASE_URL}/contact` },
               ].map((link, i) => (
                 <li key={i}>
-                  <Link 
-                    href={link.href} 
+                  <Link
+                    href={link.href}
                     className="text-slate-400 hover:text-[#38BDF8] transition-all duration-200 inline-flex items-center gap-2.5 group hover:translate-x-1.5 rtl:hover:-translate-x-1.5"
                   >
                     <span className="w-1.5 h-1.5 rounded-full bg-[#2B9FD9]/50 group-hover:bg-[#38BDF8] group-hover:scale-150 group-hover:shadow-[0_0_8px_#38BDF8] transition-all duration-300 flex-shrink-0" />
@@ -479,8 +441,8 @@ export function LandingFooter() {
             </h4>
             <ul className="space-y-3 text-xs sm:text-sm font-medium">
               <li>
-                <a 
-                  href="#" 
+                <a
+                  href="#"
                   className="flex items-center gap-2.5 text-slate-400 hover:text-white transition-all duration-200 group hover:translate-x-1.5 rtl:hover:-translate-x-1.5"
                 >
                   <MapPin size={16} className="text-[#2B9FD9] group-hover:text-[#38BDF8] group-hover:scale-110 transition-all duration-200 flex-shrink-0" />
@@ -488,8 +450,8 @@ export function LandingFooter() {
                 </a>
               </li>
               <li>
-                <a 
-                  href="tel:+966501234567" 
+                <a
+                  href="tel:+966501234567"
                   className="flex items-center gap-2.5 text-slate-400 hover:text-white transition-all duration-200 group hover:translate-x-1.5 rtl:hover:-translate-x-1.5"
                 >
                   <Phone size={16} className="text-[#2B9FD9] group-hover:text-[#38BDF8] group-hover:scale-110 transition-all duration-200 flex-shrink-0" />
@@ -497,8 +459,8 @@ export function LandingFooter() {
                 </a>
               </li>
               <li>
-                <a 
-                  href="mailto:mot7km@gmail.com" 
+                <a
+                  href="mailto:mot7km@gmail.com"
                   className="flex items-center gap-2.5 text-slate-400 hover:text-white transition-all duration-200 group hover:translate-x-1.5 rtl:hover:-translate-x-1.5"
                 >
                   <Mail size={16} className="text-[#2B9FD9] group-hover:text-[#38BDF8] group-hover:scale-110 transition-all duration-200 flex-shrink-0" />
@@ -507,17 +469,16 @@ export function LandingFooter() {
               </li>
             </ul>
           </div>
-
         </div>
 
-        {/* Bottom Utility Bar (Privacy / Rights / Back to top) */}
+        {/* Bottom Utility Bar */}
         <div className="relative z-10 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-slate-400 text-xs sm:text-sm font-medium">
             {t('footer.rights')}
           </p>
 
           <div className="flex items-center gap-4">
-            <button 
+            <button
               onClick={scrollToTop}
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/[0.05] border border-white/10 text-slate-300 hover:text-white hover:bg-[#2B9FD9]/20 hover:border-[#2B9FD9]/60 hover:shadow-[0_0_20px_rgba(43,159,217,0.4)] transition-all duration-200 text-xs font-bold cursor-pointer active:scale-95 group"
             >
@@ -526,7 +487,6 @@ export function LandingFooter() {
             </button>
           </div>
         </div>
-
       </div>
     </footer>
   );
