@@ -205,14 +205,14 @@ export function LandingFooter() {
   return (
     <footer
       ref={footerRef}
-      className="relative bg-[#060c18] border-t border-white/10 pt-16 sm:pt-24 md:pt-28 pb-8 overflow-hidden z-0"
+      className="relative bg-slate-50 dark:bg-[#060c18] border-t border-slate-200/80 dark:border-white/10 pt-16 sm:pt-24 md:pt-28 pb-8 overflow-hidden z-0 transition-colors duration-300"
     >
       {/* Background Lighting Orbs */}
-      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#2B9FD9]/50 to-transparent" />
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[450px] opacity-[0.08] pointer-events-none -z-10">
+      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#2B9FD9]/40 dark:via-[#2B9FD9]/50 to-transparent" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[450px] opacity-[0.05] dark:opacity-[0.08] pointer-events-none -z-10">
         <div className="absolute inset-0 bg-gradient-to-b from-[#2B9FD9] via-[#10B981] to-transparent blur-[140px] rounded-full" />
       </div>
-      <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-[#0B529E]/10 blur-[140px] rounded-full pointer-events-none -z-10" />
+      <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-[#0B529E]/5 dark:bg-[#0B529E]/10 blur-[140px] rounded-full pointer-events-none -z-10" />
 
       {/* JISR-STYLE GIANT BACKDROP WATERMARK "MOT7KM" */}
       <motion.div
@@ -223,38 +223,38 @@ export function LandingFooter() {
         }}
         className="absolute bottom-12 left-1/2 -translate-x-1/2 pointer-events-none select-none overflow-hidden w-full flex justify-center z-0"
       >
-        <h1 className="text-[22vw] sm:text-[20vw] md:text-[18vw] leading-none font-black text-transparent bg-clip-text bg-gradient-to-b from-white/25 via-white/10 to-transparent tracking-tighter drop-shadow-[0_20px_50px_rgba(43,159,217,0.35)]">
+        <h1 className="text-[22vw] sm:text-[20vw] md:text-[18vw] leading-none font-black text-transparent bg-clip-text bg-gradient-to-b from-slate-900/[0.08] via-slate-900/[0.03] to-transparent dark:from-white/25 dark:via-white/10 dark:to-transparent tracking-tighter drop-shadow-[0_20px_50px_rgba(43,159,217,0.12)] dark:drop-shadow-[0_20px_50px_rgba(43,159,217,0.35)]">
           MOT7KM
         </h1>
       </motion.div>
 
       <div className="container mx-auto px-4 md:px-8 relative z-10">
         {/* ============================================================
-            CTA CARD — redesigned, less "AI landing page" energy
+            CTA CARD
             ============================================================ */}
-        <div className="relative mb-16 md:mb-24 rounded-3xl bg-[#0a121f] border border-white/[0.08] overflow-hidden">
+        <div className="relative mb-16 md:mb-24 rounded-3xl bg-white/95 dark:bg-[#0a121f] border border-slate-200/90 dark:border-white/[0.08] shadow-xl shadow-slate-900/5 dark:shadow-2xl overflow-hidden backdrop-blur-2xl transition-colors duration-300">
           {/* Single soft accent glow, no hover animation */}
-          <div className="absolute -top-32 -right-24 w-[420px] h-[420px] bg-[#2B9FD9]/[0.12] blur-[130px] rounded-full pointer-events-none" />
+          <div className="absolute -top-32 -right-24 w-[420px] h-[420px] bg-[#2B9FD9]/[0.08] dark:bg-[#2B9FD9]/[0.12] blur-[130px] rounded-full pointer-events-none" />
 
           <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 p-8 sm:p-10 md:p-14 items-center">
             {/* Left: copy */}
             <div className="lg:col-span-7 text-center lg:text-start">
-              <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white leading-[1.25] tracking-tight">
+              <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 dark:text-white leading-[1.25] tracking-tight">
                 {ctaTitlePrefix}
-                <span className="text-[#38BDF8]">
+                <span className="text-[#2B9FD9] dark:text-[#38BDF8]">
                   {isRtl ? ' في مكان واحد؟' : ' in one place?'}
                 </span>
               </h3>
 
-              <p className="mt-4 text-sm sm:text-base text-slate-400 leading-relaxed max-w-xl mx-auto lg:mx-0">
+              <p className="mt-4 text-sm sm:text-base text-slate-600 dark:text-slate-400 leading-relaxed max-w-xl mx-auto lg:mx-0">
                 {t('footer.ctaDesc')}
               </p>
 
-              <div className="mt-6 flex flex-wrap items-center justify-center lg:justify-start gap-x-5 gap-y-2 text-xs text-slate-500">
+              <div className="mt-6 flex flex-wrap items-center justify-center lg:justify-start gap-x-5 gap-y-2 text-xs text-slate-500 dark:text-slate-400 font-medium">
                 <span>{t('footer.trustBadge1')}</span>
-                <span className="hidden sm:inline h-3 w-px bg-white/10" />
+                <span className="hidden sm:inline h-3 w-px bg-slate-200 dark:bg-white/10" />
                 <span>{t('footer.trustBadge2')}</span>
-                <span className="hidden sm:inline h-3 w-px bg-white/10" />
+                <span className="hidden sm:inline h-3 w-px bg-slate-200 dark:bg-white/10" />
                 <span>{t('footer.trustBadge3')}</span>
               </div>
             </div>
@@ -263,10 +263,10 @@ export function LandingFooter() {
             <div className="lg:col-span-5 w-full">
               <form
                 onSubmit={handleSubscribe}
-                className="flex flex-col sm:flex-row items-stretch gap-2 p-1.5 rounded-2xl bg-white/[0.03] border border-white/[0.08] focus-within:border-[#2B9FD9]/50 transition-colors"
+                className="flex flex-col sm:flex-row items-stretch gap-2 p-1.5 rounded-2xl bg-slate-100/90 dark:bg-white/[0.03] border border-slate-200 dark:border-white/[0.08] focus-within:border-[#2B9FD9]/60 focus-within:ring-2 focus-within:ring-[#2B9FD9]/20 transition-all"
               >
                 <div className="relative flex-1 flex items-center">
-                  <div className="pl-3 rtl:pl-0 rtl:pr-3 text-slate-500 pointer-events-none">
+                  <div className="pl-3 rtl:pl-0 rtl:pr-3 text-slate-400 dark:text-slate-500 pointer-events-none">
                     <Mail size={16} />
                   </div>
                   <input
@@ -275,12 +275,12 @@ export function LandingFooter() {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder={t('footer.emailPlaceholder')}
                     required
-                    className="w-full bg-transparent border-none outline-none text-sm text-white px-3 py-3 placeholder:text-slate-500"
+                    className="w-full bg-transparent border-none outline-none text-sm text-slate-900 dark:text-white px-3 py-3 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   />
                 </div>
                 <button
                   type="submit"
-                  className="bg-[#2B9FD9] hover:bg-[#2181B5] text-white font-semibold px-5 py-3 rounded-xl text-sm flex items-center justify-center gap-2 transition-colors cursor-pointer whitespace-nowrap flex-shrink-0"
+                  className="bg-[#2B9FD9] hover:bg-[#2181B5] text-white font-semibold px-5 py-3 rounded-xl text-sm flex items-center justify-center gap-2 shadow-md shadow-[#2B9FD9]/25 hover:shadow-lg hover:shadow-[#2B9FD9]/40 transition-all cursor-pointer whitespace-nowrap flex-shrink-0"
                 >
                   <span>{t('footer.subscribe')}</span>
                   <ArrowRight
@@ -296,7 +296,7 @@ export function LandingFooter() {
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0 }}
-                    className="mt-3 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs text-center"
+                    className="mt-3 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs text-center font-semibold"
                   >
                     {t('footer.subSuccess')}
                   </motion.div>
@@ -319,16 +319,16 @@ export function LandingFooter() {
                   className="h-11 sm:h-12 w-auto relative z-10 group-hover:scale-105 transition-transform duration-500"
                 />
               </div>
-              <span className="font-black text-2xl sm:text-3xl tracking-tight text-white group-hover:text-[#38BDF8] transition-colors duration-300">
+              <span className="font-black text-2xl sm:text-3xl tracking-tight text-slate-900 dark:text-white group-hover:text-[#2B9FD9] dark:group-hover:text-[#38BDF8] transition-colors duration-300">
                 Mot7km
               </span>
             </Link>
 
-            <p className="text-slate-400 text-sm leading-relaxed mb-6 max-w-sm">
+            <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-6 max-w-sm">
               {t('footer.desc')}
             </p>
 
-            <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-xs font-bold mb-6 shadow-sm">
+            <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-600 dark:text-emerald-400 text-xs font-bold mb-6 shadow-sm">
               <span className="relative flex h-2.5 w-2.5">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                 <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
@@ -349,7 +349,7 @@ export function LandingFooter() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={item.label}
-                  className="w-10 h-10 rounded-xl bg-white/[0.05] border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-[#2B9FD9] hover:border-[#38BDF8] hover:shadow-[0_0_20px_rgba(43,159,217,0.7)] hover:-translate-y-1 transition-all duration-300 shadow-sm cursor-pointer active:scale-95"
+                  className="w-10 h-10 rounded-xl bg-white dark:bg-white/[0.05] border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-white hover:bg-[#2B9FD9] hover:border-[#38BDF8] hover:shadow-[0_0_20px_rgba(43,159,217,0.5)] hover:-translate-y-1 transition-all duration-300 shadow-sm cursor-pointer active:scale-95"
                 >
                   <item.Icon width={18} height={18} />
                 </a>
@@ -372,9 +372,9 @@ export function LandingFooter() {
                 <li key={i}>
                   <Link
                     href={link.href}
-                    className="text-slate-400 hover:text-[#38BDF8] transition-all duration-200 inline-flex items-center gap-2.5 group hover:translate-x-1.5 rtl:hover:-translate-x-1.5"
+                    className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-[#38BDF8] transition-all duration-200 inline-flex items-center gap-2.5 group hover:translate-x-1.5 rtl:hover:-translate-x-1.5"
                   >
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#2B9FD9]/50 group-hover:bg-[#38BDF8] group-hover:scale-150 group-hover:shadow-[0_0_8px_#38BDF8] transition-all duration-300 flex-shrink-0" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#2B9FD9]/40 group-hover:bg-[#2B9FD9] dark:group-hover:bg-[#38BDF8] group-hover:scale-150 group-hover:shadow-[0_0_8px_#38BDF8] transition-all duration-300 flex-shrink-0" />
                     <span>{link.label}</span>
                   </Link>
                 </li>
@@ -397,9 +397,9 @@ export function LandingFooter() {
                 <li key={i}>
                   <Link
                     href={link.href}
-                    className="text-slate-400 hover:text-[#38BDF8] transition-all duration-200 inline-flex items-center gap-2.5 group hover:translate-x-1.5 rtl:hover:-translate-x-1.5"
+                    className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-[#38BDF8] transition-all duration-200 inline-flex items-center gap-2.5 group hover:translate-x-1.5 rtl:hover:-translate-x-1.5"
                   >
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#2B9FD9]/50 group-hover:bg-[#38BDF8] group-hover:scale-150 group-hover:shadow-[0_0_8px_#38BDF8] transition-all duration-300 flex-shrink-0" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#2B9FD9]/40 group-hover:bg-[#2B9FD9] dark:group-hover:bg-[#38BDF8] group-hover:scale-150 group-hover:shadow-[0_0_8px_#38BDF8] transition-all duration-300 flex-shrink-0" />
                     <span>{link.label}</span>
                   </Link>
                 </li>
@@ -424,9 +424,9 @@ export function LandingFooter() {
                 <li key={i}>
                   <Link
                     href={link.href}
-                    className="text-slate-400 hover:text-[#38BDF8] transition-all duration-200 inline-flex items-center gap-2.5 group hover:translate-x-1.5 rtl:hover:-translate-x-1.5"
+                    className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-[#38BDF8] transition-all duration-200 inline-flex items-center gap-2.5 group hover:translate-x-1.5 rtl:hover:-translate-x-1.5"
                   >
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#2B9FD9]/50 group-hover:bg-[#38BDF8] group-hover:scale-150 group-hover:shadow-[0_0_8px_#38BDF8] transition-all duration-300 flex-shrink-0" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#2B9FD9]/40 group-hover:bg-[#2B9FD9] dark:group-hover:bg-[#38BDF8] group-hover:scale-150 group-hover:shadow-[0_0_8px_#38BDF8] transition-all duration-300 flex-shrink-0" />
                     <span>{link.label}</span>
                   </Link>
                 </li>
@@ -443,7 +443,7 @@ export function LandingFooter() {
               <li>
                 <a
                   href="#"
-                  className="flex items-center gap-2.5 text-slate-400 hover:text-white transition-all duration-200 group hover:translate-x-1.5 rtl:hover:-translate-x-1.5"
+                  className="flex items-center gap-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all duration-200 group hover:translate-x-1.5 rtl:hover:-translate-x-1.5"
                 >
                   <MapPin size={16} className="text-[#2B9FD9] group-hover:text-[#38BDF8] group-hover:scale-110 transition-all duration-200 flex-shrink-0" />
                   <span>{t('footer.address')}</span>
@@ -452,7 +452,7 @@ export function LandingFooter() {
               <li>
                 <a
                   href="tel:+966501234567"
-                  className="flex items-center gap-2.5 text-slate-400 hover:text-white transition-all duration-200 group hover:translate-x-1.5 rtl:hover:-translate-x-1.5"
+                  className="flex items-center gap-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all duration-200 group hover:translate-x-1.5 rtl:hover:-translate-x-1.5"
                 >
                   <Phone size={16} className="text-[#2B9FD9] group-hover:text-[#38BDF8] group-hover:scale-110 transition-all duration-200 flex-shrink-0" />
                   <span dir="ltr">+966 50 123 4567</span>
@@ -461,7 +461,7 @@ export function LandingFooter() {
               <li>
                 <a
                   href="mailto:mot7km@gmail.com"
-                  className="flex items-center gap-2.5 text-slate-400 hover:text-white transition-all duration-200 group hover:translate-x-1.5 rtl:hover:-translate-x-1.5"
+                  className="flex items-center gap-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all duration-200 group hover:translate-x-1.5 rtl:hover:-translate-x-1.5"
                 >
                   <Mail size={16} className="text-[#2B9FD9] group-hover:text-[#38BDF8] group-hover:scale-110 transition-all duration-200 flex-shrink-0" />
                   <span>mot7km@gmail.com</span>
@@ -472,18 +472,18 @@ export function LandingFooter() {
         </div>
 
         {/* Bottom Utility Bar */}
-        <div className="relative z-10 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-slate-400 text-xs sm:text-sm font-medium">
+        <div className="relative z-10 pt-8 border-t border-slate-200/80 dark:border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-slate-500 dark:text-slate-400 text-xs sm:text-sm font-medium">
             {t('footer.rights')}
           </p>
 
           <div className="flex items-center gap-4">
             <button
               onClick={scrollToTop}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/[0.05] border border-white/10 text-slate-300 hover:text-white hover:bg-[#2B9FD9]/20 hover:border-[#2B9FD9]/60 hover:shadow-[0_0_20px_rgba(43,159,217,0.4)] transition-all duration-200 text-xs font-bold cursor-pointer active:scale-95 group"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white dark:bg-white/[0.05] border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-[#2B9FD9]/15 hover:border-[#2B9FD9]/60 hover:shadow-[0_0_20px_rgba(43,159,217,0.3)] transition-all duration-200 text-xs font-bold cursor-pointer active:scale-95 group shadow-sm"
             >
               <span>{t('footer.backToTop')}</span>
-              <ArrowUp size={14} className="group-hover:-translate-y-1 transition-transform duration-200 text-[#38BDF8]" />
+              <ArrowUp size={14} className="group-hover:-translate-y-1 transition-transform duration-200 text-[#2B9FD9] dark:text-[#38BDF8]" />
             </button>
           </div>
         </div>

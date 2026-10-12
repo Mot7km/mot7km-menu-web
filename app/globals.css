@@ -1,9 +1,12 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* =================================================================
   Runtime theme tokens. Values are populated from the tenant identity.
   ================================================================= */
 :root {
+  color-scheme: light;
   --color-primary: #2B9FD9;
   --color-primary-light: #5BB6E5;
   --color-secondary: #0B529E;
@@ -52,6 +55,7 @@
 }
 
 .dark {
+  color-scheme: dark;
   --color-primary: #3DA9E0;
   --color-primary-light: #67C1EC;
   --color-secondary: #1E6BB8;

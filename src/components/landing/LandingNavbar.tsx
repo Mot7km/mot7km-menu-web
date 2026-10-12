@@ -201,7 +201,7 @@ export function LandingNavbar({ onScrollTo }: LandingNavbarProps) {
             className="p-2 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors rounded-full hover:bg-black/5 dark:hover:bg-white/10 flex items-center justify-center w-9 h-9 cursor-pointer"
             aria-label={t('toggleTheme')}
           >
-            {mounted && (
+            {mounted ? (
               <motion.div
                 key={resolvedTheme}
                 initial={{ rotate: -90, opacity: 0 }}
@@ -214,6 +214,8 @@ export function LandingNavbar({ onScrollTo }: LandingNavbarProps) {
                   <Moon size={18} className="text-[#2B9FD9]" />
                 )}
               </motion.div>
+            ) : (
+              <div className="w-[18px] h-[18px]" />
             )}
           </motion.button>
 
@@ -338,6 +340,23 @@ export function LandingNavbar({ onScrollTo }: LandingNavbarProps) {
                 >
                   <Languages size={16} className="text-[#2B9FD9]" />
                   <span>{locale === 'ar' ? 'English' : 'العربية'}</span>
+                </button>
+
+                <button
+                  onClick={toggleTheme}
+                  className="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white cursor-pointer py-1"
+                >
+                  {isDark ? (
+                    <>
+                      <Sun size={16} className="text-amber-400" />
+                      <span>{isRtl ? 'الوضع النهاري' : 'Light Mode'}</span>
+                    </>
+                  ) : (
+                    <>
+                      <Moon size={16} className="text-[#2B9FD9]" />
+                      <span>{isRtl ? 'الوضع الليلي' : 'Dark Mode'}</span>
+                    </>
+                  )}
                 </button>
               </div>
 
