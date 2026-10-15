@@ -135,20 +135,18 @@ export function SettingsMenu() {
           flex items-center justify-center
           h-9 w-9 sm:h-10 sm:w-10
           rounded-xl
-          bg-[var(--color-surface)]/80 backdrop-blur-md
-          border border-[var(--color-border)]/60
-          text-[var(--color-text-secondary)]
-          hover:text-[var(--color-text-primary)]
-          hover:bg-[var(--color-surface)]
-          hover:border-[var(--color-border-strong)]
+          bg-black/20 hover:bg-white/20
+          text-white
+          backdrop-blur-xl
+          border border-white/25 hover:border-white/50
+          shadow-[0_4px_16px_rgba(0,0,0,0.2)]
           transition-all duration-200
-          shadow-sm
-          cursor-pointer
+          cursor-pointer active:scale-95
         "
         aria-label={t('settings.title')}
         aria-expanded={open}
       >
-        <Settings className="h-4 w-4 sm:h-4.5 sm:w-4.5" />
+        <Settings className="h-4 w-4 sm:h-4.5 sm:w-4.5 transition-transform duration-300 group-hover:rotate-45" />
       </button>
 
       {open &&

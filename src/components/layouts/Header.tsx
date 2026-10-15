@@ -18,7 +18,6 @@ import {
   AtSign,
   Copy,
   ExternalLink,
-  MessageCircle,
   Navigation,
 } from 'lucide-react';
 import { useStore, parseWorkingHours } from '@/store/storeHooks';
@@ -33,7 +32,33 @@ import {
   TwitterIcon,
   SnapchatIcon,
   formatSocialUrl,
+  SOCIAL_CONFIG,
 } from '@/components/icons';
+
+// Retrieve authentic platform brand styling from icons definition
+const getSocialBrandStyle = (id: string) => {
+  const config = SOCIAL_CONFIG[id];
+  const isDarkMonochrome = id === 'tiktok' || id === 'twitter' || id === 'x';
+  const isSnapchat = id === 'snapchat';
+
+  // Authentic brand color from icons config (using accessible tone for snapchat on light backgrounds)
+  const brandColor = isSnapchat ? '#D97706' : (config?.brandColor || 'var(--color-primary)');
+
+  return {
+    iconColor: isDarkMonochrome ? 'currentColor' : brandColor,
+    iconBg: isDarkMonochrome
+      ? 'bg-[var(--color-surface)] border-[var(--color-border)] text-[var(--color-text-primary)]'
+      : undefined,
+    style: !isDarkMonochrome
+      ? {
+          backgroundColor: isSnapchat ? 'rgba(245, 158, 11, 0.12)' : `${brandColor}18`,
+          borderColor: isSnapchat ? 'rgba(245, 158, 11, 0.35)' : `${brandColor}38`,
+          color: brandColor,
+        }
+      : undefined,
+  };
+};
+
 
 function formatTimeLocalized(time24?: string | null, locale = 'en'): string {
   if (!time24 || typeof time24 !== 'string') return '';
@@ -230,20 +255,31 @@ export const Header = memo(function Header() {
     return true;
   }, [isTemporarilyClosed, currentBranch, header, storeInfo, activeSchedule]);
 
-  // Comprehensive store status including "About to close" & "About to open"
+  // Comprehensive store status with consistent contrast across dark header and light/dark popups
   const storeStatusInfo = useMemo(() => {
     if (isTemporarilyClosed) {
       return {
         label: t('storeInfo.temporarilyClosed'),
-        dotColor: 'bg-amber-400',
-        badgeClass: 'bg-amber-950/85 text-amber-200 border-amber-500/50',
+        dotColor: 'bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)] animate-pulse',
+        headerTriggerClass: 'bg-amber-500/25 hover:bg-amber-500/35 text-amber-200 border-amber-400/50 shadow-[0_2px_14px_rgba(245,158,11,0.35)]',
+        popupBadgeClass: 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30',
       };
     }
 
     if (!todaySchedule || todaySchedule.isClosed || !todaySchedule.open || !todaySchedule.close) {
       return isOpenNow
-        ? { label: t('storeInfo.open'), dotColor: 'bg-emerald-400 animate-pulse', badgeClass: 'bg-emerald-950/80 text-emerald-200 border-emerald-500/50' }
-        : { label: t('storeInfo.closed'), dotColor: 'bg-rose-400', badgeClass: 'bg-rose-950/80 text-rose-200 border-rose-500/50' };
+        ? {
+          label: t('storeInfo.open'),
+          dotColor: 'bg-[var(--color-primary)] shadow-[0_0_8px_var(--color-primary)] animate-pulse',
+          headerTriggerClass: 'bg-[var(--color-primary)]/25 hover:bg-[var(--color-primary)]/35 text-white border-[var(--color-primary)]/50 shadow-sm',
+          popupBadgeClass: 'bg-[var(--color-primary)]/15 text-[var(--color-primary)] border-[var(--color-primary)]/30',
+        }
+        : {
+          label: t('storeInfo.closed'),
+          dotColor: 'bg-rose-400 shadow-[0_0_8px_rgba(251,113,133,0.8)]',
+          headerTriggerClass: 'bg-rose-500/25 hover:bg-rose-500/35 text-rose-200 border-rose-400/50 shadow-[0_2px_14px_rgba(244,63,94,0.3)]',
+          popupBadgeClass: 'bg-rose-500/15 text-rose-600 dark:text-rose-400 border-rose-500/30',
+        };
     }
 
     const now = new Date();
@@ -262,28 +298,32 @@ export const Header = memo(function Header() {
       if (diffToClose > 0 && diffToClose <= 45) {
         return {
           label: t('header.aboutToClose'),
-          dotColor: 'bg-amber-400 animate-pulse',
-          badgeClass: 'bg-amber-950/85 text-amber-200 border-amber-500/50',
+          dotColor: 'bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)] animate-pulse',
+          headerTriggerClass: 'bg-amber-500/25 hover:bg-amber-500/35 text-amber-200 border-amber-400/50 shadow-[0_2px_14px_rgba(245,158,11,0.35)]',
+          popupBadgeClass: 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30',
         };
       }
       return {
         label: t('storeInfo.open'),
-        dotColor: 'bg-emerald-400 animate-pulse',
-        badgeClass: 'bg-emerald-950/80 text-emerald-200 border-emerald-500/50',
+        dotColor: 'bg-[var(--color-primary)] shadow-[0_0_8px_var(--color-primary)] animate-pulse',
+        headerTriggerClass: 'bg-[var(--color-primary)]/25 hover:bg-[var(--color-primary)]/35 text-white border-[var(--color-primary)]/50 shadow-sm',
+        popupBadgeClass: 'bg-[var(--color-primary)]/15 text-[var(--color-primary)] border-[var(--color-primary)]/30',
       };
     } else {
       const diffToOpen = openMinutes - currentMinutes;
       if (diffToOpen > 0 && diffToOpen <= 45) {
         return {
           label: t('header.aboutToOpen'),
-          dotColor: 'bg-sky-400 animate-pulse',
-          badgeClass: 'bg-sky-950/80 text-sky-200 border-sky-500/50',
+          dotColor: 'bg-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.8)] animate-pulse',
+          headerTriggerClass: 'bg-sky-500/25 hover:bg-sky-500/35 text-sky-200 border-sky-400/50 shadow-[0_2px_14px_rgba(56,189,248,0.35)]',
+          popupBadgeClass: 'bg-sky-500/15 text-sky-600 dark:text-sky-400 border-sky-500/30',
         };
       }
       return {
         label: t('storeInfo.closed'),
-        dotColor: 'bg-rose-400',
-        badgeClass: 'bg-rose-950/80 text-rose-200 border-rose-500/50',
+        dotColor: 'bg-rose-400 shadow-[0_0_8px_rgba(251,113,133,0.8)]',
+        headerTriggerClass: 'bg-rose-500/25 hover:bg-rose-500/35 text-rose-200 border-rose-400/50 shadow-[0_2px_14px_rgba(244,63,94,0.3)]',
+        popupBadgeClass: 'bg-rose-500/15 text-rose-600 dark:text-rose-400 border-rose-500/30',
       };
     }
   }, [isTemporarilyClosed, todaySchedule, isOpenNow, t]);
@@ -421,14 +461,14 @@ export const Header = memo(function Header() {
         rounded-b-[2rem] sm:rounded-b-[2.5rem]
         px-4 sm:px-8 lg:px-10
         pt-5 pb-4 sm:pt-7 sm:pb-6
-        shadow-2xl
+        shadow-[0_16px_40px_-12px_rgba(0,0,0,0.35)]
       "
       style={{
         backgroundColor: 'var(--color-secondary)',
         minHeight: 'clamp(160px, 20vw, 210px)',
       }}
     >
-      {/* ─── Background Layer with Multi-Tone Depth ─────────────────────── */}
+      {/* ─── Background Layer with Rich Multi-Tone Depth ─────────────────────── */}
       {backgroundImage ? (
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden rounded-b-[2rem] sm:rounded-b-[2.5rem]">
           <Image
@@ -440,20 +480,23 @@ export const Header = memo(function Header() {
             sizes="100vw"
             className="object-cover object-center"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-900/80 to-black/60 rtl:bg-gradient-to-l" />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/65 via-transparent to-[var(--color-secondary)]/90" />
+          {/* Neutral photographic scrim - avoids color distortion on food photography */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-black/30" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent rtl:from-black/80 rtl:via-black/40 rtl:to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[var(--color-secondary)]/80 to-transparent" />
         </div>
       ) : (
         <div
           className="absolute inset-0 z-0 pointer-events-none overflow-hidden rounded-b-[2rem] sm:rounded-b-[2.5rem]"
           style={{
             background:
-              'linear-gradient(135deg, var(--color-secondary) 0%, #090d16 60%, var(--color-primary) 100%)',
+              'linear-gradient(135deg, var(--color-secondary) 0%, #151b26 55%, var(--color-secondary) 100%)',
           }}
         >
-          <div className="absolute inset-0 bg-gradient-to-br from-black/40 via-transparent to-black/60" />
-          <div className="absolute -top-28 -end-28 w-80 h-80 rounded-full bg-[var(--color-accent)]/20 blur-3xl animate-pulse" />
-          <div className="absolute -bottom-20 -start-20 w-64 h-64 rounded-full bg-[var(--color-primary)]/40 blur-3xl" />
+          {/* Luminous brand aura glows (Primary emerald green & Accent cyan) */}
+          <div className="absolute -top-20 -end-20 w-80 h-80 rounded-full bg-[var(--color-accent)]/20 blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-16 -start-16 w-80 h-80 rounded-full bg-[var(--color-primary)]/25 blur-3xl pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/15 via-transparent to-black/35 pointer-events-none" />
         </div>
       )}
 
@@ -473,11 +516,12 @@ export const Header = memo(function Header() {
                 flex items-center justify-center
                 h-16 w-16 sm:h-20 sm:w-20 lg:h-24 lg:w-24
                 rounded-2xl
-                border-2 border-white/25
-                bg-white/10 backdrop-blur-2xl
-                shadow-[0_12px_30px_rgba(0,0,0,0.4)]
+                border border-white/25
+                bg-white/10 dark:bg-black/25 backdrop-blur-2xl
+                shadow-[0_10px_28px_rgba(0,0,0,0.3)]
+                ring-1 ring-white/15
                 transition-all duration-300
-                hover:scale-105 hover:border-[var(--color-accent)]/90
+                hover:scale-105 hover:border-[var(--color-primary)] hover:shadow-lg
                 overflow-hidden relative
               "
             >
@@ -507,99 +551,104 @@ export const Header = memo(function Header() {
                   setShowBranchesPopup(false);
                   setShowSocialPopup(false);
                 }}
-                className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-extrabold backdrop-blur-xl shadow-md border transition-all cursor-pointer hover:scale-105 active:scale-95 group ${storeStatusInfo.badgeClass}`}
+                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] sm:text-[11px] font-extrabold backdrop-blur-xl shadow-md border transition-all cursor-pointer hover:scale-105 active:scale-95 group ${storeStatusInfo.headerTriggerClass}`}
                 aria-expanded={showHoursPopup}
                 aria-haspopup="dialog"
                 title={t('header.hoursTooltip')}
               >
-                <span className={`h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full shadow-sm flex-shrink-0 ${storeStatusInfo.dotColor}`} />
+                <span className={`h-2 w-2 rounded-full shadow-sm flex-shrink-0 ${storeStatusInfo.dotColor}`} />
                 <span className="whitespace-nowrap">{storeStatusInfo.label}</span>
-                <Clock size={11} className="opacity-70 group-hover:opacity-100 transition-opacity flex-shrink-0 ms-0.5" />
+                <Clock size={11} className="opacity-75 group-hover:rotate-12 transition-transform duration-300" />
               </button>
 
-              {/* ─── DESKTOP DROPDOWN (Anchored under trigger on sm: and up) ─── */}
+              {/* ─── DESKTOP DROPDOWN: OPERATING HOURS ─── */}
               {showHoursPopup && (
                 <div
                   className={`
-                    hidden sm:block absolute top-full mt-2.5 z-50 max-h-[580px] sm:w-[420px] md:w-[460px] overflow-y-auto overscroll-contain touch-pan-y
-                    rounded-3xl bg-zinc-950/98 border border-white/[0.12]
-                    p-5 shadow-[0_20px_50px_rgba(0,0,0,0.6)]
-                    text-white animate-popup-dropdown
+                    hidden sm:block absolute top-full mt-2.5 z-50 max-h-[580px] sm:w-[410px] md:w-[440px] overflow-y-auto overscroll-contain touch-pan-y custom-scrollbar
+                    rounded-3xl bg-[var(--color-surface)]/95 dark:bg-[var(--color-surface)]/95
+                    backdrop-blur-2xl border border-[var(--color-border)]/90 dark:border-white/[0.12]
+                    p-5 sm:p-6 shadow-[0_24px_60px_-12px_rgba(0,0,0,0.25),0_0_0_1px_rgba(0,0,0,0.05)]
+                    dark:shadow-[0_25px_65px_-12px_rgba(0,0,0,0.7),0_0_0_1px_rgba(255,255,255,0.08)]
+                    text-[var(--color-text-primary)] animate-popup-dropdown
                     ${isRTL ? 'right-0 left-auto' : 'left-0 right-auto'}
                   `}
                   role="dialog"
                   aria-modal="true"
                 >
-                  {/* Hours Header */}
-                  <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-white/10">
+                  <div
+                    className="absolute inset-x-0 top-0 h-[2.5px] rounded-t-3xl pointer-events-none"
+                    style={{ background: 'var(--gradient-primary)' }}
+                  />
+
+                  {/* Header with Integrated Live Status */}
+                  <div className="flex items-center justify-between pb-3.5 mb-3.5 border-b border-[var(--color-border)]/60">
                     <div className="flex items-center gap-2.5">
-                      <div className="h-9 w-9 rounded-xl bg-[var(--color-accent)]/20 border border-[var(--color-accent)]/40 flex items-center justify-center text-[var(--color-accent)] shadow-sm">
-                        <Clock size={18} />
+                      <div className="h-9 w-9 rounded-xl bg-[var(--color-primary)]/15 border border-[var(--color-primary)]/30 flex items-center justify-center text-[var(--color-primary)] shadow-sm">
+                        <Clock size={17} />
                       </div>
                       <div>
-                        <h3 className="text-sm font-black tracking-tight text-white">
+                        <h3 className="text-sm font-bold tracking-tight text-[var(--color-text-primary)]">
                           {t('header.operatingHours')}
                         </h3>
-                        <p className="text-[11px] text-slate-400 font-medium">
+                        <p className="text-[11px] text-[var(--color-text-secondary)] font-medium">
                           {currentBranch?.name || brandName}
                         </p>
                       </div>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => setShowHoursPopup(false)}
-                      className="h-7 w-7 rounded-full bg-white/10 hover:bg-white/20 active:scale-90 flex items-center justify-center text-slate-300 hover:text-white transition-all cursor-pointer"
-                      aria-label={t('header.close')}
-                    >
-                      <X size={14} />
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <div className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border flex items-center gap-1.5 ${storeStatusInfo.popupBadgeClass}`}>
+                        <span className={`h-1.5 w-1.5 rounded-full ${storeStatusInfo.dotColor}`} />
+                        <span>{storeStatusInfo.label}</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setShowHoursPopup(false)}
+                        className="h-7 w-7 rounded-full bg-[var(--color-surface-subtle)] hover:bg-[var(--color-surface-elevated)] border border-[var(--color-border)]/60 active:scale-90 flex items-center justify-center text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-all cursor-pointer"
+                        aria-label={t('header.close')}
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
                   </div>
 
                   {/* Temporary Closure Warning */}
                   {isTemporarilyClosed && (
-                    <div className="mb-4 p-3.5 rounded-2xl bg-amber-500/15 border border-amber-500/40 flex items-start gap-2.5 text-xs text-amber-200">
-                      <AlertCircle size={17} className="flex-shrink-0 mt-0.5 text-amber-400" />
+                    <div className="mb-3.5 p-3 rounded-2xl bg-amber-500/15 border border-amber-500/35 flex items-start gap-2.5 text-xs text-amber-800 dark:text-amber-200">
+                      <AlertCircle size={16} className="flex-shrink-0 mt-0.5 text-amber-500" />
                       <div>
-                        <p className="font-black text-sm">{t('storeInfo.temporarilyClosed')}</p>
-                        {notes && <p className="text-[11px] text-amber-300/90 mt-1 leading-relaxed">{notes}</p>}
+                        <p className="font-bold text-xs">{t('storeInfo.temporarilyClosed')}</p>
+                        {notes && <p className="text-[11px] text-amber-700 dark:text-amber-300 mt-0.5 leading-relaxed">{notes}</p>}
                       </div>
                     </div>
                   )}
 
                   {/* Today Highlight Card */}
-                  <div className="mb-4 p-3.5 rounded-2xl bg-gradient-to-r from-[var(--color-primary)]/20 via-white/5 to-transparent border border-[var(--color-primary)]/30 flex items-center justify-between">
+                  <div className="mb-3.5 p-3.5 rounded-2xl bg-[var(--color-surface-subtle)]/70 border border-[var(--color-border)]/80 flex items-center justify-between">
                     <div>
-                      <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--color-accent)]">
-                        <span>{t('header.todaySchedule')}</span>
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--color-accent)] text-slate-950 font-black">
-                          {getLocalizedDayName(todayIndex, locale)}
-                        </span>
-                      </div>
-                      <div className="mt-1 font-mono text-sm sm:text-base font-black text-white">
+                      <span className="text-[11px] font-medium text-[var(--color-text-muted)] block">
+                        {t('header.todaySchedule')} • {getLocalizedDayName(todayIndex, locale)}
+                      </span>
+                      <span className="font-mono text-sm sm:text-base font-bold text-[var(--color-text-primary)] tracking-tight block mt-0.5">
                         {todaySchedule && !todaySchedule.isClosed && todaySchedule.open && todaySchedule.close
                           ? `${formatTimeLocalized(todaySchedule.open, locale)} – ${formatTimeLocalized(todaySchedule.close, locale)}`
                           : t('header.closedToday')}
-                      </div>
+                      </span>
                     </div>
-                    <div className={`px-2.5 py-1 rounded-full text-xs font-black border ${storeStatusInfo.badgeClass}`}>
-                      {storeStatusInfo.label}
-                    </div>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-[var(--color-primary)] text-[var(--color-on-primary)] shadow-sm">
+                      {t('header.today')}
+                    </span>
                   </div>
 
                   {/* ─── 7-Day Times Table ─── */}
-                  <div className="mb-2">
-                    <div className="flex items-center justify-between pb-2 mb-2.5 border-b border-white/10 text-xs font-bold text-slate-300">
-                      <div className="flex items-center gap-1.5 text-slate-300 font-extrabold">
-                        <Calendar size={13} className="text-[var(--color-accent)]" />
-                        <span>{t('header.weeklySchedule')}</span>
-                      </div>
-                      <span className="text-[10px] text-slate-400 font-normal">
-                        {t('header.localTime')}
-                      </span>
+                  <div>
+                    <div className="flex items-center justify-between pb-1.5 mb-2 border-b border-[var(--color-border)]/40 text-[11px] font-semibold text-[var(--color-text-muted)]">
+                      <span>{t('header.weeklySchedule')}</span>
+                      <span className="font-normal">{t('header.localTime')}</span>
                     </div>
 
                     {activeSchedule.length > 0 ? (
-                      <div className="space-y-1.5 max-h-56 overflow-y-auto overscroll-contain touch-pan-y pe-1 text-xs">
+                      <div className="space-y-1 max-h-56 overflow-y-auto overscroll-contain touch-pan-y pe-1 text-xs">
                         {fullWeeklySchedule.map((item) => {
                           const isToday = item.day === todayIndex;
                           const dayLabel = getLocalizedDayName(item.day, locale);
@@ -608,29 +657,22 @@ export const Header = memo(function Header() {
                           return (
                             <div
                               key={item.day}
-                              className={`flex items-center justify-between py-2 px-3 rounded-xl transition-colors duration-150 ${isToday
-                                ? 'bg-[var(--color-accent)]/20 font-bold text-white border border-[var(--color-accent)]/40 shadow-sm'
-                                : 'text-slate-300 hover:bg-white/5 border border-white/5'
+                              className={`flex items-center justify-between py-2 px-3 rounded-xl transition-colors ${isToday
+                                  ? 'bg-[var(--color-primary)]/10 text-[var(--color-text-primary)] font-bold border-s-2 border-[var(--color-primary)]'
+                                  : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-subtle)]/60'
                                 }`}
                             >
-                              <div className="flex items-center gap-2 min-w-0">
-                                <span className={`capitalize truncate text-xs ${isToday ? 'font-black text-[var(--color-accent)]' : 'font-medium'}`}>
-                                  {dayLabel}
-                                </span>
-                                {isToday && (
-                                  <span className="text-[9px] px-1.5 py-0.5 rounded-md bg-[var(--color-accent)] text-slate-950 font-black flex-shrink-0">
-                                    {t('header.today')}
-                                  </span>
-                                )}
-                              </div>
+                              <span className={`capitalize truncate text-xs ${isToday ? 'font-bold text-[var(--color-primary)]' : 'font-medium'}`}>
+                                {dayLabel}
+                              </span>
                               <div className="flex items-center gap-2">
-                                <span className="font-mono text-xs tracking-wide font-semibold text-white/90">
+                                <span className="font-mono text-xs tabular-nums">
                                   {isClosedDay
                                     ? t('storeInfo.closed')
                                     : `${formatTimeLocalized(item.open, locale)} – ${formatTimeLocalized(item.close, locale)}`}
                                 </span>
                                 <span
-                                  className={`w-2 h-2 rounded-full flex-shrink-0 ${isClosedDay ? 'bg-rose-500' : 'bg-emerald-400'
+                                  className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${isClosedDay ? 'bg-rose-500' : 'bg-emerald-400'
                                     }`}
                                 />
                               </div>
@@ -639,7 +681,7 @@ export const Header = memo(function Header() {
                         })}
                       </div>
                     ) : (
-                      <p className="text-xs text-slate-400 py-4 text-center">
+                      <p className="text-xs text-[var(--color-text-muted)] py-3 text-center">
                         {todaySchedule && todaySchedule.open && todaySchedule.close
                           ? `${t('header.today')}: ${formatTimeLocalized(todaySchedule.open, locale)} – ${formatTimeLocalized(todaySchedule.close, locale)}`
                           : t('header.hoursNotAvailable')}
@@ -648,104 +690,96 @@ export const Header = memo(function Header() {
                   </div>
 
                   {notes && !isTemporarilyClosed && (
-                    <div className="mt-4 pt-3 border-t border-white/10 text-xs text-slate-300 leading-relaxed bg-white/5 p-3 rounded-2xl">
-                      <span className="font-black text-white">{t('header.importantNotes')}</span>
+                    <div className="mt-3 pt-2.5 border-t border-[var(--color-border)]/60 text-xs text-[var(--color-text-secondary)] leading-relaxed bg-[var(--color-surface-subtle)]/60 p-2.5 rounded-xl">
+                      <span className="font-bold text-[var(--color-text-primary)]">{t('header.importantNotes')}</span>
                       {notes}
                     </div>
                   )}
                 </div>
               )}
 
-              {/* ─── MOBILE FULL-SCREEN MODAL PORTAL (Covers 100% viewport) ─── */}
+              {/* ─── MOBILE MODAL PORTAL: OPERATING HOURS ─── */}
               {mounted && showHoursPopup && createPortal(
                 <div className="fixed inset-0 z-[998] sm:hidden">
-                  {/* Full Page Mobile Backdrop */}
                   <button
                     type="button"
                     aria-label={t('header.close')}
-                    className="fixed inset-0 bg-black/75 animate-popup-backdrop w-full h-full cursor-default border-none outline-none touch-none"
+                    className="fixed inset-0 bg-black/60 backdrop-blur-sm animate-popup-backdrop w-full h-full cursor-default border-none outline-none touch-none"
                     onClick={() => setShowHoursPopup(false)}
                     onTouchMove={(e) => e.preventDefault()}
                   />
 
-                  {/* Mobile Bottom Sheet Card */}
                   <div
-                    className="fixed inset-x-0 bottom-0 z-[999] max-h-[85dvh] overflow-y-auto overscroll-contain touch-pan-y rounded-t-3xl bg-zinc-950 border-t border-white/[0.12] p-5 pb-8 shadow-2xl text-white animate-popup-sheet"
+                    className="fixed inset-x-0 bottom-0 z-[999] max-h-[85dvh] overflow-y-auto overscroll-contain touch-pan-y rounded-t-[2rem] bg-[var(--color-surface)] dark:bg-[var(--color-surface)] border-t border-[var(--color-border)] dark:border-white/[0.12] p-5 pb-9 shadow-2xl text-[var(--color-text-primary)] animate-popup-sheet custom-scrollbar"
                     role="dialog"
                     aria-modal="true"
                   >
-                    <div className="w-10 h-1 bg-white/20 rounded-full mx-auto mb-3" />
+                    <div className="w-12 h-1.5 bg-[var(--color-border-strong)] rounded-full mx-auto mb-4 opacity-50" />
 
-                    {/* Hours Header */}
-                    <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-white/10">
+                    <div className="flex items-center justify-between pb-3.5 mb-3.5 border-b border-[var(--color-border)]/60">
                       <div className="flex items-center gap-2.5">
-                        <div className="h-9 w-9 rounded-xl bg-[var(--color-accent)]/20 border border-[var(--color-accent)]/40 flex items-center justify-center text-[var(--color-accent)] shadow-sm">
-                          <Clock size={18} />
+                        <div className="h-9 w-9 rounded-xl bg-[var(--color-primary)]/15 border border-[var(--color-primary)]/30 flex items-center justify-center text-[var(--color-primary)] shadow-sm">
+                          <Clock size={17} />
                         </div>
                         <div>
-                          <h3 className="text-sm font-black tracking-tight text-white">
+                          <h3 className="text-sm font-bold tracking-tight text-[var(--color-text-primary)]">
                             {t('header.operatingHours')}
                           </h3>
-                          <p className="text-[11px] text-slate-400 font-medium">
+                          <p className="text-[11px] text-[var(--color-text-secondary)] font-medium">
                             {currentBranch?.name || brandName}
                           </p>
                         </div>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => setShowHoursPopup(false)}
-                        className="h-7 w-7 rounded-full bg-white/10 hover:bg-white/20 active:scale-90 flex items-center justify-center text-slate-300 hover:text-white transition-all cursor-pointer"
-                        aria-label={t('header.close')}
-                      >
-                        <X size={14} />
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <div className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border flex items-center gap-1.5 ${storeStatusInfo.popupBadgeClass}`}>
+                          <span className={`h-1.5 w-1.5 rounded-full ${storeStatusInfo.dotColor}`} />
+                          <span>{storeStatusInfo.label}</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setShowHoursPopup(false)}
+                          className="h-7 w-7 rounded-full bg-[var(--color-surface-subtle)] hover:bg-[var(--color-surface-elevated)] border border-[var(--color-border)]/60 active:scale-90 flex items-center justify-center text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-all cursor-pointer"
+                          aria-label={t('header.close')}
+                        >
+                          <X size={14} />
+                        </button>
+                      </div>
                     </div>
 
-                    {/* Temporary Closure Warning */}
                     {isTemporarilyClosed && (
-                      <div className="mb-4 p-3.5 rounded-2xl bg-amber-500/15 border border-amber-500/40 flex items-start gap-2.5 text-xs text-amber-200">
-                        <AlertCircle size={17} className="flex-shrink-0 mt-0.5 text-amber-400" />
+                      <div className="mb-3.5 p-3 rounded-2xl bg-amber-500/15 border border-amber-500/35 flex items-start gap-2.5 text-xs text-amber-800 dark:text-amber-200">
+                        <AlertCircle size={16} className="flex-shrink-0 mt-0.5 text-amber-500" />
                         <div>
-                          <p className="font-black text-sm">{t('storeInfo.temporarilyClosed')}</p>
-                          {notes && <p className="text-[11px] text-amber-300/90 mt-1 leading-relaxed">{notes}</p>}
+                          <p className="font-bold text-xs">{t('storeInfo.temporarilyClosed')}</p>
+                          {notes && <p className="text-[11px] text-amber-700 dark:text-amber-300 mt-0.5 leading-relaxed">{notes}</p>}
                         </div>
                       </div>
                     )}
 
-                    {/* Today Highlight Card */}
-                    <div className="mb-4 p-3.5 rounded-2xl bg-gradient-to-r from-[var(--color-primary)]/20 via-white/5 to-transparent border border-[var(--color-primary)]/30 flex items-center justify-between">
+                    <div className="mb-3.5 p-3.5 rounded-2xl bg-[var(--color-surface-subtle)]/70 border border-[var(--color-border)]/80 flex items-center justify-between">
                       <div>
-                        <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--color-accent)]">
-                          <span>{t('header.todaySchedule')}</span>
-                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--color-accent)] text-slate-950 font-black">
-                            {getLocalizedDayName(todayIndex, locale)}
-                          </span>
-                        </div>
-                        <div className="mt-1 font-mono text-sm sm:text-base font-black text-white">
+                        <span className="text-[11px] font-medium text-[var(--color-text-muted)] block">
+                          {t('header.todaySchedule')} • {getLocalizedDayName(todayIndex, locale)}
+                        </span>
+                        <span className="font-mono text-sm sm:text-base font-bold text-[var(--color-text-primary)] tracking-tight block mt-0.5">
                           {todaySchedule && !todaySchedule.isClosed && todaySchedule.open && todaySchedule.close
                             ? `${formatTimeLocalized(todaySchedule.open, locale)} – ${formatTimeLocalized(todaySchedule.close, locale)}`
                             : t('header.closedToday')}
-                        </div>
+                        </span>
                       </div>
-                      <div className={`px-2.5 py-1 rounded-full text-xs font-black border ${storeStatusInfo.badgeClass}`}>
-                        {storeStatusInfo.label}
-                      </div>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-[var(--color-primary)] text-[var(--color-on-primary)] shadow-sm">
+                        {t('header.today')}
+                      </span>
                     </div>
 
-                    {/* ─── 7-Day Times Table ─── */}
-                    <div className="mb-2">
-                      <div className="flex items-center justify-between pb-2 mb-2.5 border-b border-white/10 text-xs font-bold text-slate-300">
-                        <div className="flex items-center gap-1.5 text-slate-300 font-extrabold">
-                          <Calendar size={13} className="text-[var(--color-accent)]" />
-                          <span>{t('header.weeklySchedule')}</span>
-                        </div>
-                        <span className="text-[10px] text-slate-400 font-normal">
-                          {t('header.localTime')}
-                        </span>
+                    <div>
+                      <div className="flex items-center justify-between pb-1.5 mb-2 border-b border-[var(--color-border)]/40 text-[11px] font-semibold text-[var(--color-text-muted)]">
+                        <span>{t('header.weeklySchedule')}</span>
+                        <span className="font-normal">{t('header.localTime')}</span>
                       </div>
 
                       {activeSchedule.length > 0 ? (
-                        <div className="space-y-1.5 max-h-56 overflow-y-auto pe-1 text-xs">
+                        <div className="space-y-1 max-h-56 overflow-y-auto pe-1 text-xs">
                           {fullWeeklySchedule.map((item) => {
                             const isToday = item.day === todayIndex;
                             const dayLabel = getLocalizedDayName(item.day, locale);
@@ -754,29 +788,22 @@ export const Header = memo(function Header() {
                             return (
                               <div
                                 key={item.day}
-                                className={`flex items-center justify-between py-2 px-3 rounded-xl transition-all ${isToday
-                                  ? 'bg-[var(--color-accent)]/20 font-bold text-white border border-[var(--color-accent)]/40 shadow-sm'
-                                  : 'text-slate-300 hover:bg-white/5 border border-white/5'
+                                className={`flex items-center justify-between py-2 px-3 rounded-xl transition-colors ${isToday
+                                    ? 'bg-[var(--color-primary)]/10 text-[var(--color-text-primary)] font-bold border-s-2 border-[var(--color-primary)]'
+                                    : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-subtle)]/60'
                                   }`}
                               >
-                                <div className="flex items-center gap-2 min-w-0">
-                                  <span className={`capitalize truncate text-xs ${isToday ? 'font-black text-[var(--color-accent)]' : 'font-medium'}`}>
-                                    {dayLabel}
-                                  </span>
-                                  {isToday && (
-                                    <span className="text-[9px] px-1.5 py-0.5 rounded-md bg-[var(--color-accent)] text-slate-950 font-black flex-shrink-0">
-                                      {t('header.today')}
-                                    </span>
-                                  )}
-                                </div>
+                                <span className={`capitalize truncate text-xs ${isToday ? 'font-bold text-[var(--color-primary)]' : 'font-medium'}`}>
+                                  {dayLabel}
+                                </span>
                                 <div className="flex items-center gap-2">
-                                  <span className="font-mono text-xs tracking-wide font-semibold text-white/90">
+                                  <span className="font-mono text-xs tabular-nums">
                                     {isClosedDay
                                       ? t('storeInfo.closed')
                                       : `${formatTimeLocalized(item.open, locale)} – ${formatTimeLocalized(item.close, locale)}`}
                                   </span>
                                   <span
-                                    className={`w-2 h-2 rounded-full flex-shrink-0 ${isClosedDay ? 'bg-rose-500' : 'bg-emerald-400'
+                                    className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${isClosedDay ? 'bg-rose-500' : 'bg-[var(--color-primary)]'
                                       }`}
                                   />
                                 </div>
@@ -785,7 +812,7 @@ export const Header = memo(function Header() {
                           })}
                         </div>
                       ) : (
-                        <p className="text-xs text-slate-400 py-4 text-center">
+                        <p className="text-xs text-[var(--color-text-muted)] py-3 text-center">
                           {todaySchedule && todaySchedule.open && todaySchedule.close
                             ? `${t('header.today')}: ${formatTimeLocalized(todaySchedule.open, locale)} – ${formatTimeLocalized(todaySchedule.close, locale)}`
                             : t('header.hoursNotAvailable')}
@@ -794,8 +821,8 @@ export const Header = memo(function Header() {
                     </div>
 
                     {notes && !isTemporarilyClosed && (
-                      <div className="mt-4 pt-3 border-t border-white/10 text-xs text-slate-300 leading-relaxed bg-white/5 p-3 rounded-2xl">
-                        <span className="font-black text-white">{t('header.importantNotes')}</span>
+                      <div className="mt-3 pt-2.5 border-t border-[var(--color-border)]/60 text-xs text-[var(--color-text-secondary)] leading-relaxed bg-[var(--color-surface-subtle)]/60 p-2.5 rounded-xl">
+                        <span className="font-bold text-[var(--color-text-primary)]">{t('header.importantNotes')}</span>
                         {notes}
                       </div>
                     )}
@@ -812,9 +839,9 @@ export const Header = memo(function Header() {
               {/* Brand Name */}
               <h1
                 className="
-                text-4xl sm:text-5xl
+                text-2xl xs:text-3xl sm:text-4xl lg:text-5xl
                 font-black tracking-tight leading-tight
-                text-white drop-shadow-[0_3px_10px_rgba(0,0,0,0.7)]
+                text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.6)]
                 truncate max-w-[220px] xs:max-w-xs sm:max-w-md lg:max-w-xl
               "
                 style={{ fontFamily: 'var(--font-display)' }}
@@ -824,14 +851,14 @@ export const Header = memo(function Header() {
 
               {/* Slogan */}
               {slogan && (
-                <p className="text-xs sm:text-sm font-medium text-slate-200/90 drop-shadow-[0_1px_3px_rgba(0,0,0,0.6)]">
+                <p className="text-xs sm:text-sm font-semibold text-white/90 drop-shadow-[0_1px_4px_rgba(0,0,0,0.7)] mt-0.5 truncate">
                   {slogan}
                 </p>
               )}
             </div>
 
-            {/* Separator Beneath Slogan */}
-            <div className="my-2 h-[2px] max-w-xs sm:max-w-xs rounded-full bg-gradient-to-r rtl:bg-gradient-to-l from-[var(--color-accent)] via-[var(--color-accent)]/50 to-transparent shadow-md" />
+            {/* Separator Beneath Slogan with Dynamic Glowing Ambient Aura */}
+            <div className="my-2 h-[2px] max-w-xs sm:max-w-xs rounded-full bg-gradient-to-r rtl:bg-gradient-to-l from-[var(--color-primary)] via-[var(--color-primary)]/40 to-transparent shadow-sm opacity-90" />
 
             {/* ─── ONE-ROW MODERN TOOLBAR ─── */}
             <div className="flex flex-wrap items-center gap-2 text-xs">
@@ -845,20 +872,20 @@ export const Header = memo(function Header() {
                       setShowHoursPopup(false);
                       setShowSocialPopup(false);
                     }}
-                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl backdrop-blur-2xl border text-white font-bold transition-all cursor-pointer shadow-sm group ${showBranchesPopup
-                      ? 'bg-white/25 border-[var(--color-accent)] ring-1 ring-[var(--color-accent)]/50'
-                      : 'bg-white/15 hover:bg-white/25 border-white/25'
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl backdrop-blur-xl border font-bold transition-all duration-200 cursor-pointer shadow-sm active:scale-95 group ${showBranchesPopup
+                      ? 'bg-white/20 text-white border-[var(--color-primary)] ring-2 ring-[var(--color-primary)]/40 shadow-md'
+                      : 'bg-white/10 hover:bg-white/15 text-white/95 border-white/20 hover:border-white/35'
                       }`}
                     aria-expanded={showBranchesPopup}
                     aria-haspopup="dialog"
                     aria-label={t('storeInfo.selectBranch')}
                   >
-                    <Store size={14} className="text-[var(--color-accent)] group-hover:scale-110 transition-transform flex-shrink-0" />
+                    <Store size={14} className="text-[var(--color-primary)] group-hover:scale-110 transition-transform flex-shrink-0" />
                     <span className="truncate max-w-[130px] xs:max-w-[180px] sm:max-w-[260px] md:max-w-[320px]">
                       {currentBranch?.name || t('header.branches')}
                     </span>
                     {branches.length > 1 && (
-                      <span className="ms-1 px-1.5 py-0.5 rounded-md text-[10px] font-black bg-white/20 text-white flex-shrink-0">
+                      <span className="ms-1 px-1.5 py-0.5 rounded-md text-[10px] font-black bg-[var(--color-primary)] text-[var(--color-on-primary)] flex-shrink-0 shadow-sm">
                         {branches.length}
                       </span>
                     )}
@@ -869,30 +896,37 @@ export const Header = memo(function Header() {
                     />
                   </button>
 
-                  {/* ─── DESKTOP DROPDOWN (Anchored under trigger on sm: and up) ─── */}
+                  {/* ─── DESKTOP DROPDOWN: BRANCHES ─── */}
                   {showBranchesPopup && (
                     <div
                       className={`
-                        hidden sm:block absolute top-full mt-2.5 z-50 max-h-[580px] sm:w-[480px] md:w-[540px] overflow-y-auto overscroll-contain touch-pan-y
-                        rounded-3xl bg-zinc-950/98 border border-white/[0.12]
-                        p-5 shadow-[0_20px_50px_rgba(0,0,0,0.6)]
-                        text-white animate-popup-dropdown
+                        hidden sm:block absolute top-full mt-2.5 z-50 max-h-[580px] sm:w-[450px] md:w-[490px] overflow-y-auto overscroll-contain touch-pan-y custom-scrollbar
+                        rounded-3xl bg-[var(--color-surface)]/95 dark:bg-[var(--color-surface)]/95
+                        backdrop-blur-2xl border border-[var(--color-border)]/90 dark:border-white/[0.12]
+                        p-5 sm:p-6 shadow-[0_24px_60px_-12px_rgba(0,0,0,0.25),0_0_0_1px_rgba(0,0,0,0.05)]
+                        dark:shadow-[0_25px_65px_-12px_rgba(0,0,0,0.7),0_0_0_1px_rgba(255,255,255,0.08)]
+                        text-[var(--color-text-primary)] animate-popup-dropdown
                         ${isRTL ? 'right-0 left-auto' : 'left-0 right-auto'}
                       `}
                       role="dialog"
                       aria-modal="true"
                     >
+                      <div
+                        className="absolute inset-x-0 top-0 h-[2.5px] rounded-t-3xl pointer-events-none"
+                        style={{ background: 'var(--gradient-primary)' }}
+                      />
+
                       {/* Branches Header */}
-                      <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-white/[0.08]">
+                      <div className="flex items-center justify-between pb-3.5 mb-3.5 border-b border-[var(--color-border)]/60">
                         <div className="flex items-center gap-2.5">
-                          <div className="h-9 w-9 rounded-xl bg-[var(--color-accent)]/15 border border-[var(--color-accent)]/30 flex items-center justify-center text-[var(--color-accent)] shadow-sm">
-                            <Store size={18} />
+                          <div className="h-9 w-9 rounded-xl bg-[var(--color-primary)]/15 border border-[var(--color-primary)]/30 flex items-center justify-center text-[var(--color-primary)] shadow-sm">
+                            <Store size={17} />
                           </div>
                           <div>
-                            <h3 className="text-sm font-bold tracking-tight text-zinc-100">
+                            <h3 className="text-sm font-bold tracking-tight text-[var(--color-text-primary)]">
                               {t('header.branchesTitle')}
                             </h3>
-                            <p className="text-[11px] text-zinc-400 font-medium">
+                            <p className="text-[11px] text-[var(--color-text-secondary)] font-medium">
                               {branches.length} {branches.length === 1 ? t('header.availableBranchSingle') : t('header.availableBranchPlural')}
                             </p>
                           </div>
@@ -900,7 +934,7 @@ export const Header = memo(function Header() {
                         <button
                           type="button"
                           onClick={() => setShowBranchesPopup(false)}
-                          className="h-7 w-7 rounded-full bg-white/10 hover:bg-white/15 active:scale-90 flex items-center justify-center text-zinc-300 hover:text-white transition-all cursor-pointer"
+                          className="h-7 w-7 rounded-full bg-[var(--color-surface-subtle)] hover:bg-[var(--color-surface-elevated)] border border-[var(--color-border)]/60 active:scale-90 flex items-center justify-center text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-all cursor-pointer"
                           aria-label={t('header.close')}
                         >
                           <X size={14} />
@@ -908,12 +942,12 @@ export const Header = memo(function Header() {
                       </div>
 
                       {/* Instructions Hint */}
-                      <p className="text-xs text-zinc-400 mb-3 px-1">
+                      <p className="text-xs text-[var(--color-text-muted)] mb-3 px-0.5">
                         {t('header.selectBranchHint')}
                       </p>
 
-                      {/* Spacious Branches List */}
-                      <div className="space-y-2.5 max-h-[380px] overflow-y-auto overscroll-contain touch-pan-y pe-1.5">
+                      {/* Branches List */}
+                      <div className="space-y-2.5 max-h-[380px] overflow-y-auto overscroll-contain touch-pan-y pe-1">
                         {branches.map((b) => {
                           const isSelected = String(b.id) === String(activeBranchId);
                           const branchLoc = b.address?.formattedAddress || b.location;
@@ -925,91 +959,75 @@ export const Header = memo(function Header() {
                           return (
                             <div
                               key={b.id}
-                              className={`w-full flex flex-col text-start p-3.5 rounded-2xl transition-colors duration-150 cursor-pointer border ${isSelected
-                                ? 'bg-white/[0.08] border-[var(--color-accent)] shadow-lg ring-1 ring-[var(--color-accent)]/30'
-                                : 'hover:bg-white/[0.08] text-zinc-200 bg-white/[0.04] border-white/[0.08] hover:border-white/[0.15]'
+                              className={`w-full flex flex-col text-start p-3.5 rounded-2xl transition-all duration-200 cursor-pointer border ${isSelected
+                                  ? 'bg-[var(--color-primary)]/8 border-[var(--color-primary)] shadow-md ring-1 ring-[var(--color-primary)]/30'
+                                  : 'bg-[var(--color-surface-subtle)]/50 hover:bg-[var(--color-surface-subtle)] border-[var(--color-border)]/70 hover:border-[var(--color-primary)]/40'
                                 }`}
                               onClick={() => {
                                 setActiveBranchId(b.id);
                                 setShowBranchesPopup(false);
                               }}
                             >
-                              {/* Top Row: Name, Main Badge, Checkmark */}
                               <div className="flex items-start justify-between gap-3">
                                 <div className="flex-1 min-w-0">
-                                  <div className="flex flex-wrap items-center gap-2 mb-1">
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <h4 className={`font-bold text-sm leading-snug truncate ${isSelected ? 'text-[var(--color-primary)]' : 'text-[var(--color-text-primary)]'
+                                      }`}>
+                                      {b.name}
+                                    </h4>
                                     {b.isMainBranch && (
-                                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-400/15 text-amber-300 border border-amber-400/30">
+                                      <span className="px-1.5 py-0.5 rounded-md text-[9px] font-bold bg-[var(--color-primary)]/15 text-[var(--color-primary)] border border-[var(--color-primary)]/30 flex-shrink-0">
                                         {t('header.mainBranch')}
                                       </span>
                                     )}
-                                    {isSelected && (
-                                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[var(--color-accent)] text-zinc-950">
-                                        {t('header.activeBranch')}
-                                      </span>
-                                    )}
                                   </div>
-                                  <h4 className="font-bold text-sm text-zinc-100 leading-snug break-words">
-                                    {b.name}
-                                  </h4>
+                                  {branchLoc && (
+                                    <p className="text-xs text-[var(--color-text-secondary)] flex items-center gap-1.5 truncate">
+                                      <MapPin size={12} className="text-[var(--color-text-muted)] flex-shrink-0" />
+                                      <span className="truncate">{branchLoc}</span>
+                                    </p>
+                                  )}
                                 </div>
 
                                 <div className="flex-shrink-0 pt-0.5">
                                   <div
-                                    className={`h-6 w-6 rounded-full flex items-center justify-center border transition-all ${isSelected
-                                      ? 'bg-[var(--color-accent)] border-[var(--color-accent)] text-zinc-950 shadow-md'
-                                      : 'border-white/20 bg-white/5'
+                                    className={`h-5 w-5 rounded-full flex items-center justify-center border transition-all ${isSelected
+                                        ? 'bg-[var(--color-primary)] border-[var(--color-primary)] text-[var(--color-on-primary)] shadow-sm'
+                                        : 'border-[var(--color-border-strong)] bg-[var(--color-surface)]'
                                       }`}
                                   >
-                                    {isSelected ? (
-                                      <Check size={14} strokeWidth={3} />
-                                    ) : (
-                                      <span className="h-2 w-2 rounded-full bg-white/40" />
-                                    )}
+                                    {isSelected && <Check size={12} strokeWidth={3} />}
                                   </div>
                                 </div>
                               </div>
 
-                              {/* Middle Row: Address & Location */}
-                              {branchLoc && (
-                                <div className="flex items-start gap-2 mt-2 pt-2 border-t border-white/[0.08] text-xs text-zinc-400">
-                                  <MapPin size={13} className="text-[var(--color-accent)] flex-shrink-0 mt-0.5" />
-                                  <span className="leading-relaxed break-words flex-1">
-                                    {branchLoc}
-                                  </span>
+                              {(mapsUrl || (typeof branchPhone === 'string' && branchPhone.trim())) && (
+                                <div className="flex items-center gap-2 mt-2.5 pt-2 border-t border-[var(--color-border)]/40">
+                                  {mapsUrl && (
+                                    <a
+                                      href={mapsUrl}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      onClick={(e) => e.stopPropagation()}
+                                      className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-[var(--color-surface)] hover:bg-[var(--color-primary)]/10 text-[var(--color-primary)] border border-[var(--color-border)]/80 transition-colors cursor-pointer"
+                                    >
+                                      <Navigation size={11} />
+                                      <span>{t('header.directionsAndMap')}</span>
+                                    </a>
+                                  )}
+                                  {typeof branchPhone === 'string' && branchPhone.trim() && (
+                                    <a
+                                      href={`tel:${branchPhone.trim()}`}
+                                      onClick={(e) => e.stopPropagation()}
+                                      className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-[var(--color-surface)] hover:bg-[var(--color-primary)]/10 text-[var(--color-primary)] border border-[var(--color-border)]/80 transition-colors cursor-pointer"
+                                      dir="ltr"
+                                    >
+                                      <Phone size={11} />
+                                      <span>{branchPhone.trim()}</span>
+                                    </a>
+                                  )}
                                 </div>
                               )}
-
-                              {/* Bottom Action Row: Directions & Map Link + Phone */}
-                              <div className="flex flex-wrap items-center justify-between gap-2 mt-2.5 pt-2 border-t border-white/[0.08]">
-                                {mapsUrl ? (
-                                  <a
-                                    href={mapsUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    onClick={(e) => e.stopPropagation()}
-                                    className="inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-[var(--color-accent)] border border-white/[0.08] transition-colors shadow-sm cursor-pointer"
-                                  >
-                                    <Navigation size={12} className="flex-shrink-0" />
-                                    <span>{t('header.directionsAndMap')}</span>
-                                    <ExternalLink size={10} className="opacity-70 flex-shrink-0" />
-                                  </a>
-                                ) : (
-                                  <span />
-                                )}
-
-                                {typeof branchPhone === 'string' && branchPhone.trim() && (
-                                  <a
-                                    href={`tel:${branchPhone.trim()}`}
-                                    onClick={(e) => e.stopPropagation()}
-                                    className="inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-zinc-200 border border-white/[0.08] transition-colors shadow-sm cursor-pointer"
-                                    dir="ltr"
-                                  >
-                                    <Phone size={12} className="text-emerald-400 flex-shrink-0" />
-                                    <span>{branchPhone.trim()}</span>
-                                  </a>
-                                )}
-                              </div>
                             </div>
                           );
                         })}
@@ -1017,37 +1035,34 @@ export const Header = memo(function Header() {
                     </div>
                   )}
 
-                  {/* ─── MOBILE FULL-SCREEN MODAL PORTAL (Covers 100% viewport) ─── */}
+                  {/* ─── MOBILE MODAL PORTAL: BRANCHES ─── */}
                   {mounted && showBranchesPopup && createPortal(
                     <div className="fixed inset-0 z-[998] sm:hidden">
-                      {/* Full Page Mobile Backdrop */}
                       <button
                         type="button"
                         aria-label={t('header.close')}
-                        className="fixed inset-0 bg-black/75 animate-popup-backdrop w-full h-full cursor-default border-none outline-none touch-none"
+                        className="fixed inset-0 bg-black/60 backdrop-blur-sm animate-popup-backdrop w-full h-full cursor-default border-none outline-none touch-none"
                         onClick={() => setShowBranchesPopup(false)}
                         onTouchMove={(e) => e.preventDefault()}
                       />
 
-                      {/* Mobile Bottom Sheet Card */}
                       <div
-                        className="fixed inset-x-0 bottom-0 z-[999] max-h-[85dvh] overflow-y-auto overscroll-contain touch-pan-y rounded-t-3xl bg-zinc-950 border-t border-white/[0.12] p-5 pb-8 shadow-2xl text-white animate-popup-sheet"
+                        className="fixed inset-x-0 bottom-0 z-[999] max-h-[85dvh] overflow-y-auto overscroll-contain touch-pan-y rounded-t-[2rem] bg-[var(--color-surface)] dark:bg-[var(--color-surface)] border-t border-[var(--color-border)] dark:border-white/[0.12] p-5 pb-9 shadow-2xl text-[var(--color-text-primary)] animate-popup-sheet custom-scrollbar"
                         role="dialog"
                         aria-modal="true"
                       >
-                        <div className="w-10 h-1 bg-white/20 rounded-full mx-auto mb-3" />
+                        <div className="w-12 h-1.5 bg-[var(--color-border-strong)] rounded-full mx-auto mb-4 opacity-50" />
 
-                        {/* Branches Header */}
-                        <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-white/[0.08]">
+                        <div className="flex items-center justify-between pb-3.5 mb-3.5 border-b border-[var(--color-border)]/60">
                           <div className="flex items-center gap-2.5">
-                            <div className="h-9 w-9 rounded-xl bg-[var(--color-accent)]/15 border border-[var(--color-accent)]/30 flex items-center justify-center text-[var(--color-accent)] shadow-sm">
-                              <Store size={18} />
+                            <div className="h-9 w-9 rounded-xl bg-[var(--color-primary)]/15 border border-[var(--color-primary)]/30 flex items-center justify-center text-[var(--color-primary)] shadow-sm">
+                              <Store size={17} />
                             </div>
                             <div>
-                              <h3 className="text-sm font-bold tracking-tight text-zinc-100">
+                              <h3 className="text-sm font-bold tracking-tight text-[var(--color-text-primary)]">
                                 {t('header.branchesTitle')}
                               </h3>
-                              <p className="text-[11px] text-zinc-400 font-medium">
+                              <p className="text-[11px] text-[var(--color-text-secondary)] font-medium">
                                 {branches.length} {branches.length === 1 ? t('header.availableBranchSingle') : t('header.availableBranchPlural')}
                               </p>
                             </div>
@@ -1055,20 +1070,18 @@ export const Header = memo(function Header() {
                           <button
                             type="button"
                             onClick={() => setShowBranchesPopup(false)}
-                            className="h-7 w-7 rounded-full bg-white/10 hover:bg-white/15 active:scale-90 flex items-center justify-center text-zinc-300 hover:text-white transition-all cursor-pointer"
+                            className="h-7 w-7 rounded-full bg-[var(--color-surface-subtle)] hover:bg-[var(--color-surface-elevated)] border border-[var(--color-border)]/60 active:scale-90 flex items-center justify-center text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-all cursor-pointer"
                             aria-label={t('header.close')}
                           >
                             <X size={14} />
                           </button>
                         </div>
 
-                        {/* Instructions Hint */}
-                        <p className="text-xs text-zinc-400 mb-3 px-1">
+                        <p className="text-xs text-[var(--color-text-muted)] mb-3 px-0.5">
                           {t('header.selectBranchHint')}
                         </p>
 
-                        {/* Spacious Branches List */}
-                        <div className="space-y-2.5 max-h-[50vh] overflow-y-auto overscroll-contain touch-pan-y pe-1.5">
+                        <div className="space-y-2.5 max-h-[50vh] overflow-y-auto overscroll-contain touch-pan-y pe-1">
                           {branches.map((b) => {
                             const isSelected = String(b.id) === String(activeBranchId);
                             const branchLoc = b.address?.formattedAddress || b.location;
@@ -1080,91 +1093,75 @@ export const Header = memo(function Header() {
                             return (
                               <div
                                 key={b.id}
-                                className={`w-full flex flex-col text-start p-3.5 rounded-2xl transition-colors duration-150 cursor-pointer border ${isSelected
-                                  ? 'bg-white/[0.08] border-[var(--color-accent)] shadow-lg ring-1 ring-[var(--color-accent)]/30'
-                                  : 'hover:bg-white/[0.08] text-zinc-200 bg-white/[0.04] border-white/[0.08] hover:border-white/[0.15]'
+                                className={`w-full flex flex-col text-start p-3.5 rounded-2xl transition-all duration-200 cursor-pointer border ${isSelected
+                                    ? 'bg-[var(--color-primary)]/8 border-[var(--color-primary)] shadow-md ring-1 ring-[var(--color-primary)]/30'
+                                    : 'bg-[var(--color-surface-subtle)]/50 hover:bg-[var(--color-surface-subtle)] border-[var(--color-border)]/70 hover:border-[var(--color-primary)]/40'
                                   }`}
                                 onClick={() => {
                                   setActiveBranchId(b.id);
                                   setShowBranchesPopup(false);
                                 }}
                               >
-                                {/* Top Row: Name, Main Badge, Checkmark */}
                                 <div className="flex items-start justify-between gap-3">
                                   <div className="flex-1 min-w-0">
-                                    <div className="flex flex-wrap items-center gap-2 mb-1">
+                                    <div className="flex items-center gap-2 mb-1">
+                                      <h4 className={`font-bold text-sm leading-snug truncate ${isSelected ? 'text-[var(--color-primary)]' : 'text-[var(--color-text-primary)]'
+                                        }`}>
+                                        {b.name}
+                                      </h4>
                                       {b.isMainBranch && (
-                                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-400/15 text-amber-300 border border-amber-400/30">
+                                        <span className="px-1.5 py-0.5 rounded-md text-[9px] font-bold bg-[var(--color-primary)]/15 text-[var(--color-primary)] border border-[var(--color-primary)]/30 flex-shrink-0">
                                           {t('header.mainBranch')}
                                         </span>
                                       )}
-                                      {isSelected && (
-                                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[var(--color-accent)] text-zinc-950">
-                                          {t('header.activeBranch')}
-                                        </span>
-                                      )}
                                     </div>
-                                    <h4 className="font-bold text-sm text-zinc-100 leading-snug break-words">
-                                      {b.name}
-                                    </h4>
+                                    {branchLoc && (
+                                      <p className="text-xs text-[var(--color-text-secondary)] flex items-center gap-1.5 truncate">
+                                        <MapPin size={12} className="text-[var(--color-text-muted)] flex-shrink-0" />
+                                        <span className="truncate">{branchLoc}</span>
+                                      </p>
+                                    )}
                                   </div>
 
                                   <div className="flex-shrink-0 pt-0.5">
                                     <div
-                                      className={`h-6 w-6 rounded-full flex items-center justify-center border transition-all ${isSelected
-                                        ? 'bg-[var(--color-accent)] border-[var(--color-accent)] text-zinc-950 shadow-md'
-                                        : 'border-white/20 bg-white/5'
+                                      className={`h-5 w-5 rounded-full flex items-center justify-center border transition-all ${isSelected
+                                          ? 'bg-[var(--color-primary)] border-[var(--color-primary)] text-[var(--color-on-primary)] shadow-sm'
+                                          : 'border-[var(--color-border-strong)] bg-[var(--color-surface)]'
                                         }`}
                                     >
-                                      {isSelected ? (
-                                        <Check size={14} strokeWidth={3} />
-                                      ) : (
-                                        <span className="h-2 w-2 rounded-full bg-white/40" />
-                                      )}
+                                      {isSelected && <Check size={12} strokeWidth={3} />}
                                     </div>
                                   </div>
                                 </div>
 
-                                {/* Middle Row: Address & Location */}
-                                {branchLoc && (
-                                  <div className="flex items-start gap-2 mt-2 pt-2 border-t border-white/[0.08] text-xs text-zinc-400">
-                                    <MapPin size={13} className="text-[var(--color-accent)] flex-shrink-0 mt-0.5" />
-                                    <span className="leading-relaxed break-words flex-1">
-                                      {branchLoc}
-                                    </span>
+                                {(mapsUrl || (typeof branchPhone === 'string' && branchPhone.trim())) && (
+                                  <div className="flex items-center gap-2 mt-2.5 pt-2 border-t border-[var(--color-border)]/40">
+                                    {mapsUrl && (
+                                      <a
+                                        href={mapsUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        onClick={(e) => e.stopPropagation()}
+                                        className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-[var(--color-surface)] hover:bg-[var(--color-primary)]/10 text-[var(--color-primary)] border border-[var(--color-border)]/80 transition-colors cursor-pointer"
+                                      >
+                                        <Navigation size={11} />
+                                        <span>{t('header.directionsAndMap')}</span>
+                                      </a>
+                                    )}
+                                    {typeof branchPhone === 'string' && branchPhone.trim() && (
+                                      <a
+                                        href={`tel:${branchPhone.trim()}`}
+                                        onClick={(e) => e.stopPropagation()}
+                                        className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-[var(--color-surface)] hover:bg-[var(--color-primary)]/10 text-[var(--color-primary)] border border-[var(--color-border)]/80 transition-colors cursor-pointer"
+                                        dir="ltr"
+                                      >
+                                        <Phone size={11} />
+                                        <span>{branchPhone.trim()}</span>
+                                      </a>
+                                    )}
                                   </div>
                                 )}
-
-                                {/* Bottom Action Row: Directions & Map Link + Phone */}
-                                <div className="flex flex-wrap items-center justify-between gap-2 mt-2.5 pt-2 border-t border-white/[0.08]">
-                                  {mapsUrl ? (
-                                    <a
-                                      href={mapsUrl}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      onClick={(e) => e.stopPropagation()}
-                                      className="inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-[var(--color-accent)] border border-white/[0.08] transition-colors shadow-sm cursor-pointer"
-                                    >
-                                      <Navigation size={12} className="flex-shrink-0" />
-                                      <span>{t('header.directionsAndMap')}</span>
-                                      <ExternalLink size={10} className="opacity-70 flex-shrink-0" />
-                                    </a>
-                                  ) : (
-                                    <span />
-                                  )}
-
-                                  {typeof branchPhone === 'string' && branchPhone.trim() && (
-                                    <a
-                                      href={`tel:${branchPhone.trim()}`}
-                                      onClick={(e) => e.stopPropagation()}
-                                      className="inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-zinc-200 border border-white/[0.08] transition-colors shadow-sm cursor-pointer"
-                                      dir="ltr"
-                                    >
-                                      <Phone size={12} className="text-emerald-400 flex-shrink-0" />
-                                      <span>{branchPhone.trim()}</span>
-                                    </a>
-                                  )}
-                                </div>
                               </div>
                             );
                           })}
@@ -1185,118 +1182,120 @@ export const Header = memo(function Header() {
                     setShowHoursPopup(false);
                     setShowBranchesPopup(false);
                   }}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl backdrop-blur-2xl border text-white font-bold transition-all cursor-pointer shadow-sm group ${showSocialPopup
-                    ? 'bg-white/25 border-[var(--color-accent)] ring-1 ring-[var(--color-accent)]/50'
-                    : 'bg-white/15 hover:bg-white/25 border-white/25'
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl backdrop-blur-xl border font-bold transition-all duration-200 cursor-pointer shadow-sm active:scale-95 group ${showSocialPopup
+                    ? 'bg-white/20 text-white border-[var(--color-primary)] ring-2 ring-[var(--color-primary)]/40 shadow-md'
+                    : 'bg-white/10 hover:bg-white/15 text-white/95 border-white/20 hover:border-white/35'
                     }`}
                   aria-expanded={showSocialPopup}
                   aria-haspopup="dialog"
                   aria-label={t('header.socialChannels')}
                   title={t('header.socialChannels')}
                 >
-                  <AtSign size={13} className="text-[var(--color-accent)] group-hover:scale-110 transition-transform flex-shrink-0" />
+                  <AtSign size={13} className="text-[var(--color-primary)] group-hover:scale-110 transition-transform flex-shrink-0" />
                   <span className="hidden xs:inline text-xs">
                     {t('header.socials')}
                   </span>
                 </button>
 
-                {/* ─── DESKTOP DROPDOWN (Anchored under trigger on sm: and up) ─── */}
+                {/* ─── DESKTOP DROPDOWN: SOCIAL MEDIA & SHARE ─── */}
                 {showSocialPopup && (
                   <div
                     className={`
-                      hidden sm:block absolute top-full mt-2.5 z-50 max-h-[580px] w-[380px] md:w-[420px] overflow-y-auto overscroll-contain touch-pan-y
-                      rounded-3xl bg-zinc-950/98 border border-white/[0.12]
-                      p-5 shadow-[0_20px_50px_rgba(0,0,0,0.6)]
-                      text-white animate-popup-dropdown
+                      hidden sm:block absolute top-full mt-2.5 z-50 max-h-[580px] w-[370px] md:w-[400px] overflow-y-auto overscroll-contain touch-pan-y custom-scrollbar
+                      rounded-3xl bg-[var(--color-surface)]/95 dark:bg-[var(--color-surface)]/95
+                      backdrop-blur-2xl border border-[var(--color-border)]/90 dark:border-white/[0.12]
+                      p-5 sm:p-6 shadow-[0_24px_60px_-12px_rgba(0,0,0,0.25),0_0_0_1px_rgba(0,0,0,0.05)]
+                      dark:shadow-[0_25px_65px_-12px_rgba(0,0,0,0.7),0_0_0_1px_rgba(255,255,255,0.08)]
+                      text-[var(--color-text-primary)] animate-popup-dropdown
                       ${isRTL ? 'right-0 left-auto' : 'left-0 right-auto'}
                     `}
                   >
+                    <div
+                      className="absolute inset-x-0 top-0 h-[2.5px] rounded-t-3xl pointer-events-none"
+                      style={{ background: 'var(--gradient-primary)' }}
+                    />
+
                     {/* Header */}
-                    <div className="flex items-center justify-between pb-3.5 mb-3.5 border-b border-white/[0.08]">
+                    <div className="flex items-center justify-between pb-3.5 mb-3.5 border-b border-[var(--color-border)]/60">
                       <div className="flex items-center gap-2.5">
-                        <div className="h-9 w-9 rounded-xl bg-[var(--color-accent)]/15 border border-[var(--color-accent)]/30 flex items-center justify-center text-[var(--color-accent)] shadow-sm">
-                          <AtSign size={16} />
+                        <div className="h-9 w-9 rounded-xl bg-[var(--color-primary)]/15 border border-[var(--color-primary)]/30 flex items-center justify-center text-[var(--color-primary)] shadow-sm">
+                          <AtSign size={17} />
                         </div>
                         <div>
-                          <h3 className="text-sm font-bold tracking-tight text-zinc-100">
+                          <h3 className="text-sm font-bold tracking-tight text-[var(--color-text-primary)]">
                             {t('header.socialChannels')}
                           </h3>
-                          <p className="text-[11px] text-zinc-400 font-medium truncate max-w-[200px]">
+                          <p className="text-[11px] text-[var(--color-text-secondary)] font-medium truncate max-w-[200px]">
                             {brandName}
                           </p>
                         </div>
                       </div>
                       <button
                         onClick={() => setShowSocialPopup(false)}
-                        className="h-7 w-7 rounded-full bg-white/10 hover:bg-white/15 active:scale-90 flex items-center justify-center text-zinc-300 hover:text-white transition-all cursor-pointer"
+                        className="h-7 w-7 rounded-full bg-[var(--color-surface-subtle)] hover:bg-[var(--color-surface-elevated)] border border-[var(--color-border)]/60 active:scale-90 flex items-center justify-center text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-all cursor-pointer"
                         aria-label={t('header.close')}
                       >
                         <X size={14} />
                       </button>
                     </div>
 
-                    {/* Direct Phone Call Button */}
+                    {/* Direct Phone Call Row (SINGLE, CLEAN, UNIFIED ACTION - NO DUPLICATE ICONS) */}
                     {phone && (
-                      <div className="mb-3 p-3 rounded-2xl bg-white/[0.04] border border-white/[0.08]">
-                        <div className="text-[11px] font-bold text-zinc-300 mb-2 flex items-center justify-between">
-                          <span className="flex items-center gap-1.5 text-zinc-200">
-                            <Phone size={12} className="text-[var(--color-accent)]" />
-                            <span>{t('header.directPhoneCall')}</span>
-                          </span>
-                          <span className="text-[10px] text-zinc-400 font-medium">
-                            {t('header.directOrders')}
-                          </span>
-                        </div>
-                        <a
-                          href={`tel:${phone.trim()}`}
-                          className="flex items-center justify-between p-2.5 px-3 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] hover:border-[var(--color-accent)]/40 text-white font-bold text-xs transition-all shadow-sm group cursor-pointer"
-                        >
-                          <div className="flex items-center gap-2.5 min-w-0">
-                            <div className="p-1.5 rounded-lg bg-[var(--color-accent)]/15 text-[var(--color-accent)] group-hover:scale-105 transition-transform flex-shrink-0">
-                              <Phone size={13} />
-                            </div>
-                            <span dir="ltr" className="font-mono text-xs sm:text-sm tracking-wide font-bold text-zinc-100 group-hover:text-white truncate">
+                      <a
+                        href={`tel:${phone.trim()}`}
+                        className="mb-3.5 flex items-center justify-between p-2.5 px-3 rounded-2xl bg-[var(--color-surface-subtle)]/70 hover:bg-[var(--color-surface-subtle)] border border-[var(--color-border)]/80 hover:border-[var(--color-primary)]/40 transition-all shadow-sm group cursor-pointer"
+                      >
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <div className="w-8 h-8 rounded-xl bg-[var(--color-primary)]/15 text-[var(--color-primary)] flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+                            <Phone size={14} />
+                          </div>
+                          <div className="min-w-0">
+                            <span className="text-[10px] font-medium text-[var(--color-text-muted)] block">
+                              {t('header.directPhoneCall')}
+                            </span>
+                            <span dir="ltr" className="font-mono text-xs font-bold text-[var(--color-text-primary)] block truncate">
                               {phone.trim()}
                             </span>
                           </div>
-                          <span className="text-[11px] px-2.5 py-1 rounded-lg bg-[var(--color-accent)] text-zinc-950 font-bold group-hover:brightness-105 transition-all flex-shrink-0">
-                            {t('header.callNow')}
-                          </span>
-                        </a>
-                      </div>
+                        </div>
+                        <span className="text-[11px] px-2.5 py-1 rounded-lg bg-[var(--color-primary)]/15 hover:bg-[var(--color-primary)]/25 text-[var(--color-primary)] font-bold border border-[var(--color-primary)]/30 flex-shrink-0 transition-colors">
+                          {t('header.callNow')}
+                        </span>
+                      </a>
                     )}
 
-                    {/* Quick Link Copy Section */}
-                    <div className="mb-3 p-3 rounded-2xl bg-white/[0.04] border border-white/[0.08]">
-                      <div className="text-[11px] font-bold text-zinc-300 mb-2 flex items-center justify-between">
+                    {/* Digital Menu Link Share (CLEAN INTEGRATED INPUT GROUP) */}
+                    <div className="mb-3.5">
+                      <div className="text-[11px] font-bold text-[var(--color-text-secondary)] mb-1.5 flex items-center justify-between px-0.5">
                         <span>{t('header.digitalMenuLink')}</span>
                         {copiedLink && (
-                          <span className="text-[10px] font-bold text-[var(--color-accent)] flex items-center gap-1 animate-pulse">
+                          <span className="text-[10px] font-bold text-[var(--color-primary)] flex items-center gap-1 animate-pulse">
                             <Check size={11} />
                             {t('header.copiedToClipboard')}
                           </span>
                         )}
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1 p-1 rounded-xl bg-[var(--color-surface-subtle)]/70 border border-[var(--color-border)]/80 focus-within:border-[var(--color-primary)]/60 focus-within:ring-2 focus-within:ring-[var(--color-primary)]/15 transition-all">
                         <input
                           type="text"
                           readOnly
                           value={typeof window !== 'undefined' ? window.location.href : ''}
-                          className="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-xl px-2.5 py-1.5 text-xs text-zinc-300 select-all focus:outline-none focus:border-[var(--color-accent)]/50"
+                          className="flex-1 bg-transparent px-2.5 py-1 text-xs text-[var(--color-text-secondary)] select-all focus:outline-none"
                         />
                         <button
+                          type="button"
                           onClick={handleCopyLink}
-                          className="px-3 py-1.5 rounded-xl bg-[var(--color-primary)] hover:brightness-110 active:scale-95 text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-sm cursor-pointer flex-shrink-0"
+                          className="px-3 py-1 rounded-lg bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] active:scale-95 text-[var(--color-on-primary)] font-bold text-xs flex items-center gap-1.5 transition-all shadow-sm cursor-pointer flex-shrink-0"
                         >
-                          {copiedLink ? <Check size={13} /> : <Copy size={13} />}
+                          {copiedLink ? <Check size={12} /> : <Copy size={12} />}
                           <span>{copiedLink ? t('header.copied') : t('header.copy')}</span>
                         </button>
                       </div>
                     </div>
 
                     {/* Social Media Channels Grid */}
-                    <div className="space-y-2">
-                      <div className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 px-1 mb-2">
+                    <div className="space-y-1.5">
+                      <div className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-muted)] px-0.5">
                         {t('header.socialChannelsList')}
                       </div>
 
@@ -1304,34 +1303,38 @@ export const Header = memo(function Header() {
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                           {socialList.map((item) => {
                             const IconComponent = item.icon;
+                            const brandStyle = getSocialBrandStyle(item.id);
                             return (
                               <a
                                 key={item.id}
                                 href={item.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex items-center justify-between p-2.5 rounded-2xl border border-white/[0.08] bg-white/[0.04] hover:bg-white/[0.08] hover:border-[var(--color-accent)]/40 transition-all duration-200 group cursor-pointer shadow-sm"
+                                className="flex items-center justify-between p-2.5 rounded-2xl border border-[var(--color-border)]/80 bg-[var(--color-surface-subtle)]/60 hover:bg-[var(--color-surface)] hover:border-[var(--color-primary)]/50 transition-all duration-200 group cursor-pointer shadow-sm"
                               >
                                 <div className="flex items-center gap-2.5 min-w-0">
-                                  <div className="p-2 rounded-xl bg-white/[0.06] group-hover:bg-white/[0.1] text-zinc-300 group-hover:text-white transition-all flex-shrink-0">
-                                    <IconComponent size={15} />
+                                  <div
+                                    className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-200 group-hover:scale-105 shadow-sm border ${brandStyle.iconBg || ''}`}
+                                    style={brandStyle.style}
+                                  >
+                                    <IconComponent size={15} color={brandStyle.iconColor} />
                                   </div>
                                   <div className="min-w-0">
-                                    <span className="font-bold text-xs text-zinc-200 group-hover:text-white block truncate">
+                                    <span className="font-bold text-xs text-[var(--color-text-primary)] group-hover:text-[var(--color-primary)] block truncate transition-colors">
                                       {item.name}
                                     </span>
-                                    <span className="text-[10px] text-zinc-400 block truncate">
+                                    <span className="text-[10px] text-[var(--color-text-muted)] block truncate">
                                       {item.badgeText}
                                     </span>
                                   </div>
                                 </div>
-                                <ExternalLink size={12} className="text-zinc-500 group-hover:text-zinc-300 transition-colors flex-shrink-0 ms-1" />
+                                <ExternalLink size={12} className="text-[var(--color-text-muted)] group-hover:text-[var(--color-primary)] transition-colors flex-shrink-0 ms-1" />
                               </a>
                             );
                           })}
                         </div>
                       ) : (
-                        <div className="p-4 rounded-2xl bg-white/[0.04] border border-white/[0.08] text-center text-xs text-zinc-400">
+                        <div className="p-3 rounded-xl bg-[var(--color-surface-subtle)] border border-[var(--color-border)]/60 text-center text-xs text-[var(--color-text-muted)]">
                           {t('header.shareHint')}
                         </div>
                       )}
@@ -1339,112 +1342,104 @@ export const Header = memo(function Header() {
                   </div>
                 )}
 
-                {/* ─── MOBILE FULL-SCREEN MODAL PORTAL (Covers 100% viewport) ─── */}
+                {/* ─── MOBILE MODAL PORTAL: SOCIAL MEDIA & SHARE ─── */}
                 {mounted && showSocialPopup && createPortal(
                   <div className="fixed inset-0 z-[998] sm:hidden">
-                    {/* Full Page Mobile Backdrop */}
                     <button
                       type="button"
                       aria-label={t('header.close')}
-                      className="fixed inset-0 bg-black/75 animate-popup-backdrop w-full h-full cursor-default border-none outline-none touch-none"
+                      className="fixed inset-0 bg-black/60 backdrop-blur-sm animate-popup-backdrop w-full h-full cursor-default border-none outline-none touch-none"
                       onClick={() => setShowSocialPopup(false)}
                       onTouchMove={(e) => e.preventDefault()}
                     />
 
-                    {/* Mobile Bottom Sheet Card */}
                     <div
-                      className="fixed inset-x-0 bottom-0 z-[999] max-h-[85dvh] overflow-y-auto overscroll-contain touch-pan-y rounded-t-3xl bg-zinc-950 border-t border-white/[0.12] p-5 pb-8 shadow-2xl text-white animate-popup-sheet"
+                      className="fixed inset-x-0 bottom-0 z-[999] max-h-[85dvh] overflow-y-auto overscroll-contain touch-pan-y rounded-t-[2rem] bg-[var(--color-surface)] dark:bg-[var(--color-surface)] border-t border-[var(--color-border)] dark:border-white/[0.12] p-5 pb-9 shadow-2xl text-[var(--color-text-primary)] animate-popup-sheet custom-scrollbar"
                       role="dialog"
                       aria-modal="true"
                     >
-                      <div className="w-10 h-1 bg-white/20 rounded-full mx-auto mb-3" />
+                      <div className="w-12 h-1.5 bg-[var(--color-border-strong)] rounded-full mx-auto mb-4 opacity-50" />
 
-                      {/* Header */}
-                      <div className="flex items-center justify-between pb-3.5 mb-3.5 border-b border-white/[0.08]">
+                      <div className="flex items-center justify-between pb-3.5 mb-3.5 border-b border-[var(--color-border)]/60">
                         <div className="flex items-center gap-2.5">
-                          <div className="h-9 w-9 rounded-xl bg-[var(--color-accent)]/15 border border-[var(--color-accent)]/30 flex items-center justify-center text-[var(--color-accent)] shadow-sm">
-                            <AtSign size={16} />
+                          <div className="h-9 w-9 rounded-xl bg-[var(--color-primary)]/15 border border-[var(--color-primary)]/30 flex items-center justify-center text-[var(--color-primary)] shadow-sm">
+                            <AtSign size={17} />
                           </div>
                           <div>
-                            <h3 className="text-sm font-bold tracking-tight text-zinc-100">
+                            <h3 className="text-sm font-bold tracking-tight text-[var(--color-text-primary)]">
                               {t('header.socialChannels')}
                             </h3>
-                            <p className="text-[11px] text-zinc-400 font-medium truncate max-w-[200px]">
+                            <p className="text-[11px] text-[var(--color-text-secondary)] font-medium truncate max-w-[200px]">
                               {brandName}
                             </p>
                           </div>
                         </div>
                         <button
                           onClick={() => setShowSocialPopup(false)}
-                          className="h-7 w-7 rounded-full bg-white/10 hover:bg-white/15 active:scale-90 flex items-center justify-center text-zinc-300 hover:text-white transition-all cursor-pointer"
+                          className="h-7 w-7 rounded-full bg-[var(--color-surface-subtle)] hover:bg-[var(--color-surface-elevated)] border border-[var(--color-border)]/60 active:scale-90 flex items-center justify-center text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-all cursor-pointer"
                           aria-label={t('header.close')}
                         >
                           <X size={14} />
                         </button>
                       </div>
 
-                      {/* Direct Phone Call Button */}
+                      {/* Direct Phone Call Row */}
                       {phone && (
-                        <div className="mb-3 p-3 rounded-2xl bg-white/[0.04] border border-white/[0.08]">
-                          <div className="text-[11px] font-bold text-zinc-300 mb-2 flex items-center justify-between">
-                            <span className="flex items-center gap-1.5 text-zinc-200">
-                              <Phone size={12} className="text-[var(--color-accent)]" />
-                              <span>{t('header.directPhoneCall')}</span>
-                            </span>
-                            <span className="text-[10px] text-zinc-400 font-medium">
-                              {t('header.directOrders')}
-                            </span>
-                          </div>
-                          <a
-                            href={`tel:${phone.trim()}`}
-                            className="flex items-center justify-between p-2.5 px-3 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] hover:border-[var(--color-accent)]/40 text-white font-bold text-xs transition-all shadow-sm group cursor-pointer"
-                          >
-                            <div className="flex items-center gap-2.5 min-w-0">
-                              <div className="p-1.5 rounded-lg bg-[var(--color-accent)]/15 text-[var(--color-accent)] group-hover:scale-105 transition-transform flex-shrink-0">
-                                <Phone size={13} />
-                              </div>
-                              <span dir="ltr" className="font-mono text-xs sm:text-sm tracking-wide font-bold text-zinc-100 group-hover:text-white truncate">
+                        <a
+                          href={`tel:${phone.trim()}`}
+                          className="mb-3.5 flex items-center justify-between p-2.5 px-3 rounded-2xl bg-[var(--color-surface-subtle)]/70 hover:bg-[var(--color-surface-subtle)] border border-[var(--color-border)]/80 hover:border-[var(--color-primary)]/40 transition-all shadow-sm group cursor-pointer"
+                        >
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <div className="w-8 h-8 rounded-xl bg-[var(--color-primary)]/15 text-[var(--color-primary)] flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+                              <Phone size={14} />
+                            </div>
+                            <div className="min-w-0">
+                              <span className="text-[10px] font-medium text-[var(--color-text-muted)] block">
+                                {t('header.directPhoneCall')}
+                              </span>
+                              <span dir="ltr" className="font-mono text-xs font-bold text-[var(--color-text-primary)] block truncate">
                                 {phone.trim()}
                               </span>
                             </div>
-                            <span className="text-[11px] px-2.5 py-1 rounded-lg bg-[var(--color-accent)] text-zinc-950 font-bold group-hover:brightness-105 transition-all flex-shrink-0">
-                              {t('header.callNow')}
-                            </span>
-                          </a>
-                        </div>
+                          </div>
+                          <span className="text-[11px] px-2.5 py-1 rounded-lg bg-[var(--color-primary)]/15 hover:bg-[var(--color-primary)]/25 text-[var(--color-primary)] font-bold border border-[var(--color-primary)]/30 flex-shrink-0 transition-colors">
+                            {t('header.callNow')}
+                          </span>
+                        </a>
                       )}
 
-                      {/* Quick Link Copy Section */}
-                      <div className="mb-3 p-3 rounded-2xl bg-white/[0.04] border border-white/[0.08]">
-                        <div className="text-[11px] font-bold text-zinc-300 mb-2 flex items-center justify-between">
+                      {/* Digital Menu Link Share */}
+                      <div className="mb-3.5">
+                        <div className="text-[11px] font-bold text-[var(--color-text-secondary)] mb-1.5 flex items-center justify-between px-0.5">
                           <span>{t('header.digitalMenuLink')}</span>
                           {copiedLink && (
-                            <span className="text-[10px] font-bold text-[var(--color-accent)] flex items-center gap-1 animate-pulse">
+                            <span className="text-[10px] font-bold text-[var(--color-primary)] flex items-center gap-1 animate-pulse">
                               <Check size={11} />
                               {t('header.copiedToClipboard')}
                             </span>
                           )}
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1 p-1 rounded-xl bg-[var(--color-surface-subtle)]/70 border border-[var(--color-border)]/80 focus-within:border-[var(--color-primary)]/60 focus-within:ring-2 focus-within:ring-[var(--color-primary)]/15 transition-all">
                           <input
                             type="text"
                             readOnly
                             value={typeof window !== 'undefined' ? window.location.href : ''}
-                            className="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-xl px-2.5 py-1.5 text-xs text-zinc-300 select-all focus:outline-none focus:border-[var(--color-accent)]/50"
+                            className="flex-1 bg-transparent px-2.5 py-1 text-xs text-[var(--color-text-secondary)] select-all focus:outline-none"
                           />
                           <button
+                            type="button"
                             onClick={handleCopyLink}
-                            className="px-3 py-1.5 rounded-xl bg-[var(--color-primary)] hover:brightness-110 active:scale-95 text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-sm cursor-pointer flex-shrink-0"
+                            className="px-3 py-1 rounded-lg bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] active:scale-95 text-[var(--color-on-primary)] font-bold text-xs flex items-center gap-1.5 transition-all shadow-sm cursor-pointer flex-shrink-0"
                           >
-                            {copiedLink ? <Check size={13} /> : <Copy size={13} />}
+                            {copiedLink ? <Check size={12} /> : <Copy size={12} />}
                             <span>{copiedLink ? t('header.copied') : t('header.copy')}</span>
                           </button>
                         </div>
                       </div>
 
                       {/* Social Media Channels Grid */}
-                      <div className="space-y-2">
-                        <div className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 px-1 mb-2">
+                      <div className="space-y-1.5">
+                        <div className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-muted)] px-0.5">
                           {t('header.socialChannelsList')}
                         </div>
 
@@ -1452,34 +1447,38 @@ export const Header = memo(function Header() {
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                             {socialList.map((item) => {
                               const IconComponent = item.icon;
+                              const brandStyle = getSocialBrandStyle(item.id);
                               return (
                                 <a
                                   key={item.id}
                                   href={item.url}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="flex items-center justify-between p-2.5 rounded-2xl border border-white/[0.08] bg-white/[0.04] hover:bg-white/[0.08] hover:border-[var(--color-accent)]/40 transition-all duration-200 group cursor-pointer shadow-sm"
+                                  className="flex items-center justify-between p-2.5 rounded-2xl border border-[var(--color-border)]/80 bg-[var(--color-surface-subtle)]/60 hover:bg-[var(--color-surface)] hover:border-[var(--color-primary)]/50 transition-all duration-200 group cursor-pointer shadow-sm"
                                 >
                                   <div className="flex items-center gap-2.5 min-w-0">
-                                    <div className="p-2 rounded-xl bg-white/[0.06] group-hover:bg-white/[0.1] text-zinc-300 group-hover:text-white transition-all flex-shrink-0">
-                                      <IconComponent size={15} />
+                                    <div
+                                      className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-200 group-hover:scale-105 shadow-sm border ${brandStyle.iconBg || ''}`}
+                                      style={brandStyle.style}
+                                    >
+                                      <IconComponent size={15} color={brandStyle.iconColor} />
                                     </div>
                                     <div className="min-w-0">
-                                      <span className="font-bold text-xs text-zinc-200 group-hover:text-white block truncate">
+                                      <span className="font-bold text-xs text-[var(--color-text-primary)] group-hover:text-[var(--color-primary)] block truncate transition-colors">
                                         {item.name}
                                       </span>
-                                      <span className="text-[10px] text-zinc-400 block truncate">
+                                      <span className="text-[10px] text-[var(--color-text-muted)] block truncate">
                                         {item.badgeText}
                                       </span>
                                     </div>
                                   </div>
-                                  <ExternalLink size={12} className="text-zinc-500 group-hover:text-zinc-300 transition-colors flex-shrink-0 ms-1" />
+                                  <ExternalLink size={12} className="text-[var(--color-text-muted)] group-hover:text-[var(--color-primary)] transition-colors flex-shrink-0 ms-1" />
                                 </a>
                               );
                             })}
                           </div>
                         ) : (
-                          <div className="p-4 rounded-2xl bg-white/[0.04] border border-white/[0.08] text-center text-xs text-zinc-400">
+                          <div className="p-3 rounded-xl bg-[var(--color-surface-subtle)] border border-[var(--color-border)]/60 text-center text-xs text-[var(--color-text-muted)]">
                             {t('header.shareHint')}
                           </div>
                         )}
